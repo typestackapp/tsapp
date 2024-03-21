@@ -1,0 +1,10 @@
+{
+    "packages": {
+        "@typestackapp/core": {
+            "next": { "alias": { "router": null, "admin": "core" } },
+            "express": { "alias": "core" },
+            "graphql": { "alias": null },
+            "docker": { "alias": "tsapp" }
+        }
+    }
+}

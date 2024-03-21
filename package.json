@@ -1,0 +1,6 @@
+{
+  "name": "@typestackapp/main",
+  "workspaces": [
+    "packages/*"
+  ]
+}
