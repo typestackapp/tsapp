@@ -3,6 +3,7 @@
 !example.env
 compose.*
 logs/*
+packages/*
 
 # JAVA projects
 HELP.md
