@@ -1,0 +1,20 @@
+version: '3.3'
+services:
+  haproxy:
+    mem_limit: 3g
+    image: haproxy:2.6.6
+    restart: always
+    user: root
+    environment:
+      - CERTBOT_RESTART_TIME=${CERTBOT_RESTART_TIME}
+      - SERVER_DOMAIN_NAME=${SERVER_DOMAIN_NAME}
+    networks:
+      default_network:
+        ipv4_address: ${IP_PROXY}
+    volumes:
+      - ../packages/${ALIAS}/codegen/haproxy/proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ../packages/${ALIAS}/logs/haproxy/:/var/log/
+      - ../packages/${ALIAS}/apps/haproxy/ssl/:/home/ssl/
+      - ../packages/${ALIAS}/bin/haproxy.sh:/home/scripts/haproxy.sh
+    entrypoint: /home/scripts/haproxy.sh
+    ports: ${PORT_PROXY}

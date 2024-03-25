@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  tsapp:
+    image: node:18
+    restart: always
+    env_file:
+      - ${TSAPP_ENV_FILE}
+    networks:
+      default_network:
+        ipv4_address: ${IP_TSAPP}
+    volumes:
+      - ../:/tsapp/
+    ports:
+      - "${PORT_TSAPP_NEXT}:80"       # HTTP NEXT
+      - "${PORT_TSAPP_API}:8000"      # HTTP API
+      - "${PORT_TSAPP_GRAPHQL}:8002"  # HTTP GRAPHQL
+    entrypoint: /tsapp/packages/${ALIAS}/bin/node.sh

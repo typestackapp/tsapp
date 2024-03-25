@@ -1,0 +1,11 @@
+/**/*.js
+/**/*.map
+!compose.*
+logs
+apps
+codegen/tsapp.json
+codegen/config
+codegen/haproxy
+configs/output
+configs/mod
+node_modules

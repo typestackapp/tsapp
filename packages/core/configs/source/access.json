@@ -1,0 +1,138 @@
+{
+    "ACTIVE": {
+        "Auth": {
+            "use": {
+                "info": [ "Handle Authentification via trpc" ]
+            },
+            "app": {
+                "info": [ "Returns app data" ],
+                "auth": { "tokens": ["Bearer"] }
+            },
+            "grant": {
+                "info": [
+                    "User grants access to external app",
+                    "User is redirected to external apps callback",
+                    "External app can retreive token by using tokenAuthorizationCode"
+                ],
+                "auth": { "tokens": ["Bearer"] }
+            },
+            "authorize": {
+                "info": [
+                    "Authorize external app to access user data",
+                    "User is redirected to external apps callback",
+                    "External app can retreive token by using tokenAuthorizationCode"
+                ],
+                "auth": { "tokens": ["Bearer"] }
+            },
+            "callback": {
+                "info": [
+                    "User is redirected to this endpoint to add new token to user tokens",
+                    "Token can be added from internal app or external app",
+                    "Token retrival is handled by auth client"
+                ],
+                "auth": { "tokens": ["Bearer"] }
+            },
+            "revoke": {
+                "info": [ 
+                    "User can revoke session token by providing Authorization Bearer header",
+                    "User can revoke external app token by providing Authorization Bearer header and token_id"
+                ],
+                "auth": { "tokens": ["Bearer"] }
+            },
+            "tokenPassword": {
+                "info": [
+                    "User can retreive new token by providing Basic auth",
+                    "Header should be set liek this Authorization: Basic base64(email:psw)"
+                ],
+                "auth": { "tokens": ["Basic"] }
+            },
+            "tokenSession": {
+                "info": [ "For user return new refresh and access token from session cookie" ]
+            },
+            "tokenAuthorizationCode": {
+                "info": [ "For external app grant user token by providing app secret id and token id(code)" ]
+            },
+            "tokenRefreshToken": {
+                "info": [ "For external app grant new toke" ]
+            }
+        },
+        "User": {
+            "accountApp": {
+                "next": {
+                    "import": "@typestackapp/core/components/user/account",
+                    "title": "Account",
+                    "group": "User",
+                    "list": "grow"
+                }
+            },
+            "getCurrentUser": {
+                "info": [ "Allows user to get current token holder user data" ],
+                "auth": { "tokens": ["Bearer"], "permission": "Read" }
+            },
+            "getUser": {
+                "info": [ "Allows user to get any user data by providing user id" ],
+                "auth": { "tokens": ["Bearer"], "permission": "Read" }
+            },
+            "getUserRole": {
+                "info": [ "Allows user to get users role" ],
+                "auth": { "tokens": ["Bearer"], "permission": "Read" }
+            }
+        },
+        "UserApiKey": {},
+        "UserBearerKey": {},
+        "UserInformation": {},
+        "Config": {
+            "searchConfigs": {
+                "info": [ "Allows user to search for configs with Read permission" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
+                "type": { "mongoose": "@typestackapp/core/models/config" }
+            },
+            "getConfig": {
+                "info": [ "Allows user to get config with Read permission by providing config id" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
+                "type": { "mongoose": "@typestackapp/core/models/config" }
+            }
+        },
+        "Job": {
+            "searchJobs": {
+                "info": [ "Allows user to search for jobs with Read permission" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
+                "type": { "mongoose": "@typestackapp/core/models/job" }
+            },
+            "getJob": {
+                "info": [ "Allows user to read job with Read permission by providing job id" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
+                "type": { "mongoose": "@typestackapp/core/models/job" }
+            },
+            "createJob":{
+                "info": [ "Allows user to create new job with Write permission" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Write" },
+                "type": { "mongoose": "@typestackapp/core/models/job" }
+            },
+            "updateJob": {
+                "info": [ "Allows user to update job with Update permission" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Update" },
+                "type": { "mongoose": "@typestackapp/core/models/job" }
+            },
+            "deleteJob": {
+                "info": [ "Allows user to delete job with Delete permission" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Delete" },
+                "type": { "mongoose": "@typestackapp/core/models/job" }
+            }
+        },
+        "MessagingCampaign": {
+            "createMessagingCampaignJob": {
+                "info": [ "Allows user to create new MessagingCampaign job via EXPRESS API" ],
+                "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Write" }
+            }
+        },
+        "Country": {
+            "getCountry": {},
+            "searchCountry": {},
+            "searchTimezone": {}
+        },
+        "Test": {
+            "getPing": {}
+        }
+    }
+}

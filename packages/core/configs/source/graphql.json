@@ -1,0 +1,16 @@
+{
+    "ACTIVE": {
+        "system": {
+            "isServer": true,
+            "isPublic": false,
+            "modules": [
+                "@typestackapp/core/graphql/"
+            ],
+            "documents": [
+                "@typestackapp/core/graphql/**/*.{ts,tsx}",
+                "@typestackapp/core/components/**/*.{ts,tsx}",
+                "@typestackapp/core/next/app/**/*.{ts,tsx}"
+            ]
+        }
+    }
+}

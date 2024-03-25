@@ -1,0 +1,25 @@
+version: '3.3'
+services:
+  certbot:
+    image: certbot/certbot:latest
+    restart: always
+    environment:
+      - SERVER_DOMAIN_NAME=${SERVER_DOMAIN_NAME}
+      - CERTBOT_SELFSIGNED=${CERTBOT_SELFSIGNED}
+      - CERTBOT_EXTRA_DOMAIN_NAMES=${CERTBOT_EXTRA_DOMAIN_NAMES}
+      - CERTBOT_RESTART_TIME=${CERTBOT_RESTART_TIME}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    networks:
+      default_network:
+        ipv4_address: ${IP_CERTBOT}
+    volumes:
+      - ../packages/${ALIAS}/configs/proxy/certbot.conf:/etc/nginx/nginx.conf
+      - ../packages/${ALIAS}/bin/certbot.sh:/home/scripts/certbot.sh
+      - ../packages/${ALIAS}/apps/proxy/wk/:/var/www/wk/
+      - ../packages/${ALIAS}/apps/proxy/ssl/:/home/ssl/
+      - ../packages/${ALIAS}/logs/proxy/:/etc/nginx/logs/
+      - ../packages/${ALIAS}/logs/certbot/:/var/log/letsencrypt/
+      - ../packages/${ALIAS}/apps/certbot/:/etc/letsencrypt/
+    entrypoint: /home/scripts/certbot.sh
+    ports:
+      - "${PORT_CERTBOT}:80" # CERTBOT HTTP

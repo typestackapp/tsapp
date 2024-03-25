@@ -1,0 +1,8 @@
+{
+    "DEV_SEND_EMAIL": [],
+    "DEV_SEND_SMS": [],
+    "DEV_SEND_MESSAGES_TO_DEV" : false,
+    "DEV_CLEAN_LOGS" : false,
+    "SEND_EMAILS" : true,
+    "SEND_SMS" : true
+}

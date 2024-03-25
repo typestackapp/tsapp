@@ -1,0 +1,11 @@
+version: '3.3'
+networks:
+  default_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${DEFAULT_NETWORK_SUBNET}
+volumes:
+  mongo-db:
+  rabbitmq:
