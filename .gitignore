@@ -6,6 +6,7 @@ logs/*
 packages/*
 package-lock.json
 !packages/core
+!packages/cli
 
 # JAVA projects
 HELP.md
