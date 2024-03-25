@@ -1,6 +1,14 @@
 {
   "name": "@typestackapp/main",
-  "workspaces": [
-    "packages/*"
-  ]
+  "version": "0.0.4",
+  "workspaces": ["packages/*"],
+  "tsapp": {
+    "packages": {
+      "@typestackapp/core": {
+        "alias": "core",
+        "haproxy": { "rewrite": true },
+        "disable_next_alias": true
+      }
+    }
+  }
 }

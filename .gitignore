@@ -4,6 +4,7 @@
 compose.*
 logs/*
 packages/*
+package-lock.json
 
 # JAVA projects
 HELP.md
