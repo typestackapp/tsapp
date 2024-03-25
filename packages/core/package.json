@@ -15,12 +15,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/typestackapp/core.git"
+    "url": "git+https://github.com/typestackapp/main.git"
   },
   "bugs": {
-    "url": "https://github.com/typestackapp/core/issues"
+    "url": "https://github.com/typestackapp/main/issues"
   },
-  "homepage": "https://github.com/typestackapp/core#readme",
+  "homepage": "https://github.com/typestackapp/main#readme",
   "devDependencies": {
     "@babel/core": "^7.21.5",
     "@babel/plugin-transform-runtime": "^7.19.6",
