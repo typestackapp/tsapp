@@ -13,13 +13,13 @@ services:
       default_network:
         ipv4_address: ${IP_CERTBOT}
     volumes:
-      - ../packages/${ALIAS}/configs/proxy/certbot.conf:/etc/nginx/nginx.conf
+      - ../packages/${ALIAS}/configs/certbot/nginx.conf:/etc/nginx/nginx.conf
+      - ../packages/${ALIAS}/configs/haproxy/wk/:/var/www/wk/
+      - ../packages/${ALIAS}/configs/haproxy/ssl/:/home/ssl/
+      - ../packages/${ALIAS}/configs/letsencrypt/:/etc/letsencrypt/
+      - ../packages/${ALIAS}/logs/certbot/:/etc/nginx/logs/
+      - ../packages/${ALIAS}/logs/letsencrypt/:/var/log/letsencrypt/
       - ../packages/${ALIAS}/bin/certbot.sh:/home/scripts/certbot.sh
-      - ../packages/${ALIAS}/apps/proxy/wk/:/var/www/wk/
-      - ../packages/${ALIAS}/apps/proxy/ssl/:/home/ssl/
-      - ../packages/${ALIAS}/logs/proxy/:/etc/nginx/logs/
-      - ../packages/${ALIAS}/logs/certbot/:/var/log/letsencrypt/
-      - ../packages/${ALIAS}/apps/certbot/:/etc/letsencrypt/
     entrypoint: /home/scripts/certbot.sh
     ports:
       - "${PORT_CERTBOT}:80" # CERTBOT HTTP

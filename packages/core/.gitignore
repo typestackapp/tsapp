@@ -8,4 +8,6 @@ codegen/config
 codegen/haproxy
 configs/output
 configs/mod
+configs/haproxy
+configs/letsencrypt
 node_modules
