@@ -612,11 +612,9 @@ export async function prepareEnvVars(env_path: string) {
     return env_vars
 }
 
-export async function prepareComposeFile(global_compose_file: Buffer | string, env_vars: any, file: string, output: string, env_name: string) {
+export async function prepareDockerFile(global_compose_file: Buffer | string, env_vars: any, file: string, output: string, env_name: string) {
     // read compose file
     let docker_compose_file = fs.readFileSync(file).toString() 
-    // remove first line from docker_compose_file
-    docker_compose_file = docker_compose_file.replace(/.*\r?\n/, "")
 
     // add global compose file to docker_compose_file with new line
     docker_compose_file = global_compose_file + "\r" + docker_compose_file

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { 
     copyConfigs, getConfigFile, mergeWithoutPublicRemoval, writeJsonTypeFile, 
-    writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareComposeFile 
+    writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareDockerFile 
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
@@ -120,16 +120,26 @@ export const config = async (options: ConfigOptions) => {
             // check if directory is empty and exists
             if(!fs.existsSync(docker_folder) || fs.readdirSync(docker_folder).length === 0) continue
 
-            const docker_files = fs.readdirSync(docker_folder)?.filter(file => file.includes('.yml') && !file.includes('global.yml'))
+            const compose_files = fs.readdirSync(docker_folder)?.filter(file => file.includes('.yml') && !file.includes('global.yml'))
     
             // foreach docker file in package
-            for(const dfile of docker_files) {
-                const input_file_path = `${docker_folder}/${dfile}`
-                const docker_file_name = dfile.replace('.yml', '').replace('compose.', '')
+            for(const cfile of compose_files) {
+                const input_file_path = `${docker_folder}/${cfile}`
+                const docker_file_name = cfile.replace('.yml', '').replace('compose.', '')
                 const output_file_path = `${output_folder}/compose.${_config.alias}.${docker_file_name}.yml`
                 // console.log(`Creating ${output_file_path}`)
                 // console.log(`Using ${input_file_path}`)
-                prepareComposeFile(docker_global_file, env_vars, input_file_path, output_file_path, env_file)
+                prepareDockerFile(docker_global_file, env_vars, input_file_path, output_file_path, env_file)
+            }
+
+            const docker_files = fs.readdirSync(docker_folder)?.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'))
+            for(const dfile of docker_files) {
+                const input_file_path = `${docker_folder}/${dfile}`
+                const compose_file_name = dfile.replace('Dockerfile.', '')
+                const output_file_path = `${output_folder}/Dockerfile.${_config.alias}.${compose_file_name}`
+                // console.log(`Creating ${output_file_path}`)
+                // console.log(`Using ${input_file_path}`)
+                prepareDockerFile("", env_vars, input_file_path, output_file_path, env_file)
             }
         }
     }

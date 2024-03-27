@@ -1,5 +1,21 @@
 {
     "ACTIVE": {
+        "start": {
+            "dev": [
+                {"name": "NEXT", "service": "next"},
+                {"name": "EXPRESS", "service": "express"},
+                {"name": "JOBS", "service": "jobs"}, 
+                {"name": "GRAPHQL", "service": "graphql"},
+                {"name": "CONSUMER-TSAPP", "service": "consumers", "args": "RCS=tsapp"}
+            ],
+            "prod": [
+                {"name": "NEXT", "service": "next"},
+                {"name": "EXPRESS", "service": "express"},
+                {"name": "JOBS", "service": "jobs"}, 
+                {"name": "GRAPHQL", "service": "graphql"},
+                {"name": "CONSUMER-TSAPP", "service": "consumers", "args": "RCS=tsapp"}
+            ]
+        },
         "enviroments": {
             "dev": {
                 "templates": {

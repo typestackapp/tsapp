@@ -1,6 +1,6 @@
+!docker/*
 /**/*.js
 /**/*.map
-!compose.*
 logs
 apps
 codegen/tsapp.json
@@ -10,4 +10,5 @@ configs/output
 configs/mod
 configs/haproxy
 configs/letsencrypt
+configs/mongo
 node_modules

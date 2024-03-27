@@ -1,7 +1,6 @@
-version: '3.3'
 services:
   tsapp:
-    image: node:18
+    image: tsapp:latest
     restart: always
     env_file:
       - ${TSAPP_ENV_FILE}
@@ -14,4 +13,4 @@ services:
       - "${PORT_TSAPP_NEXT}:80"       # HTTP NEXT
       - "${PORT_TSAPP_API}:8000"      # HTTP API
       - "${PORT_TSAPP_GRAPHQL}:8002"  # HTTP GRAPHQL
-    entrypoint: /tsapp/packages/${ALIAS}/bin/node.sh
+    entrypoint: /tsapp/packages/${ALIAS}/bin/tsapp.sh

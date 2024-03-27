@@ -42,7 +42,7 @@ const child_process_1 = __importDefault(require("child_process"));
 const crypto = __importStar(require("crypto"));
 const exec = child_process_1.default.execSync;
 const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const CWD = options.cwd;
     const core_dir = `${CWD}/packages/core`;
     const module_folder = `${core_dir}/codegen/config`;
@@ -137,15 +137,24 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             // check if directory is empty and exists
             if (!fs_1.default.existsSync(docker_folder) || fs_1.default.readdirSync(docker_folder).length === 0)
                 continue;
-            const docker_files = (_b = fs_1.default.readdirSync(docker_folder)) === null || _b === void 0 ? void 0 : _b.filter(file => file.includes('.yml') && !file.includes('global.yml'));
+            const compose_files = (_b = fs_1.default.readdirSync(docker_folder)) === null || _b === void 0 ? void 0 : _b.filter(file => file.includes('.yml') && !file.includes('global.yml'));
             // foreach docker file in package
-            for (const dfile of docker_files) {
-                const input_file_path = `${docker_folder}/${dfile}`;
-                const docker_file_name = dfile.replace('.yml', '').replace('compose.', '');
+            for (const cfile of compose_files) {
+                const input_file_path = `${docker_folder}/${cfile}`;
+                const docker_file_name = cfile.replace('.yml', '').replace('compose.', '');
                 const output_file_path = `${output_folder}/compose.${_config.alias}.${docker_file_name}.yml`;
                 // console.log(`Creating ${output_file_path}`)
                 // console.log(`Using ${input_file_path}`)
-                (0, util_1.prepareComposeFile)(docker_global_file, env_vars, input_file_path, output_file_path, env_file);
+                (0, util_1.prepareDockerFile)(docker_global_file, env_vars, input_file_path, output_file_path, env_file);
+            }
+            const docker_files = (_c = fs_1.default.readdirSync(docker_folder)) === null || _c === void 0 ? void 0 : _c.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'));
+            for (const dfile of docker_files) {
+                const input_file_path = `${docker_folder}/${dfile}`;
+                const compose_file_name = dfile.replace('Dockerfile.', '');
+                const output_file_path = `${output_folder}/Dockerfile.${_config.alias}.${compose_file_name}`;
+                // console.log(`Creating ${output_file_path}`)
+                // console.log(`Using ${input_file_path}`)
+                (0, util_1.prepareDockerFile)("", env_vars, input_file_path, output_file_path, env_file);
             }
         }
     }
@@ -330,7 +339,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     };
     const pack_config = JSON.parse(fs_1.default.readFileSync(pack_config_output, 'utf8'));
     for (const [pack_key, _config] of Object.entries(pack_config)) {
-        if (!((_c = _config.access) === null || _c === void 0 ? void 0 : _c.ACTIVE))
+        if (!((_d = _config.access) === null || _d === void 0 ? void 0 : _d.ACTIVE))
             continue;
         // loop trough each resource
         for (const [resource_key, _resource] of Object.entries(_config.access.ACTIVE)) {
@@ -437,7 +446,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     `;
     let graphql_services = "";
     for (const [pack_key, _config] of Object.entries(pack_config)) {
-        if (!((_d = _config === null || _config === void 0 ? void 0 : _config.graphql) === null || _d === void 0 ? void 0 : _d.ACTIVE)
+        if (!((_e = _config === null || _config === void 0 ? void 0 : _config.graphql) === null || _e === void 0 ? void 0 : _e.ACTIVE)
             || Object.keys(_config.graphql.ACTIVE).length === 0)
             continue;
         graphql_services = `${graphql_services}

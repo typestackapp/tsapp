@@ -2,6 +2,7 @@
 *.env
 !example.env
 compose.*
+Dockerfile.*
 logs/*
 packages/*
 package-lock.json

@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findTSAppRootDir = exports.prepareComposeFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
+exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
 // import type { GraphqlResovlerModule, GraphqlRouter, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core'
 // import type { Config, Packages } from '@typestackapp/core/codegen/config'
 const fs_1 = __importDefault(require("fs"));
@@ -544,12 +544,10 @@ function prepareEnvVars(env_path) {
     });
 }
 exports.prepareEnvVars = prepareEnvVars;
-function prepareComposeFile(global_compose_file, env_vars, file, output, env_name) {
+function prepareDockerFile(global_compose_file, env_vars, file, output, env_name) {
     return __awaiter(this, void 0, void 0, function* () {
         // read compose file
         let docker_compose_file = fs_1.default.readFileSync(file).toString();
-        // remove first line from docker_compose_file
-        docker_compose_file = docker_compose_file.replace(/.*\r?\n/, "");
         // add global compose file to docker_compose_file with new line
         docker_compose_file = global_compose_file + "\r" + docker_compose_file;
         // replace file env variables
@@ -564,7 +562,7 @@ function prepareComposeFile(global_compose_file, env_vars, file, output, env_nam
         fs_1.default.writeFileSync(output, docker_compose_file_new);
     });
 }
-exports.prepareComposeFile = prepareComposeFile;
+exports.prepareDockerFile = prepareDockerFile;
 function findTSAppRootDir() {
     let dir = process.cwd();
     while (dir !== '/') {
