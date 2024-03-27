@@ -2,7 +2,7 @@ version: '3.3'
 services:
   haproxy:
     mem_limit: 3g
-    image: haproxy:2.6.6
+    image: haproxy:2.9.6
     restart: always
     user: root
     environment:
