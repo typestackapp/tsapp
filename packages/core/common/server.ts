@@ -13,7 +13,7 @@ import type { ApolloServerPlugin } from '@apollo/server'
 import type { AccessRequest, GraphqlServerAccess, ExpressRequestHandler, ExpressServerAccess, middleware} from "@typestackapp/core/models/user/access/middleware"
 import type { Router } from "express"
 import { IGraphqlMethod } from "@typestackapp/core"
-import { Packages, packages } from "../codegen/config"
+import { Packages, packages } from "@typestackapp/core"
 import { DeepRequired } from "utility-types"
 import { Resolver } from "@apollo/client"
 

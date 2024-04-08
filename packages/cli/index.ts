@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 import type { ConfigOptions } from "./common/config"
-import type { ServerOptions } from "./common/service"
+import type { ServiceOptions } from "./common/service"
 import type { GraphqlOptions } from "./common/graphql"
 import { findTSAppRootDir } from "./common/util"
 import minimist from "./lib/minimist"
 
 const argv = minimist(process.argv.slice(2))
 const action = argv['_'][0]
-const env_vars: string[] | string | undefined  = argv?.e
 const cwd = argv?.cwd || findTSAppRootDir()
 
 console.log(`cwd: ${cwd}`)
@@ -21,36 +20,37 @@ const config_options: ConfigOptions = {
     cwd
 }
 
-const service_options: ServerOptions = {
-    server: argv?.server || "",
-    name: argv?.name || "",
-    env: argv?.env || "",
-    tpl: argv?.tpl,
-    e: env_vars ? typeof env_vars === 'string' ? [env_vars] : env_vars : [],
-    pack: argv?.pack || undefined
+const service_options: ServiceOptions = {
+    cwd,
+    up: argv?.up,
+    env: argv?.env
 }
 
 const graphql_options: GraphqlOptions = {}
 
 switch(action) {
     case 'config':
-        console.log(`Generating configs`)
-        import("./common/config").then(module => module.config(config_options))
+        import("./common/config")
+        .then(module => module.config(config_options))
+        .catch(error => console.log(error))
     break
     case 'graphql':
-        console.log(`Generating graphql`)
-        import("./common/graphql").then(module => module.graphql(graphql_options))
+        import("./common/graphql")
+        .then(module => module.graphql(graphql_options))
+        .catch(error => console.log(error))
     break
     case 'update':
-        console.log(`Updating system`)
-        import("./common/update").then(module => module.update())
+        import("./common/update")
+        .then(module => module.update())
+        .catch(error => console.log(error))
     break
     case 'service':
-        console.log(`Starting service`)
-        import("./common/service").then(module => module.server(service_options))
+        import("./common/service")
+        .then(module => module.service(service_options))
+        .catch(error => console.log(error))
     break
     default:
         console.log(`Unknown action: ${action}`)
-        console.log(`Available actions: config, server, docker, test, update`)
+        console.log(`Available actions: config, service, docker, test, update`)
     break
 }

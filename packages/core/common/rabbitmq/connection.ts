@@ -1,5 +1,5 @@
 import amqp, { Connection as RabbitmqConnection, Channel, Message, Options, Replies } from "amqplib/callback_api"
-import { Packages, Config } from '../../codegen/config'
+import { Packages, Config } from "@typestackapp/core"
 import { ChannelOptions } from "../../models/config/channel"
 import { ConsumerList } from "./consumer"
 

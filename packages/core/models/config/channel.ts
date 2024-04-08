@@ -2,7 +2,7 @@ import { Options } from "amqplib"
 import { Schema, Document, Model } from "mongoose"
 import { ConfigInput, ConfigModel } from "."
 import { ConsumerInput, consumerSchema } from "./consumer"
-import { Packages } from "../../codegen/config"
+import { Packages } from "@typestackapp/core"
 
 export const pack = "@typestackapp/core"
 export const type = "ChannelConfig"

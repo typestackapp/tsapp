@@ -8,7 +8,7 @@ import { ApiKeyTokenInput, ApiKeyTokenModel } from "@typestackapp/core/models/us
 import { system_admin_id, all_access_inputs } from "@typestackapp/core/models/update"
 import { UserModel } from "@typestackapp/core/models/user"
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
-import { env } from "@typestackapp/cli/config"
+import { env } from "@typestackapp/core"
 
 export const api_key_id = new Types.ObjectId()
 export const email_config_id = new Types.ObjectId("62091b669343af312f5f1eee")
@@ -28,7 +28,7 @@ export async function setup() {
         fs.emptyDirSync(`${process.cwd()}/logs/email`)
         fs.emptyDirSync(`/tsapp/logs/email`)
     }
-    
+    global.tsapp["@conventuslv/csdd"]
     // upsert root user
     const _user = await UserModel.findOne({ _id: system_admin_id })
     if(!_user) throw "Root user not found"

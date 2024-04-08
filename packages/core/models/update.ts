@@ -3,7 +3,7 @@ import { RoleConfigDocument, RoleConfigModel, RoleConfigInput } from "@typestack
 import { AccessDocument } from "@typestackapp/core/models/user/access"
 import { secretHash, randomSecret } from "@typestackapp/core/models/user/access/util"
 import { sleep } from "@typestackapp/core/common/util"
-import { env, config, Config, Packages } from "@typestackapp/core/codegen/config"
+import { env, config, Config, Packages } from "@typestackapp/core"
 import { UserInput, UserModel } from "@typestackapp/core/models/user"
 import { IAccessInput } from "@typestackapp/core"
 import { OauthAppInput, OauthAppModel } from "@typestackapp/core/models/user/app/oauth"

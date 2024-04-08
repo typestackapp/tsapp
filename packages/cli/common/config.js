@@ -226,6 +226,11 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     fs_1.default.writeFileSync(pack_config_output, JSON.stringify(configs, null, 4));
     (0, util_1.writeJsonTypeFile)(pack_config_output);
     const output_dir = `${core_dir}/codegen/next`;
+    // delete `${output_dir}/app` and `${output_dir}/public`
+    if (fs_1.default.existsSync(`${output_dir}/app`))
+        fs_1.default.rmSync(`${output_dir}/app`, { recursive: true });
+    if (fs_1.default.existsSync(`${output_dir}/public`))
+        fs_1.default.rmSync(`${output_dir}/public`, { recursive: true });
     // create output_dir/app
     if (!fs_1.default.existsSync(`${output_dir}/app`))
         fs_1.default.mkdirSync(`${output_dir}/app`, { recursive: true });

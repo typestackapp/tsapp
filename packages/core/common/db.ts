@@ -1,4 +1,4 @@
-import { Packages, Config, config } from '../codegen/config'
+import { Packages, Config, config } from "@typestackapp/core"
 import { MongoClient } from 'mongodb'
 import { Pool as PgConnection } from 'pg'
 import mysql, { Pool as MysqlConnection } from 'mysql2/promise'

@@ -1,4 +1,4 @@
-import { Packages } from '../../codegen/config';
+import { Packages } from "@typestackapp/core";
 import mongoose, { Schema } from 'mongoose'
 
 export interface MessageInput<TData> {

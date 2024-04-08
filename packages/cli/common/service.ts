@@ -1,50 +1,77 @@
 import { exec } from "child_process"
 
-export type ServerOptions = {
-    env: string // dev | prod
-    server: string // next | api | jobs | graphql | rmq-${server_name}
-    name: string // process name
-    e: string[] // enviroment variables space separated key=value, example: --e PORT=3000 --e NODE_ENV=production
-    tpl?: string // pm2 | any other template key
-    pack?: string // pack name
+export type ServiceOptions = {
+    cwd: string // current working directory
+    up: any // start all services
+    //down: any // stop all services
+    //start: any // boolean, start specific service, by name
+    //stop: any // boolean, stop specific service, by name
+    env: any // string // dev | prod
 }
 
-export const server = async (options: ServerOptions) => {
-    const module_folder = `${process.cwd()}/node_modules/@typestackapp/cli/config`
-    const config = (await import(module_folder)).config
-
+export const service = async (options: ServiceOptions) => {
+    if(!options.up) throw `Error, missing start or up option`
+    if(typeof options.env != 'string') throw `Error, missing env option`
+    if(!['prod', 'dev', 'stage'].includes(options.env)) console.log(`Warning, env should be one of prod, dev, stage`)
+    
+    const module_folder = `${process.cwd()}/node_modules/@typestackapp/core`
+    const packages = (await import(module_folder)).config
     const env = options.env
-    const server = options.server
-    const name = options.name
-    const tpl = options?.tpl
-    const pack = options.pack
-    const template = config["@typestackapp/core"].services.ACTIVE.enviroments[env].templates[tpl]
 
-    // prepare commands
-    const script = config["@typestackapp/core"].services.ACTIVE.services[server][env].script
-    const run_before_command = config["@typestackapp/core"].services.ACTIVE.services[server][env].before
-    const config_args = config["@typestackapp/core"].services.ACTIVE.services[server][env].args
+    // start all services for all packages
+    for( const [pack_key, pack] of Object.entries(packages) as any) {
+        if(!pack?.services?.ACTIVE?.start || !pack?.services?.ACTIVE?.start[env]) continue
 
-    // prepare enviroment variables
-    const envs = options?.e ? options.e.reduce((acc, cur) => {
-        const [key, value] = cur.split('=')
-        acc[key] = value
-        return acc
-    }, {}) : {}
-    const env_vars = { ...process.env, ...envs }
+        const start = pack.services.ACTIVE.start[env]
+        const templates = pack.services.ACTIVE.templates
+        const services = pack.services.ACTIVE.services
 
-    var command = run_before_command ? `${run_before_command} && ` : ''
-    command += template
-        .replaceAll('${name}', name)
-        .replaceAll('${script}', script)
-        .replaceAll('${args}', config_args)
-    
-    // console.log(`Starting ${name} server in ${env} enviroment`)
-    // console.log(`Enviroment variables: ${JSON.stringify(env_vars)}`)
-    // console.log(`Command: ${command}`)
-    
-    const _process = exec(command, { env: env_vars })
-    _process.stdout.on('data', function(data) {
-        console.log(data.toString())
+        if(!start || start.length == 0) {
+            console.log(`No services to start for ${pack_key} package`)
+            continue
+        }else {
+            console.log(`Starting services for ${pack_key} package`)
+        }
+
+        for(const service of start) {
+            const process_name = service.name
+            const template_name = service.template
+            const service_name = service.service
+            const run_before = service.run_before
+            const service_env_vars = service.e
+
+            // prepare commands
+            const template = templates[template_name]
+            const script = services[service_name].script
+            const service_args = services[service_name].args
+            const env_vars = { ...process.env, ...service_env_vars }
+
+            var command = run_before ? `${run_before} && ` : ''
+            command += template
+                .replaceAll('${name}', process_name)
+                .replaceAll('${script}', script)
+                .replaceAll('${args}', service_args)
+            
+            // console.log(`Starting ${process_name} server in ${env} enviroment`)
+            // console.log(`Enviroment variables: ${JSON.stringify(env_vars)}`)
+            // console.log(`Command: ${command}`)
+            
+            // start service
+            await execAsync(command, env_vars)
+        }
+    }
+}
+
+function execAsync(command: string, env_vars: any){
+    return new Promise((resolve, reject) => {
+        exec(command, { env: env_vars }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`exec error: ${error}`)
+                reject(error)
+            }
+            console.log(`stdout: ${stdout}`)
+            console.error(`stderr: ${stderr}`)
+            resolve(stdout)
+        })
     })
 }

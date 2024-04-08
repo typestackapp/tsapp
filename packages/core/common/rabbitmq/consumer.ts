@@ -3,7 +3,7 @@ import { Types } from "mongoose"
 import { ConsumerInput } from "../../models/config/consumer"
 import { ChannelConfigDocument, ChannelConfigModel } from "../../models/config/channel"
 import { ConnectionInstance } from "./connection"
-import { config, rcs } from "../../codegen/config"
+import { config, rcs } from "@typestackapp/core"
 
 export type ConsumerOnMessage = ( msg: Message | null ) => void
 

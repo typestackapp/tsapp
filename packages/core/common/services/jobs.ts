@@ -1,4 +1,4 @@
-import {} from "@typestackapp/cli/config"
+import {} from "@typestackapp/core"
 import DB from "@typestackapp/core/common/db"
 import { ModelLoader } from "@typestackapp/core/common/model"
 

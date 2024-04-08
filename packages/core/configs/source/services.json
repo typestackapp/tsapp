@@ -2,82 +2,64 @@
     "ACTIVE": {
         "start": {
             "dev": [
-                {"name": "NEXT", "service": "next"},
-                {"name": "EXPRESS", "service": "express"},
-                {"name": "JOBS", "service": "jobs"}, 
-                {"name": "GRAPHQL", "service": "graphql"},
-                {"name": "CONSUMER-TSAPP", "service": "consumers", "args": "RCS=tsapp"}
+                {"template": "pm2_dev", "service": "next_dev", "name": "NEXT" },
+                {"template": "pm2_dev", "service": "express_dev", "name": "EXPRESS" },
+                {"template": "pm2_dev", "service": "jobs_dev", "name": "JOBS" }, 
+                {"template": "pm2_dev", "service": "graphql_dev", "name": "GRAPHQL" },
+                {"template": "pm2_dev", "service": "consumers_dev", "name": "CONSUMER-TSAPP", "e": {"RCS": "tsapp"} }
             ],
             "prod": [
-                {"name": "NEXT", "service": "next"},
-                {"name": "EXPRESS", "service": "express"},
-                {"name": "JOBS", "service": "jobs"}, 
-                {"name": "GRAPHQL", "service": "graphql"},
-                {"name": "CONSUMER-TSAPP", "service": "consumers", "args": "RCS=tsapp"}
+                {"template": "pm2_prod", "service": "next_prod", "name": "NEXT" },
+                {"template": "pm2_prod", "service": "express_prod", "name": "EXPRESS" },
+                {"template": "pm2_prod", "service": "jobs_prod", "name": "JOBS" }, 
+                {"template": "pm2_prod", "service": "graphql_prod", "name": "GRAPHQL" },
+                {"template": "pm2_prod", "service": "consumers_prod", "name": "CONSUMER-TSAPP", "e": {"RCS": "tsapp"} }
             ]
         },
-        "enviroments": {
-            "dev": {
-                "templates": {
-                    "pm2": "pm2 start --exp-backoff-restart-delay=100 --time --name ${name} -e /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.error.log -o /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.log ${script} -- --delay 1.0 ${args}"
-                }
-            },
-            "prod": {
-                "templates": {
-                    "pm2": "pm2 start --exp-backoff-restart-delay=100 --time --name ${name} -e /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.error.log -o /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.log ${script} -- ${args}"
-                }
-            }
+        "templates": {
+            "pm2_dev": "pm2 start --exp-backoff-restart-delay=100 --time --name ${name} -e /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.error.log -o /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.log ${script} -- --delay 1.0 ${args}",
+            "pm2_prod": "pm2 start --exp-backoff-restart-delay=100 --time --name ${name} -e /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.error.log -o /tsapp/node_modules/@typestackapp/core/logs/tsapp/${name}.log ${script} -- ${args}"
         },
         "services": {
-            "next": {
-                "dev": {
-                    "script": "nodemon",
-                    "args": "-e js --exec 'node ./packages/cli/services/next.js' -w ./packages/cli/services/next.js"
-                },
-                "prod": {
-                    "script": "node",
-                    "args": "./packages/cli/services/next.js"
-                }
+            "next_dev": {
+                "script": "nodemon",
+                "args": "-e js --exec 'node ./packages/core/common/services/next.js' -w ./packages/core/common/services/next.js"
             },
-            "express": {
-                "dev": {
-                    "script": "nodemon",
-                    "args": "-e ts,json --exec 'node ./packages/cli/services/express.js' -w ./packages/cli/services/express.js -w './packages/**/express/' -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
-                },
-                "prod": {
-                    "script": "node",
-                    "args": "./packages/cli/services/express.js"
-                }
+            "next_prod": {
+                "script": "node",
+                "args": "./packages/core/common/services/next.js"
             },
-            "jobs": {
-                "dev": {
-                    "script": "nodemon",
-                    "args": "-e ts,json --exec 'node ./packages/cli/services/jobs.js' -w ./packages/cli/services/jobs.js -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
-                },
-                "prod": {
-                    "script": "node",
-                    "args": "./packages/cli/services/jobs.js"
-                }
+            "express_dev": {
+                "script": "nodemon",
+                "args": "-e ts,json --exec 'node ./packages/core/common/services/express.js' -w ./packages/core/common/services/express.js -w './packages/**/express/' -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
             },
-            "graphql": {
-                "dev": {
-                    "script": "nodemon",
-                    "args": "-e ts,json --exec 'node ./packages/cli/services/graphql.js' -w ./packages/cli/services/graphql.js -w './packages/**/graphql/' -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
-                },
-                "prod": {
-                    "script": "node",
-                    "args": "./packages/cli/services/graphql.js"
-                }
+            "express_prod": {
+                "script": "node",
+                "args": "./packages/core/common/services/express.js"
             },
-            "consumers": {
-                "dev": {
-                    "script": "nodemon",
-                    "args": "-e ts,json --exec 'node ./packages/cli/services/consumers.js' -w ./packages/cli/services/consumers.js -w './packages/**/consumers/' -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
-                },
-                "prod": {
-                    "script": "node",
-                    "args": "./packages/cli/services/consumers.js"
-                }
+            "jobs_dev": {
+                "script": "nodemon",
+                "args": "-e ts,json --exec 'node ./packages/core/common/services/jobs.js' -w ./packages/core/common/services/jobs.js -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
+            },
+            "jobs_prod": {
+                "script": "node",
+                "args": "./packages/core/common/services/jobs.js"
+            },
+            "graphql_dev": {
+                "script": "nodemon",
+                "args": "-e ts,json --exec 'node ./packages/core/common/services/graphql.js' -w ./packages/core/common/services/graphql.js -w './packages/**/graphql/' -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
+            },
+            "graphql_prod": {
+                "script": "node",
+                "args": "./packages/core/common/services/graphql.js"
+            },
+            "consumers_dev": {
+                "script": "nodemon",
+                "args": "-e ts,json --exec 'node ./packages/core/common/services/consumers.js' -w ./packages/core/common/services/consumers.js -w './packages/**/consumers/' -w './packages/cli/config/' -w './packages/**/common/' -w './packages/**/models/'"
+            },
+            "consumers_prod": {
+                "script": "node",
+                "args": "./packages/core/common/services/consumers.js"
             }
         }
     }

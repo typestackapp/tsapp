@@ -9,7 +9,7 @@ import { IServerAccess, IAccessOptions } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
 import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '@typestackapp/core/common/server'
 import { Maybe } from 'graphql/jsutils/Maybe'
-import { Packages, env } from '../../../codegen/config'
+import { Packages, env } from "@typestackapp/core"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
 import { access_token_config_id } from "@typestackapp/core/models/update"

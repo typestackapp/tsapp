@@ -1,10 +1,17 @@
-export * from "@typestackapp/core/common/server"
-export type * from "@typestackapp/core/codegen/system"
+import type { UserDocument } from '@typestackapp/core/models/user'
+import type { EmailConfigDocument } from '@typestackapp/core/models/config/email'
+import type { ChannelConfigDocument } from '@typestackapp/core/models/config/channel'
+import type { TokenDocument } from '@typestackapp/core/models/user/token'
+import type { JobList } from '@typestackapp/core/common/job'
+
 import { Connection as DbConnection } from "@typestackapp/core/common/db"
 import { Connection as RmqConnection } from "@typestackapp/core/common/rabbitmq/connection"
 import tsapp from "@typestackapp/core/codegen/tsapp.json"
 import config from "@typestackapp/core/codegen/config/output.json"
 import {T as Config} from "@typestackapp/core/codegen/config/output"
+
+export * from "@typestackapp/core/common/server"
+export type * from "@typestackapp/core/codegen/system"
 
 export { config }
 export type { Config }
@@ -14,6 +21,13 @@ export type Packages = keyof typeof packages
 declare global {
     var tsapp : {
         [Package in Packages]: ServerGlobals<Package>
+    }
+    var core_tsapp_test: {
+        root_user: UserDocument
+        email_config: EmailConfigDocument
+        email_channel_config: ChannelConfigDocument
+        api_key: TokenDocument
+        jobs: JobList
     }
 }
 

@@ -1,4 +1,4 @@
-import { Packages } from "../../codegen/config"
+import { Packages } from "@typestackapp/core"
 import mongoose, { ObjectId, Schema, Types } from "mongoose"
 
 export interface GroupEntryInput<TData> {

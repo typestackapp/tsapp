@@ -31,7 +31,6 @@ const util_1 = require("./common/util");
 const minimist_1 = __importDefault(require("./lib/minimist"));
 const argv = (0, minimist_1.default)(process.argv.slice(2));
 const action = argv['_'][0];
-const env_vars = argv === null || argv === void 0 ? void 0 : argv.e;
 const cwd = (argv === null || argv === void 0 ? void 0 : argv.cwd) || (0, util_1.findTSAppRootDir)();
 console.log(`cwd: ${cwd}`);
 console.log(`action: ${action}`);
@@ -44,33 +43,30 @@ const config_options = {
     cwd
 };
 const service_options = {
-    server: (argv === null || argv === void 0 ? void 0 : argv.server) || "",
-    name: (argv === null || argv === void 0 ? void 0 : argv.name) || "",
-    env: (argv === null || argv === void 0 ? void 0 : argv.env) || "",
-    tpl: argv === null || argv === void 0 ? void 0 : argv.tpl,
-    e: env_vars ? typeof env_vars === 'string' ? [env_vars] : env_vars : [],
-    pack: (argv === null || argv === void 0 ? void 0 : argv.pack) || undefined
+    cwd,
+    up: argv === null || argv === void 0 ? void 0 : argv.up,
+    env: argv === null || argv === void 0 ? void 0 : argv.env
 };
 const graphql_options = {};
 switch (action) {
     case 'config':
-        console.log(`Generating configs`);
-        Promise.resolve().then(() => __importStar(require("./common/config"))).then(module => module.config(config_options));
+        Promise.resolve().then(() => __importStar(require("./common/config"))).then(module => module.config(config_options))
+            .catch(error => console.log(error));
         break;
     case 'graphql':
-        console.log(`Generating graphql`);
-        Promise.resolve().then(() => __importStar(require("./common/graphql"))).then(module => module.graphql(graphql_options));
+        Promise.resolve().then(() => __importStar(require("./common/graphql"))).then(module => module.graphql(graphql_options))
+            .catch(error => console.log(error));
         break;
     case 'update':
-        console.log(`Updating system`);
-        Promise.resolve().then(() => __importStar(require("./common/update"))).then(module => module.update());
+        Promise.resolve().then(() => __importStar(require("./common/update"))).then(module => module.update())
+            .catch(error => console.log(error));
         break;
     case 'service':
-        console.log(`Starting service`);
-        Promise.resolve().then(() => __importStar(require("./common/service"))).then(module => module.server(service_options));
+        Promise.resolve().then(() => __importStar(require("./common/service"))).then(module => module.service(service_options))
+            .catch(error => console.log(error));
         break;
     default:
         console.log(`Unknown action: ${action}`);
-        console.log(`Available actions: config, server, docker, test, update`);
+        console.log(`Available actions: config, service, docker, test, update`);
         break;
 }

@@ -9,7 +9,7 @@ import { AccessRequest, middlewares } from "@typestackapp/core/models/user/acces
 import { Types } from 'mongoose'
 import { Response } from 'express'
 import { z } from "zod"
-import { env } from "@typestackapp/core/codegen/config"
+import { env } from "@typestackapp/core"
 import { allowed_actions, z_app_filters } from '@typestackapp/core/common/auth'
 import { BearerTokenInput, BearerTokenInputData, BearerTokenModel } from '@typestackapp/core/models/user/token/bearer'
 import { checkAccessToAllResources } from '@typestackapp/core/models/user/access/util'

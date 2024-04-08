@@ -2,7 +2,7 @@ import mongoose, { Document, Model, Schema } from "mongoose"
 import { IAccessInput, ITokenType } from '@typestackapp/core'
 import { IAccessDocument, IServerAccess, IAccessOptions } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
-import { Packages } from '../../../codegen/config'
+import { Packages } from "@typestackapp/core"
 import { CaptchaResponse } from "@typestackapp/core/models/user/access/middleware"
 import { Serialize } from "@trpc/server/shared"
 
