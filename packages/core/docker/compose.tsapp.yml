@@ -1,6 +1,8 @@
 services:
   tsapp:
-    image: tsapp:latest
+    image: typestackapp/tsapp:latest
+    build:
+      dockerfile: ./Dockerfile.${ALIAS}.tsapp
     restart: always
     env_file:
       - ${TSAPP_ENV_FILE}
