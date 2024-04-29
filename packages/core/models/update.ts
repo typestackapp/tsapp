@@ -206,7 +206,7 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
     // UPDATE SYSTEM ADMIN USER
     const system_admin_input: UserInput = {
         _id: system_admin_id,
-        email: env.TSAPP_INIT_EMAIL,
+        usn: env.TSAPP_INIT_EMAIL,
         psw: secretHash(env.TSAPP_INIT_PSW),
         role: "SystemAdmin"
     }
