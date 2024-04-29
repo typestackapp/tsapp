@@ -10,7 +10,7 @@ export default function AccountComponent() {
 
   return (
     <div>
-      Email: {data?.getCurrentUser?.email}
+      Email: {data?.getCurrentUser?.usn}
     </div>
   )
 }
