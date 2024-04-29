@@ -406,7 +406,7 @@ function emptyDir(dir) {
 exports.emptyDir = emptyDir;
 function getGraphqlRouterConfigs() {
     const _server = [];
-    const config = require(`${process.cwd()}/node_modules/@typestackapp/cli/config`).config;
+    const config = require(`${process.cwd()}/node_modules/@typestackapp/core`).config;
     for (const [package_key, pack] of Object.entries(config)) {
         const conf = pack.graphql.ACTIVE;
         for (const [server_key, server] of Object.entries(conf)) {

@@ -65,7 +65,7 @@ export const graphql = async (options: GraphqlOptions) => {
             let file_result = fs.readFileSync(graphql_server.typeDefPath, 'utf8')
             file_result = `
                 import { DeepRequired } from 'utility-types'
-                import { Packages } from '@typestackapp/cli/config'
+                import { Packages } from '@typestackapp/core'
     
                 ${file_result}
     

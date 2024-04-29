@@ -1,5 +1,5 @@
 
-import { Packages, config } from "@typestackapp/cli/config"
+import { Packages, config } from "@typestackapp/core"
 import fs from "fs"
 
 // export static class named ModelLoader

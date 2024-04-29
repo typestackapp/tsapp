@@ -2,7 +2,7 @@
 import Cron from 'cron'
 import { Types } from "mongoose"
 import {JobDocument, JobInput, JobModel } from "@typestackapp/core/models/job"
-import { Packages } from '@typestackapp/cli/config'
+import { Packages } from '@typestackapp/core'
 
 interface CronJobDoc extends JobDocument<any> {
     type: any

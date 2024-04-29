@@ -452,7 +452,7 @@ export function emptyDir(dir: string){
 
 export function getGraphqlRouterConfigs(): GraphqlServerConfig[] {
     const _server: GraphqlServerConfig[] = []
-    const config = require(`${process.cwd()}/node_modules/@typestackapp/cli/config`).config as Config
+    const config = require(`${process.cwd()}/node_modules/@typestackapp/core`).config as Config
 
     for(const [package_key, pack] of Object.entries(config) as any) {
         const conf = pack.graphql.ACTIVE

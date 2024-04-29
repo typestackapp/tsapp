@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { secretCompare } from "@typestackapp/core/models/user/access/util"
-import { env } from "@typestackapp/cli/config"
+import { env } from "@typestackapp/core"
 
 describe('Test users', () => {
     

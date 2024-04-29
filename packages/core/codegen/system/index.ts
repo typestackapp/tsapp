@@ -1,6 +1,6 @@
 
                 import { DeepRequired } from 'utility-types'
-                import { Packages } from '../config'
+                import { Packages } from '@typestackapp/core'
     
                 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';

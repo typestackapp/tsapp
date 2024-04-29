@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { apps as next_apps } from '@typestackapp/cli/next/apps'
+import { apps as next_apps } from '@typestackapp/core/codegen/next/apps'
 import Link from 'next/link'
 import TSAppClient from '@typestackapp/core/models/user/app/oauth/client/tsapp'
 import type { AuthOutput } from "@typestackapp/core/express/auth"
@@ -10,7 +10,7 @@ import { useParams } from 'next/navigation'
 import { context } from '@typestackapp/core/components/global'
 import { checkResourceAccess } from '@typestackapp/core/models/user/access/util'
 import type { AccessCheckOptions } from '@typestackapp/core/models/user/access/middleware'
-import { Packages } from '@typestackapp/cli/config'
+import { Packages } from '@typestackapp/core'
 
 export type GridProps = {
   heading?: {

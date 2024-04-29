@@ -1,4 +1,4 @@
-import { env, packages } from "@typestackapp/cli/config"
+import { env, packages } from "@typestackapp/core"
 import { expect } from "chai"
 
 describe('Test services', () => {

@@ -1,6 +1,6 @@
 "use client"
 import { Dispatch, SetStateAction, createContext} from 'react'
-import frontend from '@typestackapp/cli/config/source/@typestackapp/core/frontend.public.json'
+import frontend from '@typestackapp/core/codegen/config/source/@typestackapp/core/frontend.public.json'
 import TSAppClient from '@typestackapp/core/models/user/app/oauth/client/tsapp'
 import type { ClientSession } from '@typestackapp/core/models/user/app/oauth/client'
 import type { SideNavApps } from '@typestackapp/core/components/util'

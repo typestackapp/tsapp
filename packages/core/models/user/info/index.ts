@@ -1,4 +1,4 @@
-import { Packages } from "@typestackapp/cli/config";
+import { Packages } from "@typestackapp/core";
 import mongoose, { ObjectId, Schema, Types } from "mongoose"
 
 export interface UserInfoInput<TData> {
