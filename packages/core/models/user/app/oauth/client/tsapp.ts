@@ -2,7 +2,7 @@ import moment from "moment"
 import { CreateTRPCClientOptions, CreateTRPCProxyClient, HTTPHeaders, createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 import { AuthUrlOptions, CallbackOptions, Client, ClientOptions, ClientSession, GetTokenOptions } from "@typestackapp/core/models/user/app/oauth/client"
 import type { AuthInput, AuthOutput, AuthRouter } from "@typestackapp/core/express/auth"
-import { GraphqlClients, getGraphqlClients } from "@typestackapp/cli/next/graphql"
+import { GraphqlClients, getGraphqlClients } from "@typestackapp/core/codegen/next/graphql"
 
 export default class TSAppClient extends Client {
     readonly auth: CreateTRPCProxyClient<AuthRouter> // auth trpc client

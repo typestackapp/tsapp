@@ -1,9 +1,9 @@
 import { MongoId, MongoIdMeybe, MongoTimeStamps } from "@typestackapp/core/graphql/common/schema"
 
 export const UserInput = `
+    usn: String!
     psw: String!
     role: String!
-    email: String!
 `
 
 export default `#graphql
@@ -19,7 +19,7 @@ export default `#graphql
     }
 
     type UserOutput implements MongoId & MongoTimeStamps {
-        email: String!
+        usn: String!
         role: RoleConfigDocument
         ${MongoId}
         ${MongoTimeStamps}

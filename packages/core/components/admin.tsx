@@ -3,7 +3,7 @@ import LoginComponent from '@typestackapp/core/components/user/access/login'
 import { context } from '@typestackapp/core/components/global'
 import { DisplayComponent, Main, SideNav, SideNavApp, TopNav, getBasePath, urlDecode } from '@typestackapp/core/components/util'
 import { useParams, usePathname } from 'next/navigation'
-import { apps } from '@typestackapp/cli/next/apps'
+import { apps } from '@typestackapp/core/codegen/next/apps'
 import { gql } from '@typestackapp/core/codegen/system/client'
 import { ApolloProvider } from "@apollo/client"
 
@@ -40,7 +40,7 @@ export const getAdminUserDataQuery = gql(`#graphql
   query GetAdminUserData {
     getCurrentUser {
       _id
-      email
+      usn
       role {
         _id
         title

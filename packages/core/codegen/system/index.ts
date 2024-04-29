@@ -651,31 +651,31 @@ export interface ITypeOptions {
 export interface IUserDocument extends IMongoId, IMongoTimeStamps {
   _id: Scalars['ObjectId'];
   createdAt: Scalars['DateTime'];
-  email: Scalars['String'];
   psw: Scalars['String'];
   role: Scalars['String'];
   updatedAt: Scalars['DateTime'];
+  usn: Scalars['String'];
 }
 
 export interface IUserInput {
   _id?: Maybe<Scalars['ObjectId']>;
-  email: Scalars['String'];
   psw: Scalars['String'];
   role: Scalars['String'];
+  usn: Scalars['String'];
 }
 
 export interface IUserOutput extends IMongoId, IMongoTimeStamps {
   _id: Scalars['ObjectId'];
   createdAt: Scalars['DateTime'];
-  email: Scalars['String'];
   role?: Maybe<IRoleConfigDocument>;
   updatedAt: Scalars['DateTime'];
+  usn: Scalars['String'];
 }
 
 export type IGetAdminUserDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IGetAdminUserDataQuery = { getCurrentUser?: { _id: any, email: string, role?: { _id?: any | null, title: string, pack: Packages, type: string, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType> }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } } | null } | null };
+export type IGetAdminUserDataQuery = { getCurrentUser?: { _id: any, usn: string, role?: { _id?: any | null, title: string, pack: Packages, type: string, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType> }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } } | null } | null };
 
 
 
@@ -1451,27 +1451,27 @@ export type ITypeOptionsResolvers<ContextType = any, ParentType extends IResolve
 export type IUserDocumentResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserDocument'] = IResolversParentTypes['UserDocument']> = {
   _id?: Resolver<IResolversTypes['ObjectId'], ParentType, ContextType>;
   createdAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
-  email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   psw?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
+  usn?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type IUserInputResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserInput'] = IResolversParentTypes['UserInput']> = {
   __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   _id?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
-  email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   psw?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  usn?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type IUserOutputResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserOutput'] = IResolversParentTypes['UserOutput']> = {
   _id?: Resolver<IResolversTypes['ObjectId'], ParentType, ContextType>;
   createdAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
-  email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<Maybe<IResolversTypes['RoleConfigDocument']>, ParentType, ContextType>;
   updatedAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
+  usn?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1546,7 +1546,7 @@ export type IResolvers<ContextType = any> = {
 
 
 
-export const GetAdminUserDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminUserData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<IGetAdminUserDataQuery, IGetAdminUserDataQueryVariables>;
+export const GetAdminUserDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminUserData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"usn"}},{"kind":"Field","name":{"kind":"Name","value":"role"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<IGetAdminUserDataQuery, IGetAdminUserDataQueryVariables>;
     
                 // additional types generated by build-graphql.js script!
                 export type GraphqlResolvers = Record<IGraphqlMethod, Record<string, any>>

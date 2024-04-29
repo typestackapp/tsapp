@@ -12,7 +12,7 @@ export type UserDocument = IUserDocument & Document<Types.ObjectId> & {
 }
 
 export const userSchema = new Schema<UserDocument, Model<UserDocument>, UserDocument>({
-    name: { type: String, required: true, unique: true, index: true },
+    usn: { type: String, required: true, unique: true, index: true },
     psw: { type: String, required: true },
     role: { type: String, required: true, index: true }
 },{ timestamps:true })
