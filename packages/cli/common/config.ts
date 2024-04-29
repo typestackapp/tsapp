@@ -213,7 +213,7 @@ export const config = async (options: ConfigOptions) => {
         }
 
         // fill empty configs
-        const empty_configs = ['rabbitmq', 'db', 'consumers', "captcha", "graphql"]
+        const empty_configs = ['rabbitmq', 'db', 'consumers', "captcha", "graphql", "access"]
         for(const empty_config of empty_configs) {
             if(!configs[_package]) configs[_package] = {}
             if(!configs[_package][empty_config]) configs[_package][empty_config] = {ACTIVE: {}}
