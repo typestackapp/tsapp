@@ -508,7 +508,7 @@ export async function getGraphqlModules(config: GraphqlServerConfig, options: Ge
         const files = fs.readdirSync(directory);
     
         for(const file of files) {
-             const filePath = path.join(directory, file);
+            const filePath = path.join(directory, file);
     
             // Check if it's a directory
             if (fs.statSync(filePath).isDirectory()) {

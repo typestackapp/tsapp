@@ -1,6 +1,5 @@
 import { env } from "@typestackapp/core"
 import DB from "@typestackapp/core/common/db"
-
 DB.getInstance()
 
 import { ApolloServer } from '@apollo/server'

@@ -33,4 +33,9 @@ export const appSchema = new Schema<AppDocument, Model<AppDocument>, AppDocument
     updated_by: { type: Schema.Types.ObjectId, required: true, index: true },
 }, { timestamps: true })
 
-export const AppModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model('user_apps', appSchema, 'user_apps')
+appSchema.index(
+    { data: "text", type: "text" },
+    { name: "app_search_index" }
+)
+
+export const AppModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<AppDocument>('user_apps', appSchema)

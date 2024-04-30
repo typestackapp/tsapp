@@ -48,6 +48,9 @@ const service_options = {
     env: argv === null || argv === void 0 ? void 0 : argv.env
 };
 const graphql_options = {};
+const update_options = {
+    cwd
+};
 switch (action) {
     case 'config':
         Promise.resolve().then(() => __importStar(require("./common/config"))).then(module => module.config(config_options))
@@ -58,7 +61,7 @@ switch (action) {
             .catch(error => console.log(error));
         break;
     case 'update':
-        Promise.resolve().then(() => __importStar(require("./common/update"))).then(module => module.update())
+        Promise.resolve().then(() => __importStar(require("./common/update"))).then(module => module.update(update_options))
             .catch(error => console.log(error));
         break;
     case 'service':

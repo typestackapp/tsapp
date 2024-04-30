@@ -1,6 +1,5 @@
-import {env} from "@typestackapp/core"
+import { env } from "@typestackapp/core"
 import DB from "@typestackapp/core/common/db"
-
 DB.getInstance()
 
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"

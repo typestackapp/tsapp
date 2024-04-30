@@ -1,4 +1,4 @@
-import {rcs} from "@typestackapp/core"
+import { rcs } from "@typestackapp/core"
 import DB from "@typestackapp/core/common/db"
 
 async function initilize() {

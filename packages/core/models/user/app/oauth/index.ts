@@ -1,5 +1,5 @@
-import { Schema, Model } from 'mongoose'
 import { AppInput, AppModel, AppDocument, AppAction } from "@typestackapp/core/models/user/app"
+import { Schema, Model } from 'mongoose'
 import { IAccessInput } from '@typestackapp/core/codegen/system'
 import { accessSchema } from '@typestackapp/core/models/user/access'
 import { Client, ClientOptions } from '@typestackapp/core/models/user/app/oauth/client'

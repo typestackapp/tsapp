@@ -12,7 +12,7 @@ import { Maybe } from 'graphql/jsutils/Maybe'
 import { Packages, env } from "@typestackapp/core"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
-import { access_token_config_id } from "@typestackapp/core/models/update"
+import { access_token_config_id } from "@typestackapp/core/models/update/main"
 import moment from 'moment'
 import { UserAccessInput, UserAccessLogDocument, UserAccessLogInput, UserAccessLogModel, UserAccessModel, UserDevice } from '@typestackapp/core/models/user/access'
 import { checkResourceAccess, secretCompare } from '@typestackapp/core/models/user/access/util'

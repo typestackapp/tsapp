@@ -1,7 +1,6 @@
 import {} from "@typestackapp/core"
-import DB from "@typestackapp/core/common/db"
 import { ModelLoader } from "@typestackapp/core/common/model"
-
+import DB from "@typestackapp/core/common/db"
 DB.getInstance()
 
 import { JobList } from "@typestackapp/core/common/job"

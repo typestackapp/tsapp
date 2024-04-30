@@ -3,6 +3,7 @@ import type { ConfigOptions } from "./common/config"
 import type { ServiceOptions } from "./common/service"
 import type { GraphqlOptions } from "./common/graphql"
 import { findTSAppRootDir } from "./common/util"
+import { UpdateOptions } from "./common/update"
 import minimist from "./lib/minimist"
 
 const argv = minimist(process.argv.slice(2))
@@ -28,6 +29,10 @@ const service_options: ServiceOptions = {
 
 const graphql_options: GraphqlOptions = {}
 
+const update_options: UpdateOptions = {
+    cwd
+}
+
 switch(action) {
     case 'config':
         import("./common/config")
@@ -41,7 +46,7 @@ switch(action) {
     break
     case 'update':
         import("./common/update")
-        .then(module => module.update())
+        .then(module => module.update(update_options))
         .catch(error => console.log(error))
     break
     case 'service':

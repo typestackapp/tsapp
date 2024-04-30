@@ -1,18 +1,29 @@
-import { Types, Schema, Document, ClientSession } from "mongoose"
-import { RoleConfigDocument, RoleConfigModel, RoleConfigInput } from "@typestackapp/core/models/config/role"
-import { AccessDocument } from "@typestackapp/core/models/user/access"
-import { secretHash, randomSecret } from "@typestackapp/core/models/user/access/util"
-import { sleep } from "@typestackapp/core/common/util"
-import { env, config, Config, Packages } from "@typestackapp/core"
-import { UserInput, UserModel } from "@typestackapp/core/models/user"
-import { IAccessInput } from "@typestackapp/core"
-import { OauthAppInput, OauthAppModel } from "@typestackapp/core/models/user/app/oauth"
-import { JWKConfigDocument, JWKConfigInput, JWKConfigModel, AccessTokenJWKData, RefreshTokenJWKData } from "@typestackapp/core/models/config/jwk"
+import { Types, ClientSession } from "mongoose"
 import { generateKeyPair, exportJWK } from "jose"
+import { JWKConfigDocument, JWKConfigInput, JWKConfigModel, AccessTokenJWKData, RefreshTokenJWKData } from "@typestackapp/core/models/config/jwk"
+import { RoleConfigDocument, RoleConfigModel, RoleConfigInput } from "@typestackapp/core/models/config/role"
+import { OauthAppInput, OauthAppModel } from "@typestackapp/core/models/user/app/oauth"
+import { UpdateDocument, UpdateInput, UpdateModel } from "@typestackapp/core/models/update"
+import { secretHash, randomSecret } from "@typestackapp/core/models/user/access/util"
+import { UserInput, UserModel } from "@typestackapp/core/models/user"
+import { env, config, Config, Packages } from "@typestackapp/core"
+import { AccessDocument } from "@typestackapp/core/models/user/access"
+import { getPackageVersion } from "@typestackapp/cli/common/util"
+import { sleep } from "@typestackapp/core/common/util"
+import { IAccessInput } from "@typestackapp/core"
+
+export const system_admin_id = new Types.ObjectId("62082b4a4a13ab628afc0cce")
+export const refresh_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccd")
+export const access_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccc")
+export const role_config_id = new Types.ObjectId("64ac53099725764a2af1feb2")
+export const default_user_app_id = new Types.ObjectId("64ac53099725764a2af1feb3")
+export const default_user_app_client_id = "5125b186995939a4b263b835670aab334787815b"
+export const all_access_inputs: AccessDocument[] = getAllAccessInputs()
 
 export const update = async () => {
     const update_input: UpdateInput = {
-        version: "000",
+        pack: "@typestackapp/core",
+        version: getPackageVersion("@typestackapp/core"),
         log: []
     }
 
@@ -22,17 +33,15 @@ export const update = async () => {
     )
 
     update.log.push({ type: "update", msg: "started" })
-    console.log("Update started")
     const session = await global.tsapp["@typestackapp/core"].db.mongoose.core.startSession()
     session.startTransaction()
     
-    // sleep for 1 second
+    // sleep for 2 second
     // fixes Update error: MongoServerError: Unable to acquire IX lock on
-    await sleep(1)
+    await sleep(2)
 
     await transaction(session, update)
     .then(async () => {
-        console.log("Update completed")
         await session.commitTransaction()
         update.log.push({ type: "update", msg: "completed" })
         await update.save()
@@ -49,43 +58,31 @@ export const update = async () => {
     })
 }
 
-export interface UpdateInput {
-    version: string
-    log: UpdateLogInput[]
+export function getAllAccessInputs(): AccessDocument[] {
+    var _access: AccessDocument[] = []
+    for(const [pack_key, pack] of Object.entries(config as Config)) {
+        const active_access = pack?.access?.ACTIVE
+        if(!active_access) continue
+        for (const [resource_key, resource] of Object.entries(active_access)) {
+            let doc_input: IAccessInput = {
+                status: "Enabled",
+                pack: pack_key as Packages,
+                resource: resource_key,
+                permissions: ["Read", "Write", "Update", "Delete"]
+            }
+            let doc = doc_input as any
+            _access.push(doc)
+        }
+    }
+    return _access
 }
-
-export interface UpdateLogInput {
-    type: string,
-    msg: string | undefined
-}
-
-export interface UpdateDocument extends UpdateInput, Document {}
-
-export const updateLogSchema = new Schema<UpdateLogInput>({
-    type: { type: String, required: true, unique: false, index: true },
-    msg: { type: String, required: false, unique: false, index: true }
-},{ _id: false, timestamps: true })
-
-export const updateSchema = new Schema<UpdateDocument>({
-    version: { type: String, required: true, unique: false, index: true },
-    log: { type: [updateLogSchema], required: true, unique: false, index: true }
-},{ timestamps:true })
-
-export const UpdateModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<UpdateDocument>('updates', updateSchema)
-
-export const system_admin_id = new Types.ObjectId("62082b4a4a13ab628afc0cce")
-export const refresh_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccd")
-export const access_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccc")
-export const role_config_id = new Types.ObjectId("64ac53099725764a2af1feb2")
-export const default_user_app_id = new Types.ObjectId("64ac53099725764a2af1feb3")
-export const default_user_app_client_id = "5125b186995939a4b263b835670aab334787815b"
-export const all_access_inputs: AccessDocument[] = getAllAccessInputs()
 
 export const transaction = async (session: ClientSession, update: UpdateDocument) => {
     const host = `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_PROXY_TSAPP}`
 
     // ADD JWT FOR REFRESH TOKEN
-    if(await JWKConfigModel.findOne({ _id: refresh_token_config_id }) == null || env.TYPE == "dev") {
+    const refresh_token_config = await JWKConfigModel.findOne({ _id: refresh_token_config_id }, {}, { session })
+    if(!refresh_token_config || env.TYPE == "dev") {
         const pair = await generateKeyPair("RS256")
         const key = await exportJWK(pair.privateKey)
         const refresh_token_config_input: JWKConfigInput<RefreshTokenJWKData> = {
@@ -115,7 +112,8 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
 
 
     // ADD JWT FOR ACCESS TOKEN
-    if(await JWKConfigModel.findOne({ _id: access_token_config_id }) == null || env.TYPE == "dev") {
+    const access_token_config = await JWKConfigModel.findOne({ _id: access_token_config_id }, {}, { session })
+    if(!access_token_config || env.TYPE == "dev") {
         const pair = await generateKeyPair("RS256")
         const key = await exportJWK(pair.privateKey)
         const access_token_config_input: JWKConfigInput<AccessTokenJWKData> = {
@@ -191,17 +189,22 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
         created_by: system_admin_id,
         updated_by: system_admin_id
     }
-    let default_user_app = await OauthAppModel.findOne({ _id: default_user_app_id })
+
+    let default_user_app = await OauthAppModel.findOne({ _id: default_user_app_id }, {}, { session })
     update.log.push({ type: "default_user_app", msg: default_user_app ? "found" : "not found" })
-    if (!default_user_app) {
-        default_user_app = new OauthAppModel(default_user_app_input, { session })
-        update.log.push({ type: "default_user_app", msg: "created" })
-    } else {
+    if(default_user_app) {
         default_user_app.data.access = all_access_inputs
         default_user_app.data.roles = [role_config_input.data.name]
         update.log.push({ type: "default_user_app", msg: "access updated" })
+        await default_user_app.save({ session })
+    } else {
+        await OauthAppModel.findOneAndUpdate<OauthAppInput>(
+            { _id: default_user_app_id },
+            default_user_app_input,
+            { upsert: true, new: true, session }
+        )
+        update.log.push({ type: "default_user_app", msg: "created" })
     }
-    await default_user_app.save({ session })
 
     // UPDATE SYSTEM ADMIN USER
     const system_admin_input: UserInput = {
@@ -216,24 +219,4 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
         { upsert: true, new: true, session }
     )
     update.log.push({ type: "system_admin", msg: "upserted" })
-
-}
-
-function getAllAccessInputs(): AccessDocument[] {
-    var _access: AccessDocument[] = []
-    for(const [pack_key, pack] of Object.entries(config as Config)) {
-        const active_access = pack?.access?.ACTIVE
-        if(!active_access) continue
-        for (const [resource_key, resource] of Object.entries(active_access)) {
-            let doc_input: IAccessInput = {
-                status: "Enabled",
-                pack: pack_key as Packages,
-                resource: resource_key,
-                permissions: ["Read", "Write", "Update", "Delete"]
-            }
-            let doc = doc_input as any
-            _access.push(doc)
-        }
-    }
-    return _access
 }

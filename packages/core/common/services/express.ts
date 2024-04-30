@@ -1,11 +1,10 @@
-import { Packages } from "@typestackapp/core"
+import { env, packages, Packages, ExpressRouter } from "@typestackapp/core"
 import DB from "@typestackapp/core/common/db"
 DB.getInstance()
+
 import express from "express"
-import { ExpressRouter } from "@typestackapp/core"
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
 import { middleware, upsertRouterDocs } from "@typestackapp/core/models/user/access/middleware"
-import { env, packages } from "@typestackapp/core"
 
 async function initilize() {
     await DB.getInstance()
