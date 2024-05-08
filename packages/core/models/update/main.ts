@@ -1,62 +1,23 @@
-import { Types, ClientSession } from "mongoose"
+import { Types } from "mongoose"
 import { generateKeyPair, exportJWK } from "jose"
 import { JWKConfigDocument, JWKConfigInput, JWKConfigModel, AccessTokenJWKData, RefreshTokenJWKData } from "@typestackapp/core/models/config/jwk"
 import { RoleConfigDocument, RoleConfigModel, RoleConfigInput } from "@typestackapp/core/models/config/role"
 import { OauthAppInput, OauthAppModel } from "@typestackapp/core/models/user/app/oauth"
-import { UpdateDocument, UpdateInput, UpdateModel } from "@typestackapp/core/models/update"
+import { Transaction } from "@typestackapp/core/models/update"
 import { secretHash, randomSecret } from "@typestackapp/core/models/user/access/util"
 import { UserInput, UserModel } from "@typestackapp/core/models/user"
 import { env, config, Config, Packages } from "@typestackapp/core"
 import { AccessDocument } from "@typestackapp/core/models/user/access"
-import { getPackageVersion } from "@typestackapp/cli/common/util"
-import { sleep } from "@typestackapp/core/common/util"
 import { IAccessInput } from "@typestackapp/core"
 
 export const system_admin_id = new Types.ObjectId("62082b4a4a13ab628afc0cce")
 export const refresh_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccd")
 export const access_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccc")
 export const role_config_id = new Types.ObjectId("64ac53099725764a2af1feb2")
+export const role_config_name = "SystemAdmin"
 export const default_user_app_id = new Types.ObjectId("64ac53099725764a2af1feb3")
 export const default_user_app_client_id = "5125b186995939a4b263b835670aab334787815b"
 export const all_access_inputs: AccessDocument[] = getAllAccessInputs()
-
-export const update = async () => {
-    const update_input: UpdateInput = {
-        pack: "@typestackapp/core",
-        version: getPackageVersion("@typestackapp/core"),
-        log: []
-    }
-
-    const update = await UpdateModel.findOneAndUpdate(
-        { version: update_input.version }, update_input, 
-        { upsert: true, new: true }
-    )
-
-    update.log.push({ type: "update", msg: "started" })
-    const session = await global.tsapp["@typestackapp/core"].db.mongoose.core.startSession()
-    session.startTransaction()
-    
-    // sleep for 2 second
-    // fixes Update error: MongoServerError: Unable to acquire IX lock on
-    await sleep(2)
-
-    await transaction(session, update)
-    .then(async () => {
-        await session.commitTransaction()
-        update.log.push({ type: "update", msg: "completed" })
-        await update.save()
-    })
-    .catch(async (err: any) => {
-        console.log("Update error:", err)
-        await session.abortTransaction()
-        update.log.push({ type: "error", msg: `${err}` })
-        await update.save()
-    })
-    .finally(async () => {
-        session.endSession()
-        await global.tsapp["@typestackapp/core"].db.mongoose.core.close()
-    })
-}
 
 export function getAllAccessInputs(): AccessDocument[] {
     var _access: AccessDocument[] = []
@@ -77,7 +38,7 @@ export function getAllAccessInputs(): AccessDocument[] {
     return _access
 }
 
-export const transaction = async (session: ClientSession, update: UpdateDocument) => {
+export const transaction: Transaction = async (session, update) => {
     const host = `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_PROXY_TSAPP}`
 
     // ADD JWT FOR REFRESH TOKEN
@@ -147,7 +108,7 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
         updated_by: system_admin_id,
         title: "SystemAdmin role config",
         data: {
-            name: "SystemAdmin",
+            name: role_config_name,
             resource_access: all_access_inputs,
             graphql_access: [{
                 pack: "@typestackapp/core",
@@ -172,7 +133,7 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
             client_id: default_user_app_client_id,
             client_secret: randomSecret(40),
             access: all_access_inputs,
-            roles: [role_config_input.data.name],
+            roles: [role_config_name],
             grants: [
                 { type: "authorization_code" },
                 { type: "refresh_token" },
@@ -194,7 +155,7 @@ export const transaction = async (session: ClientSession, update: UpdateDocument
     update.log.push({ type: "default_user_app", msg: default_user_app ? "found" : "not found" })
     if(default_user_app) {
         default_user_app.data.access = all_access_inputs
-        default_user_app.data.roles = [role_config_input.data.name]
+        default_user_app.data.roles = [role_config_name]
         update.log.push({ type: "default_user_app", msg: "access updated" })
         await default_user_app.save({ session })
     } else {

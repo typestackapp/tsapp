@@ -37,6 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.update = void 0;
 const fs_1 = __importDefault(require("fs"));
+const util_1 = require("./util");
 function update(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const core = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core")));
@@ -49,6 +50,13 @@ function update(options) {
         console.log(`Info, connecting to rabbitmq`);
         const rabbitmq = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core/common/rabbitmq/connection")));
         yield rabbitmq.ConnectionList.initilize();
+        const { UpdateModel } = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core/models/update")));
+        const session = yield global.tsapp["@typestackapp/core"].db.mongoose.core.startSession();
+        session.startTransaction();
+        // sleep for 2 second, fixes Update error: MongoServerError: Unable to acquire IX lock on
+        yield (0, util_1.sleep)(2);
+        const pack_updates = [];
+        const pack_errors = [];
         for (const [pack_key, pack] of Object.entries(core.packages)) {
             const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`;
             console.log(`Info, updating package: ${pack_key}`);
@@ -67,14 +75,50 @@ function update(options) {
                 if (!fs_1.default.existsSync(`${update_path}/${file.replace('.js', '.ts')}`))
                     continue;
                 const module = yield Promise.resolve(`${filePath}`).then(s => __importStar(require(s)));
-                if (module.update) {
-                    const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/');
-                    console.log(`Info, running script: ${logFilePath}`);
-                    yield module.update();
-                }
+                if (!module.transaction)
+                    continue;
+                const transaction = module.transaction;
+                const update_input = {
+                    pack: pack_key,
+                    version: (0, util_1.getPackageVersion)(pack_key),
+                    log: []
+                };
+                const update = yield UpdateModel.findOneAndUpdate({ version: update_input.version }, update_input, { upsert: true, new: true });
+                update.log.push({ type: "update", msg: "started" });
+                const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/');
+                console.log(`Info, running script: ${logFilePath}`);
+                yield transaction(session, update)
+                    .then(() => __awaiter(this, void 0, void 0, function* () {
+                    update.log.push({ type: "update", msg: "completed" });
+                    pack_updates.push(update);
+                }))
+                    .catch((err) => __awaiter(this, void 0, void 0, function* () {
+                    console.log("Update error in package: ", pack_key);
+                    console.log("Update error:", err);
+                    update.log.push({ type: "error", msg: `${err}` });
+                    pack_errors.push(update);
+                }));
             }
         }
-        console.log(`Info, update completed`);
+        if (pack_errors.length > 0) {
+            console.log(`Error, update failed`);
+            yield session.abortTransaction();
+            session.endSession();
+        }
+        else {
+            console.log(`Info, update completed`);
+            yield session.commitTransaction();
+            session.endSession();
+        }
+        // save each update
+        for (const update of pack_updates) {
+            yield update.save();
+        }
+        // save each error
+        for (const update of pack_errors) {
+            yield update.save();
+        }
+        console.log(`Info, update log saved`);
         process.exit(0);
     });
 }

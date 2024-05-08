@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
+exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
 // import type { GraphqlResovlerModule, GraphqlRouter, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core'
 // import type { Config, Packages } from '@typestackapp/core/codegen/config'
 const fs_1 = __importDefault(require("fs"));
@@ -577,3 +577,9 @@ function findTSAppRootDir() {
     return undefined;
 }
 exports.findTSAppRootDir = findTSAppRootDir;
+function sleep(seconds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+    });
+}
+exports.sleep = sleep;

@@ -1,6 +1,9 @@
 import { Packages } from "@typestackapp/core"
 import { Types, Schema, Document, ClientSession } from "mongoose"
 
+// export const transaction = async (session: ClientSession, update: UpdateDocument) => {
+export type Transaction = (session: ClientSession, update: UpdateDocument) => Promise<void>
+
 export interface UpdateInput {
     pack: Packages
     version: string

@@ -1,4 +1,6 @@
 import fs from "fs"
+import type { Transaction, UpdateInput, UpdateDocument } from "@typestackapp/core/models/update"
+import { getPackageVersion, sleep } from "./util"
 
 export type UpdateOptions = {
     cwd: string // current working directory
@@ -18,6 +20,17 @@ export async function update(options: UpdateOptions) {
     console.log(`Info, connecting to rabbitmq`)
     const rabbitmq = await import("@typestackapp/core/common/rabbitmq/connection")
     await rabbitmq.ConnectionList.initilize()
+
+    const { UpdateModel } = await import("@typestackapp/core/models/update")
+
+    const session = await global.tsapp["@typestackapp/core"].db.mongoose.core.startSession()
+    session.startTransaction()
+    
+    // sleep for 2 second, fixes Update error: MongoServerError: Unable to acquire IX lock on
+    await sleep(2)
+
+    const pack_updates: UpdateDocument[] = [];
+    const pack_errors: UpdateDocument[] = [];
 
     for (const [pack_key, pack] of Object.entries(core.packages)) {
         const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`
@@ -42,15 +55,60 @@ export async function update(options: UpdateOptions) {
                 continue
 
             const module = await import(filePath)
+            
+            if(!module.transaction) continue
 
-            if (module.update) {
-                const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/')
-                console.log(`Info, running script: ${logFilePath}`)
-                await module.update()
+            const transaction = module.transaction as Transaction
+
+            const update_input: UpdateInput = {
+                pack: pack_key as any,
+                version: getPackageVersion(pack_key),
+                log: []
             }
+        
+            const update = await UpdateModel.findOneAndUpdate(
+                { version: update_input.version }, update_input, 
+                { upsert: true, new: true }
+            )
+        
+            update.log.push({ type: "update", msg: "started" })
+
+            const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/')
+            console.log(`Info, running script: ${logFilePath}`)
+            await transaction(session, update)
+            .then(async () => {
+                update.log.push({ type: "update", msg: "completed" })
+                pack_updates.push(update)
+            })
+            .catch(async (err: any) => {
+                console.log("Update error in package: ", pack_key)
+                console.log("Update error:", err)
+                update.log.push({ type: "error", msg: `${err}` })
+                pack_errors.push(update)
+            })
         }
     }
 
-    console.log(`Info, update completed`)
+    if(pack_errors.length > 0) {
+        console.log(`Error, update failed`)
+        await session.abortTransaction()
+        session.endSession()
+    }else {
+        console.log(`Info, update completed`)
+        await session.commitTransaction()
+        session.endSession()
+    }
+
+    // save each update
+    for(const update of pack_updates){
+        await update.save()
+    }
+
+    // save each error
+    for(const update of pack_errors){
+        await update.save()
+    }
+
+    console.log(`Info, update log saved`)
     process.exit(0)
 }
