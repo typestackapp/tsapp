@@ -93,7 +93,12 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         const haproxy_input_files = fs_1.default.readdirSync(haproxy_input_folder);
         for (const haproxy_input_file of haproxy_input_files) {
             const file_name = haproxy_input_file.split('.').slice(0, -1).join(' ');
-            const file_content = fs_1.default.readFileSync(`${haproxy_input_folder}/${haproxy_input_file}`, 'utf8');
+            const haproxy_input_file_path = `${haproxy_input_folder}/${haproxy_input_file}`;
+            if (!fs_1.default.existsSync(haproxy_input_file_path)) {
+                console.log(`Error: File ${haproxy_input_file_path} does not exist`);
+                continue;
+            }
+            const file_content = fs_1.default.readFileSync(haproxy_input_file_path, 'utf8');
             haproxy_output_file_content[file_name] = "# " + pack_key + ", " + file_name + "\n" + file_content + "\n";
         }
     }
