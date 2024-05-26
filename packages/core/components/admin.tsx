@@ -65,6 +65,22 @@ export const getAdminUserDataQuery = gql(`#graphql
   }
 `)
 
+export class ErrourBoundary extends React.Component<{ children: React.ReactNode }> {
+  state = { hasError: false }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true }
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error(error, errorInfo)
+  }
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>
+    }
+    return this.props.children
+  }
+}
+
 export default function AdminLayout( { children }: { children: React.ReactNode } ) {
   const init = React.useRef(false)
   const params = useParams() as AdminParams
@@ -93,13 +109,15 @@ export default function AdminLayout( { children }: { children: React.ReactNode }
   }
 
   if(session?.error || !session?.data) return (
-    <context.Provider value={globalContext}>
-      <div className="flex flex-col items-center justify-center w-full h-full">
-        <div className="w-[300px]">
-          <LoginComponent/>
+      <context.Provider value={globalContext}>
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <div className="w-[300px]">
+            <ErrourBoundary>
+              <LoginComponent/>
+            </ErrourBoundary>
+          </div>
         </div>
-      </div>
-    </context.Provider>
+      </context.Provider>
   )
 
   const appContent = app ? <DisplayComponent component={app.next.import}/> : children

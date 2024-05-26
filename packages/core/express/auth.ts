@@ -707,4 +707,4 @@ const middleware = trpcExpress.createExpressMiddleware({
     createContext,
 })
 
-router.use(config.access.ACTIVE.Auth.use, middleware)
+router.use("/api/auth", config.access.ACTIVE.Auth.use, middleware)

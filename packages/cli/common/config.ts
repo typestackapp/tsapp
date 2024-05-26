@@ -198,9 +198,13 @@ export const config = async (options: ConfigOptions) => {
     const configs = {} as any
 
     // merge each module config into one
-    for(const [_package, _config] of Object.entries(packages)) {
+    for(const [_package, _config] of Object.entries(packages) as any) {
         const output_folder = `${module_folder}/source/${_package}/`
         const input_folder = `${CWD}/node_modules/${_package}/configs/output/`
+
+        // create package config
+        !configs[_package] && (configs[_package] = {})
+        configs[_package].alias = _config.alias
 
         // foreach folder config file
         for(const _input_file of fs.readdirSync(input_folder)) {
@@ -216,7 +220,6 @@ export const config = async (options: ConfigOptions) => {
             writeJsonTypeFile(output_file)
             writePublicFile(output_file, content_public)
 
-            !configs[_package] && (configs[_package] = {})
             configs[_package][file_name] = content_server
         }
 

@@ -207,6 +207,9 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     for (const [_package, _config] of Object.entries(packages)) {
         const output_folder = `${module_folder}/source/${_package}/`;
         const input_folder = `${CWD}/node_modules/${_package}/configs/output/`;
+        // create package config
+        !configs[_package] && (configs[_package] = {});
+        configs[_package].alias = _config.alias;
         // foreach folder config file
         for (const _input_file of fs_1.default.readdirSync(input_folder)) {
             const input_file = `${input_folder}/${_input_file}`;
@@ -218,7 +221,6 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             fs_1.default.writeFileSync(output_file, JSON.stringify(content_server, null, 4));
             (0, util_1.writeJsonTypeFile)(output_file);
             (0, util_1.writePublicFile)(output_file, content_public);
-            !configs[_package] && (configs[_package] = {});
             configs[_package][file_name] = content_server;
         }
         // fill empty configs

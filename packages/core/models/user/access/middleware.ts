@@ -424,8 +424,8 @@ export async function validateUserToken( req: Request, options?: IAccessOptions)
 }
 
 export const validateBasicKey = async ( base64: string ): Promise<ValidUserToken> => {
-    const [email, psw] = Buffer.from(base64, 'base64').toString().split(':')
-    const user = await UserModel.findOne({ email })
+    const [usn, psw] = Buffer.from(base64, 'base64').toString().split(':')
+    const user = await UserModel.findOne({ usn })
     if(!user) throw "user not found"
     const match = secretCompare(psw, user.psw)
     if(!match) throw "invalid password"
