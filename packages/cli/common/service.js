@@ -44,6 +44,7 @@ const service = (options) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`Warning, env should be one of prod, dev, stage`);
     const module_folder = `${process.cwd()}/node_modules/@typestackapp/core`;
     const packages = (yield Promise.resolve(`${module_folder}`).then(s => __importStar(require(s)))).config;
+    process.chdir("/tsapp/packages/core/codegen/next");
     const env = options.env;
     // start all services for all packages
     for (const [pack_key, pack] of Object.entries(packages)) {

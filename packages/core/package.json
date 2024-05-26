@@ -107,7 +107,7 @@
     "mongoose": "^8.3.2",
     "mssql": "^9.1.1",
     "mysql2": "^3.6.3",
-    "next": "^14.0.1",
+    "next": "^14.2.3",
     "node-html-parser": "^6.1.5",
     "nodemailer": "^6.6.1",
     "passport": "^0.6.0",

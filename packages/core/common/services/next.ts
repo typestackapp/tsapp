@@ -15,24 +15,22 @@ async function initilize() {
 const nextBuild = async (dir: string) => {
     return new Promise(async (resolve, reject) => {
         // change cwd directory to dir and run next build ./next
-        const cwd = process.cwd()
-        process.chdir(dir)
         const { exec } = await import("child_process")
-        exec("npx next build ./next", (err, stdout, stderr) => {
-
+        exec(`npx next build ./codegen/next/`, { cwd: dir }, (err, stdout, stderr) => {
             // CONSOLE LOG SERVER INFO
             console.log(`--------------------NEXT BUILD-------------------------`)
             console.log(`dir: ${dir}`)
+            console.log(`cwd: ${process.cwd()}`)
             console.log(`-------------------------------------------------------`)
 
             if(err) {
                 console.log(err)
                 reject(err)
+            }else {
+                console.log(stdout)
+                console.log(stderr)
+                resolve(true)
             }
-            console.log(stdout)
-            console.log(stderr)
-            resolve(true)
-            process.chdir(cwd)
         })
     })
 }
@@ -46,7 +44,7 @@ initilize()
     const nextConfig = (await import(conf_dir)).default
 
     const next_options: NextServerOptions = {
-        dev: env.TYPE == "dev",
+        dev: false,
         port,
         dir,
         quiet: false,
