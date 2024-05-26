@@ -16,7 +16,6 @@ export const service = async (options: ServiceOptions) => {
     
     const module_folder = `${process.cwd()}/node_modules/@typestackapp/core`
     const packages = (await import(module_folder)).config
-    process.chdir("/tsapp/packages/core/codegen/next")
     const env = options.env
 
     // start all services for all packages

@@ -44,7 +44,7 @@ initilize()
     const nextConfig = (await import(conf_dir)).default
 
     const next_options: NextServerOptions = {
-        dev: false,
+        dev: env.TYPE == "dev",
         port,
         dir,
         quiet: false,
