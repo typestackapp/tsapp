@@ -41,7 +41,7 @@ initilize()
 .then(async () => {
     const server = express()
     const port = 80
-    const dir = `${process.cwd()}/node_modules/@typestackapp/cli/next`
+    const dir = `${process.cwd()}/node_modules/@typestackapp/core/codegen/next`
     const conf_dir = `${dir}/next.config`
     const nextConfig = (await import(conf_dir)).default
 

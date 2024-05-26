@@ -12,6 +12,7 @@
     "codegen/system/**/*",
     "codegen/config/**/*",
     "tailwind/**/*",
+    "codegen/next/next.config.ts",
     "next/**/*", "env.ts", "global.ts", "setup.test.ts", "setup.ts",
   ],
   "exclude": [
