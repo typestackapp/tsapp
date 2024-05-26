@@ -28,7 +28,7 @@ export async function setup() {
         fs.emptyDirSync(`${process.cwd()}/logs/email`)
         fs.emptyDirSync(`/tsapp/logs/email`)
     }
-    global.tsapp["@conventuslv/csdd"]
+
     // upsert root user
     const _user = await UserModel.findOne({ _id: system_admin_id })
     if(!_user) throw "Root user not found"
