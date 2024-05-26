@@ -81,7 +81,8 @@ export const config = async (options: ConfigOptions) => {
     }
     // write haproxy file
     let haproxy_output_content = ""
-    const haproxy_output = `${CWD}/node_modules/@typestackapp/core/codegen/haproxy/proxy.cfg`
+    const haproxy_output_folder = `${CWD}/node_modules/@typestackapp/core/codegen/haproxy`
+    const haproxy_output_file = `${haproxy_output_folder}/proxy.cfg`
     const haproxy_order = ["resolvers", "global", "defaults", "frontend", "backend" ]
     const haproxy_output_content_order: {file_name: string, content: string}[] = []
     for(const file_name of haproxy_order) {
@@ -97,7 +98,9 @@ export const config = async (options: ConfigOptions) => {
     for(const content of haproxy_output_content_order) {
         haproxy_output_content += content.file_name + "\n" + content.content + "\n"
     }
-    fs.writeFileSync(haproxy_output, haproxy_output_content)
+    // create output folder if not exists
+    fs.existsSync(haproxy_output_folder) || fs.mkdirSync(haproxy_output_folder)
+    fs.writeFileSync(haproxy_output_file, haproxy_output_content)
 
 
     // -------------------- DOCKER --------------------

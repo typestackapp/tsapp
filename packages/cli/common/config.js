@@ -104,7 +104,8 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // write haproxy file
     let haproxy_output_content = "";
-    const haproxy_output = `${CWD}/node_modules/@typestackapp/core/codegen/haproxy/proxy.cfg`;
+    const haproxy_output_folder = `${CWD}/node_modules/@typestackapp/core/codegen/haproxy`;
+    const haproxy_output_file = `${haproxy_output_folder}/proxy.cfg`;
     const haproxy_order = ["resolvers", "global", "defaults", "frontend", "backend"];
     const haproxy_output_content_order = [];
     for (const file_name of haproxy_order) {
@@ -120,7 +121,9 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     for (const content of haproxy_output_content_order) {
         haproxy_output_content += content.file_name + "\n" + content.content + "\n";
     }
-    fs_1.default.writeFileSync(haproxy_output, haproxy_output_content);
+    // create output folder if not exists
+    fs_1.default.existsSync(haproxy_output_folder) || fs_1.default.mkdirSync(haproxy_output_folder);
+    fs_1.default.writeFileSync(haproxy_output_file, haproxy_output_content);
     // -------------------- DOCKER --------------------
     // create docker compose files
     // foreach env file
