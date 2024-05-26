@@ -77,7 +77,7 @@ export const config = async (options: ConfigOptions) => {
     // write haproxy file
     let haproxy_output_content = ""
     const haproxy_output = `${CWD}/node_modules/@typestackapp/core/codegen/haproxy/proxy.cfg`
-    const haproxy_order = ["frontend", "backend", "resolvers", "global", "defaults"]
+    const haproxy_order = ["resolvers", "global", "defaults", "frontend", "backend" ]
     const haproxy_output_content_order: {file_name: string, content: string}[] = []
     for(const file_name of haproxy_order) {
         for(const [key, content] of Object.entries(haproxy_output_file_content)) {
