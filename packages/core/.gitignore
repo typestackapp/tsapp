@@ -11,4 +11,5 @@ configs/mod
 configs/haproxy
 configs/letsencrypt
 configs/mongo
+configs/codeserver
 node_modules
