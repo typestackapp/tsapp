@@ -12,4 +12,5 @@ configs/haproxy
 configs/letsencrypt
 configs/mongo
 configs/codeserver
+configs/wireguard
 node_modules
