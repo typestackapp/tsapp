@@ -45,7 +45,7 @@ export const env = {
     TSAPP_INIT_EMAIL: process.env.TSAPP_INIT_EMAIL as string,
     TSAPP_INIT_PSW: process.env.TSAPP_INIT_PSW as string,
     IP_CERTBOT: process.env.IP_CERTBOT as string, // example: "10.44.44.44"
-    IP_PROXY: process.env.IP_PROXY as string, // example: "10.44.44.44"
+    IP_HAPROXY: process.env.IP_HAPROXY as string, // example: "10.44.44.44"
     IP_RABBITMQ: process.env.IP_RABBITMQ as string, // example: "10.44.44.44"
     IP_MONGO_MASTER: process.env.IP_MONGO_MASTER as string, // example: "10.44.44.44"
     IP_TSAPP: process.env.IP_TSAPP as string, // example: "10.44.44.44"

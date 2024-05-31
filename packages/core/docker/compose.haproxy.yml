@@ -10,7 +10,7 @@ services:
       - HAPROXY_STATS_AUTH=${HAPROXY_STATS_AUTH}
     networks:
       default_network:
-        ipv4_address: ${IP_PROXY}
+        ipv4_address: ${IP_HAPROXY}
     volumes:
       - ../packages/${ALIAS}/codegen/haproxy/proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
       - ../packages/${ALIAS}/logs/haproxy/:/var/log/
