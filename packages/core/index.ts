@@ -50,7 +50,7 @@ export const env = {
     IP_MONGO_MASTER: process.env.IP_MONGO_MASTER as string, // example: "10.44.44.44"
     IP_TSAPP: process.env.IP_TSAPP as string, // example: "10.44.44.44"
     SERVER_DOMAIN_NAME: process.env.SERVER_DOMAIN_NAME as string, // example: "@typestackapp"
-    PORT_PROXY_TSAPP: process.env.PORT_PROXY_TSAPP as string, // example: "7443" | "443"
+    PORT_HAPROXY_TSAPP: process.env.PORT_HAPROXY_TSAPP as string, // example: "7443" | "443"
     RCS: process.env.RCS as string, // rabbitmq consumer services, example: "core,example"
 }
 

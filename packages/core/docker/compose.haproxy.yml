@@ -7,6 +7,7 @@ services:
     environment:
       - CERTBOT_RESTART_TIME=${CERTBOT_RESTART_TIME}
       - SERVER_DOMAIN_NAME=${SERVER_DOMAIN_NAME}
+      - HAPROXY_LOG_AUTH=${HAPROXY_LOG_AUTH}
     networks:
       default_network:
         ipv4_address: ${IP_PROXY}
@@ -16,4 +17,4 @@ services:
       - ../packages/${ALIAS}/configs/haproxy/ssl/:/home/ssl/
       - ../packages/${ALIAS}/bin/haproxy.sh:/home/scripts/haproxy.sh
     entrypoint: /home/scripts/haproxy.sh
-    ports: ${PORT_PROXY}
+    ports: ${PORT_HAPROXY}

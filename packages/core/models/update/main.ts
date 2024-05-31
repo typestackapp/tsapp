@@ -39,7 +39,7 @@ export function getAllAccessInputs(): AccessDocument[] {
 }
 
 export const transaction: Transaction = async (session, update) => {
-    const host = `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_PROXY_TSAPP}`
+    const host = `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_HAPROXY_TSAPP}`
 
     // ADD JWT FOR REFRESH TOKEN
     const refresh_token_config = await JWKConfigModel.findOne({ _id: refresh_token_config_id }, {}, { session })
@@ -144,7 +144,7 @@ export const transaction: Transaction = async (session, update) => {
             redirect_url: `${host}/admin`,
             token_url: env.TYPE == "dev" ? `http://${env.IP_TSAPP}:8000/api/auth/token` : `${host}/api/auth/token` 
         },
-        icon: `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_PROXY_TSAPP}/public/logo.png`,
+        icon: `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_HAPROXY_TSAPP}/public/logo.png`,
         name: env.SERVER_DOMAIN_NAME,
         description: `Use ${env.SERVER_DOMAIN_NAME} account`,
         created_by: system_admin_id,
