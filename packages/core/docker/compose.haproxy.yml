@@ -7,7 +7,7 @@ services:
     environment:
       - CERTBOT_RESTART_TIME=${CERTBOT_RESTART_TIME}
       - SERVER_DOMAIN_NAME=${SERVER_DOMAIN_NAME}
-      - HAPROXY_LOG_AUTH=${HAPROXY_LOG_AUTH}
+      - HAPROXY_STATS_AUTH=${HAPROXY_STATS_AUTH}
     networks:
       default_network:
         ipv4_address: ${IP_PROXY}
