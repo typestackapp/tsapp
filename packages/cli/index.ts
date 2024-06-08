@@ -18,7 +18,8 @@ if(!cwd) console.log(`Could not find tsapp root dir`)
 if(!cwd) process.exit(1)
 
 const config_options: ConfigOptions = {
-    cwd
+    cwd,
+    link: argv?.link,
 }
 
 const service_options: ServiceOptions = {

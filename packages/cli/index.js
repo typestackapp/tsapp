@@ -40,7 +40,8 @@ if (!cwd)
 if (!cwd)
     process.exit(1);
 const config_options = {
-    cwd
+    cwd,
+    link: argv === null || argv === void 0 ? void 0 : argv.link,
 };
 const service_options = {
     cwd,

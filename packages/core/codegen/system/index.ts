@@ -9,53 +9,56 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export interface Scalars {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
-  DateTime: Date;
-  Object: any;
-  ObjectId: any;
-  Packages: Packages;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  DateTime: { input: Date; output: Date; }
+  Object: { input: any; output: any; }
+  ObjectId: { input: any; output: any; }
+  Packages: { input: Packages; output: Packages; }
 }
 
 export interface IAccessDocument extends IAccessInput, IMongoTimeStamps {
-  action?: Maybe<Scalars['String']>;
-  createdAt: Scalars['DateTime'];
-  created_by?: Maybe<Scalars['ObjectId']>;
-  pack: Scalars['Packages'];
+  action?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  created_by?: Maybe<Scalars['ObjectId']['output']>;
+  pack: Scalars['Packages']['output'];
   permissions: Array<IPermissionType>;
-  resource: Scalars['String'];
+  resource: Scalars['String']['output'];
   status: IAccessStatus;
-  updatedAt: Scalars['DateTime'];
-  updated_by?: Maybe<Scalars['ObjectId']>;
+  updatedAt: Scalars['DateTime']['output'];
+  updated_by?: Maybe<Scalars['ObjectId']['output']>;
 }
 
 export interface IAccessInput {
-  action?: Maybe<Scalars['String']>;
-  created_by?: Maybe<Scalars['ObjectId']>;
-  pack: Scalars['Packages'];
+  action?: Maybe<Scalars['String']['output']>;
+  created_by?: Maybe<Scalars['ObjectId']['output']>;
+  pack: Scalars['Packages']['output'];
   permissions: Array<IPermissionType>;
-  resource: Scalars['String'];
+  resource: Scalars['String']['output'];
   status: IAccessStatus;
-  updated_by?: Maybe<Scalars['ObjectId']>;
+  updated_by?: Maybe<Scalars['ObjectId']['output']>;
 }
 
 export interface IAccessOptions extends IEnabled {
-  action: Scalars['String'];
+  action: Scalars['String']['output'];
   auth?: Maybe<IAuthOptions>;
   captcha?: Maybe<ICaptchaOptions>;
-  config?: Maybe<Scalars['String']>;
-  enabled: Scalars['Boolean'];
+  config?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
   limit?: Maybe<ILimitOptions>;
   log: ILogOptions;
-  pack: Scalars['Packages'];
-  resource: Scalars['String'];
-  resourceAction: Scalars['String'];
+  pack: Scalars['Packages']['output'];
+  resource: Scalars['String']['output'];
+  resourceAction: Scalars['String']['output'];
   type?: Maybe<ITypeOptions>;
   types?: Maybe<Array<IAccessType>>;
 }
@@ -67,153 +70,153 @@ export type IAccessStatus =
   | 'EnabledByUser';
 
 export interface IAccessType {
-  info?: Maybe<Array<Scalars['String']>>;
-  pack: Scalars['Packages'];
-  path: Scalars['String'];
-  type: Scalars['String'];
+  info?: Maybe<Array<Scalars['String']['output']>>;
+  pack: Scalars['Packages']['output'];
+  path: Scalars['String']['output'];
+  type: Scalars['String']['output'];
 }
 
 export interface IAuthOptions {
-  authParamKeyName?: Maybe<Scalars['String']>;
-  enabled: Scalars['Boolean'];
+  authParamKeyName?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
   permission?: Maybe<IPermissionType>;
   tokens: Array<ITokenType>;
 }
 
 export interface ICaptchaOptions {
-  enabled: Scalars['Boolean'];
-  pack: Scalars['Packages'];
-  type: Scalars['String'];
+  enabled: Scalars['Boolean']['output'];
+  pack: Scalars['Packages']['output'];
+  type: Scalars['String']['output'];
 }
 
 export interface IConfigBase {
-  _id?: Maybe<Scalars['ObjectId']>;
-  created_by: Scalars['ObjectId'];
-  data?: Maybe<Scalars['Object']>;
-  title: Scalars['String'];
-  updated_by: Scalars['ObjectId'];
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  created_by: Scalars['ObjectId']['output'];
+  data?: Maybe<Scalars['Object']['output']>;
+  title: Scalars['String']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IConfigDocument {
-  _id?: Maybe<Scalars['ObjectId']>;
-  created_by: Scalars['ObjectId'];
-  data?: Maybe<Scalars['Object']>;
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  created_by: Scalars['ObjectId']['output'];
+  data?: Maybe<Scalars['Object']['output']>;
   log: ILogOptionsDocument;
-  pack: Scalars['Packages'];
-  title: Scalars['String'];
-  type: Scalars['String'];
-  updated_by: Scalars['ObjectId'];
+  pack: Scalars['Packages']['output'];
+  title: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IConfigDocumentBase {
   log: ILogOptionsDocument;
-  pack: Scalars['Packages'];
-  type: Scalars['String'];
+  pack: Scalars['Packages']['output'];
+  type: Scalars['String']['output'];
 }
 
 export interface IConfigInput {
-  _id?: Maybe<Scalars['ObjectId']>;
-  created_by: Scalars['ObjectId'];
-  data?: Maybe<Scalars['Object']>;
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  created_by: Scalars['ObjectId']['output'];
+  data?: Maybe<Scalars['Object']['output']>;
   log?: Maybe<ILogOptionsInput>;
-  title: Scalars['String'];
-  updated_by: Scalars['ObjectId'];
+  title: Scalars['String']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IConfigOutput extends IMongoTimeStamps {
-  _id?: Maybe<Scalars['ObjectId']>;
-  createdAt: Scalars['DateTime'];
-  created_by: Scalars['ObjectId'];
-  data?: Maybe<Scalars['Object']>;
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  created_by: Scalars['ObjectId']['output'];
+  data?: Maybe<Scalars['Object']['output']>;
   log: ILogOptionsDocument;
-  pack: Scalars['Packages'];
-  title: Scalars['String'];
-  type: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
-  updated_by: Scalars['ObjectId'];
+  pack: Scalars['Packages']['output'];
+  title: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IConfigPagination extends IPagination {
   list: Array<IConfigSearch>;
-  total?: Maybe<Scalars['Int']>;
+  total?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface IConfigSearch extends IMongoTimeStamps, ISearchScore {
-  _id?: Maybe<Scalars['ObjectId']>;
-  createdAt: Scalars['DateTime'];
-  created_by: Scalars['ObjectId'];
-  data?: Maybe<Scalars['Object']>;
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  created_by: Scalars['ObjectId']['output'];
+  data?: Maybe<Scalars['Object']['output']>;
   log: ILogOptionsDocument;
-  pack: Scalars['Packages'];
-  score?: Maybe<Scalars['Float']>;
-  title: Scalars['String'];
-  type: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
-  updated_by: Scalars['ObjectId'];
+  pack: Scalars['Packages']['output'];
+  score?: Maybe<Scalars['Float']['output']>;
+  title: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface ICountryDocument extends ICountryInput {
-  alpha2: Scalars['String'];
-  alpha3: Scalars['String'];
-  area?: Maybe<Scalars['Int']>;
-  gdp?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
-  phone: Scalars['String'];
-  population?: Maybe<Scalars['Int']>;
-  priority?: Maybe<Scalars['Int']>;
+  alpha2: Scalars['String']['output'];
+  alpha3: Scalars['String']['output'];
+  area?: Maybe<Scalars['Int']['output']>;
+  gdp?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
+  population?: Maybe<Scalars['Int']['output']>;
+  priority?: Maybe<Scalars['Int']['output']>;
   timezones: Array<ITimeZoneDocument>;
 }
 
 export interface ICountryInput {
-  alpha2: Scalars['String'];
-  alpha3: Scalars['String'];
-  area?: Maybe<Scalars['Int']>;
-  gdp?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
-  phone: Scalars['String'];
-  population?: Maybe<Scalars['Int']>;
-  priority?: Maybe<Scalars['Int']>;
+  alpha2: Scalars['String']['output'];
+  alpha3: Scalars['String']['output'];
+  area?: Maybe<Scalars['Int']['output']>;
+  gdp?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
+  population?: Maybe<Scalars['Int']['output']>;
+  priority?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface ICountryPagination extends IPagination {
   list: Array<ICountrySearch>;
-  total?: Maybe<Scalars['Int']>;
+  total?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface ICountrySearch extends ISearchScore {
-  alpha2: Scalars['String'];
-  alpha3: Scalars['String'];
-  area?: Maybe<Scalars['Int']>;
-  gdp?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
-  phone: Scalars['String'];
-  population?: Maybe<Scalars['Int']>;
-  priority?: Maybe<Scalars['Int']>;
-  score?: Maybe<Scalars['Float']>;
+  alpha2: Scalars['String']['output'];
+  alpha3: Scalars['String']['output'];
+  area?: Maybe<Scalars['Int']['output']>;
+  gdp?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
+  population?: Maybe<Scalars['Int']['output']>;
+  priority?: Maybe<Scalars['Int']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
   timezones: Array<ITimeZoneDocument>;
 }
 
 export interface ICountryUpdate {
-  alpha2?: InputMaybe<Scalars['String']>;
-  alpha3?: InputMaybe<Scalars['String']>;
-  area?: InputMaybe<Scalars['Int']>;
-  gdp?: InputMaybe<Scalars['String']>;
-  name?: InputMaybe<Scalars['String']>;
-  phone?: InputMaybe<Scalars['String']>;
-  population?: InputMaybe<Scalars['Int']>;
-  priority?: InputMaybe<Scalars['Int']>;
+  alpha2?: InputMaybe<Scalars['String']['input']>;
+  alpha3?: InputMaybe<Scalars['String']['input']>;
+  area?: InputMaybe<Scalars['Int']['input']>;
+  gdp?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  population?: InputMaybe<Scalars['Int']['input']>;
+  priority?: InputMaybe<Scalars['Int']['input']>;
 }
 
 export interface IDefaultAccessOptions {
-  action: Scalars['String'];
-  pack: Scalars['Packages'];
-  resource: Scalars['String'];
-  resourceAction: Scalars['String'];
+  action: Scalars['String']['output'];
+  pack: Scalars['Packages']['output'];
+  resource: Scalars['String']['output'];
+  resourceAction: Scalars['String']['output'];
   types?: Maybe<Array<IAccessType>>;
 }
 
 export interface IEnabled {
-  enabled: Scalars['Boolean'];
+  enabled: Scalars['Boolean']['output'];
 }
 
 export type IExpressMethod =
@@ -228,8 +231,8 @@ export type IExpressMethod =
   | 'use';
 
 export interface IGraphqlAccess {
-  pack: Scalars['Packages'];
-  services: Array<Scalars['String']>;
+  pack: Scalars['Packages']['output'];
+  services: Array<Scalars['String']['output']>;
 }
 
 export type IGraphqlMethod =
@@ -238,98 +241,98 @@ export type IGraphqlMethod =
   | 'Subscription';
 
 export interface IJobActionDocument extends IJobActionInput, IMongoId, IMongoTimeStamps {
-  _id: Scalars['ObjectId'];
-  createdAt: Scalars['DateTime'];
-  job_id?: Maybe<Scalars['ObjectId']>;
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  job_id?: Maybe<Scalars['ObjectId']['output']>;
   steps: Array<IJobStepInput>;
-  updatedAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime']['output'];
 }
 
 export interface IJobActionInput {
-  job_id?: Maybe<Scalars['ObjectId']>;
+  job_id?: Maybe<Scalars['ObjectId']['output']>;
   steps: Array<IJobStepInput>;
 }
 
 export interface IJobActionPagination extends IPagination {
   list: Array<IJobActionSearch>;
-  total?: Maybe<Scalars['Int']>;
+  total?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface IJobActionSearch extends IJobActionInput, IMongoId, IMongoTimeStamps, ISearchScore {
-  _id: Scalars['ObjectId'];
-  createdAt: Scalars['DateTime'];
-  job_id?: Maybe<Scalars['ObjectId']>;
-  score?: Maybe<Scalars['Float']>;
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  job_id?: Maybe<Scalars['ObjectId']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
   steps: Array<IJobStepInput>;
-  updatedAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime']['output'];
 }
 
 export interface IJobBase {
-  created_by: Scalars['ObjectId'];
-  cron?: Maybe<Scalars['String']>;
-  data?: Maybe<Scalars['Object']>;
-  description: Scalars['String'];
-  params: Scalars['Object'];
-  parent_id?: Maybe<Scalars['ObjectId']>;
+  created_by: Scalars['ObjectId']['output'];
+  cron?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Scalars['Object']['output']>;
+  description: Scalars['String']['output'];
+  params: Scalars['Object']['output'];
+  parent_id?: Maybe<Scalars['ObjectId']['output']>;
   status: IJobStatus;
-  updated_by: Scalars['ObjectId'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IJobDocument extends IJobBase, IMongoId, IMongoTimeStamps {
-  _id: Scalars['ObjectId'];
-  createdAt: Scalars['DateTime'];
-  created_by: Scalars['ObjectId'];
-  cron?: Maybe<Scalars['String']>;
-  data?: Maybe<Scalars['Object']>;
-  description: Scalars['String'];
-  error?: Maybe<Scalars['String']>;
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  created_by: Scalars['ObjectId']['output'];
+  cron?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Scalars['Object']['output']>;
+  description: Scalars['String']['output'];
+  error?: Maybe<Scalars['String']['output']>;
   log: ILogOptionsDocument;
-  pack: Scalars['Packages'];
-  params: Scalars['Object'];
-  parent_id?: Maybe<Scalars['ObjectId']>;
-  run_on_startup: Scalars['Boolean'];
+  pack: Scalars['Packages']['output'];
+  params: Scalars['Object']['output'];
+  parent_id?: Maybe<Scalars['ObjectId']['output']>;
+  run_on_startup: Scalars['Boolean']['output'];
   status: IJobStatus;
-  time_zone: Scalars['String'];
-  type: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
-  updated_by: Scalars['ObjectId'];
+  time_zone: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IJobInput {
-  created_by: Scalars['ObjectId'];
-  cron?: Maybe<Scalars['String']>;
-  data?: Maybe<Scalars['Object']>;
-  description: Scalars['String'];
+  created_by: Scalars['ObjectId']['output'];
+  cron?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Scalars['Object']['output']>;
+  description: Scalars['String']['output'];
   log?: Maybe<ILogOptionsInput>;
-  params: Scalars['Object'];
-  parent_id?: Maybe<Scalars['ObjectId']>;
-  run_on_startup?: Maybe<Scalars['Boolean']>;
+  params: Scalars['Object']['output'];
+  parent_id?: Maybe<Scalars['ObjectId']['output']>;
+  run_on_startup?: Maybe<Scalars['Boolean']['output']>;
   status: IJobStatus;
-  time_zone?: Maybe<Scalars['String']>;
-  updated_by: Scalars['ObjectId'];
+  time_zone?: Maybe<Scalars['String']['output']>;
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IJobPagination extends IPagination {
   list: Array<IJobSearch>;
-  total?: Maybe<Scalars['Int']>;
+  total?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface IJobSearch extends IJobBase, IJobInput, IMongoId, IMongoTimeStamps, ISearchScore {
-  _id: Scalars['ObjectId'];
-  createdAt: Scalars['DateTime'];
-  created_by: Scalars['ObjectId'];
-  cron?: Maybe<Scalars['String']>;
-  data?: Maybe<Scalars['Object']>;
-  description: Scalars['String'];
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  created_by: Scalars['ObjectId']['output'];
+  cron?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Scalars['Object']['output']>;
+  description: Scalars['String']['output'];
   log?: Maybe<ILogOptionsInput>;
-  params: Scalars['Object'];
-  parent_id?: Maybe<Scalars['ObjectId']>;
-  run_on_startup?: Maybe<Scalars['Boolean']>;
-  score?: Maybe<Scalars['Float']>;
+  params: Scalars['Object']['output'];
+  parent_id?: Maybe<Scalars['ObjectId']['output']>;
+  run_on_startup?: Maybe<Scalars['Boolean']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
   status: IJobStatus;
-  time_zone?: Maybe<Scalars['String']>;
-  updatedAt: Scalars['DateTime'];
-  updated_by: Scalars['ObjectId'];
+  time_zone?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export type IJobStatus =
@@ -340,9 +343,9 @@ export type IJobStatus =
   | 'Success';
 
 export interface IJobStepInput {
-  data: Scalars['Object'];
-  error?: Maybe<Scalars['String']>;
-  identifier: Scalars['String'];
+  data: Scalars['Object']['output'];
+  error?: Maybe<Scalars['String']['output']>;
+  identifier: Scalars['String']['output'];
   status: IJobStepStatus;
 }
 
@@ -353,31 +356,31 @@ export type IJobStepStatus =
   | 'Initilized';
 
 export interface ILimitOptions {
-  enabled: Scalars['Boolean'];
-  limitInterval: Scalars['String'];
-  limitTreshold: Scalars['Int'];
+  enabled: Scalars['Boolean']['output'];
+  limitInterval: Scalars['String']['output'];
+  limitTreshold: Scalars['Int']['output'];
 }
 
 export interface ILogOptions {
-  enabled: Scalars['Boolean'];
+  enabled: Scalars['Boolean']['output'];
 }
 
 export interface ILogOptionsDocument {
-  enabled: Scalars['Boolean'];
-  max: Scalars['Int'];
+  enabled: Scalars['Boolean']['output'];
+  max: Scalars['Int']['output'];
 }
 
 export interface ILogOptionsInput {
-  enabled?: Maybe<Scalars['Boolean']>;
-  max?: Maybe<Scalars['Int']>;
+  enabled?: Maybe<Scalars['Boolean']['output']>;
+  max?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface IMongoId {
-  _id: Scalars['ObjectId'];
+  _id: Scalars['ObjectId']['output'];
 }
 
 export interface IMongoIdMeybe {
-  _id?: Maybe<Scalars['ObjectId']>;
+  _id?: Maybe<Scalars['ObjectId']['output']>;
 }
 
 export type IMongoOperationType =
@@ -400,8 +403,8 @@ export type IMongoOperationType =
 
 export interface IMongoStream {
   documentKey: IMongoId;
-  fullDocument?: Maybe<Scalars['Object']>;
-  fullDocumentBeforeChange?: Maybe<Scalars['Object']>;
+  fullDocument?: Maybe<Scalars['Object']['output']>;
+  fullDocumentBeforeChange?: Maybe<Scalars['Object']['output']>;
   ns: IMongoStreamNameSpace;
   operationType: IMongoOperationType;
   updateDescription?: Maybe<IMongoStreamUpdateDescription>;
@@ -412,56 +415,56 @@ export interface IMongoStreamInput {
 }
 
 export interface IMongoStreamNameSpace {
-  coll?: Maybe<Scalars['String']>;
-  db?: Maybe<Scalars['String']>;
+  coll?: Maybe<Scalars['String']['output']>;
+  db?: Maybe<Scalars['String']['output']>;
 }
 
 export interface IMongoStreamUpdateDescription {
-  removedFields: Array<Scalars['String']>;
-  truncatedArrays: Array<Scalars['String']>;
-  updatedFields: Scalars['Object'];
+  removedFields: Array<Scalars['String']['output']>;
+  truncatedArrays: Array<Scalars['String']['output']>;
+  updatedFields: Scalars['Object']['output'];
 }
 
 export interface IMongoTimeStamps {
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  createdAt: Scalars['DateTime']['output'];
+  updatedAt: Scalars['DateTime']['output'];
 }
 
 export interface IMongoTimeStampsMeybe {
-  createdAt?: Maybe<Scalars['DateTime']>;
-  updatedAt?: Maybe<Scalars['DateTime']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 }
 
 export interface IMongoTimeStampsType extends IMongoTimeStamps {
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  createdAt: Scalars['DateTime']['output'];
+  updatedAt: Scalars['DateTime']['output'];
 }
 
 export interface IMongoUpdateRes {
-  acknowledged?: Maybe<Scalars['Boolean']>;
-  matchedCount?: Maybe<Scalars['Int']>;
-  modifiedCount?: Maybe<Scalars['Int']>;
-  upsertedCount?: Maybe<Scalars['Int']>;
-  upsertedId?: Maybe<Scalars['String']>;
+  acknowledged?: Maybe<Scalars['Boolean']['output']>;
+  matchedCount?: Maybe<Scalars['Int']['output']>;
+  modifiedCount?: Maybe<Scalars['Int']['output']>;
+  upsertedCount?: Maybe<Scalars['Int']['output']>;
+  upsertedId?: Maybe<Scalars['String']['output']>;
 }
 
 export interface IMutation {
-  getPing?: Maybe<Scalars['Boolean']>;
+  getPing?: Maybe<Scalars['Boolean']['output']>;
 }
 
 export interface IMySqlRes {
-  affectedRows?: Maybe<Scalars['Int']>;
-  changedRows?: Maybe<Scalars['Int']>;
-  fieldCount?: Maybe<Scalars['Int']>;
-  insertId?: Maybe<Scalars['Int']>;
-  message?: Maybe<Scalars['String']>;
-  protocol41?: Maybe<Scalars['Boolean']>;
-  serverStatus?: Maybe<Scalars['Int']>;
-  warningCount?: Maybe<Scalars['Int']>;
+  affectedRows?: Maybe<Scalars['Int']['output']>;
+  changedRows?: Maybe<Scalars['Int']['output']>;
+  fieldCount?: Maybe<Scalars['Int']['output']>;
+  insertId?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  protocol41?: Maybe<Scalars['Boolean']['output']>;
+  serverStatus?: Maybe<Scalars['Int']['output']>;
+  warningCount?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface IPagination {
-  total?: Maybe<Scalars['Int']>;
+  total?: Maybe<Scalars['Int']['output']>;
 }
 
 export type IPermissionType =
@@ -475,7 +478,7 @@ export interface IQuery {
   getCountry?: Maybe<ICountryDocument>;
   getCurrentUser?: Maybe<IUserOutput>;
   getJob?: Maybe<IJobDocument>;
-  getPing?: Maybe<Scalars['Boolean']>;
+  getPing?: Maybe<Scalars['Boolean']['output']>;
   getUser?: Maybe<IUserOutput>;
   searchConfigs?: Maybe<IConfigPagination>;
   searchCountry: Array<ICountrySearch>;
@@ -485,22 +488,22 @@ export interface IQuery {
 
 
 export interface IQueryGetConfigArgs {
-  id: Scalars['String'];
+  id: Scalars['String']['input'];
 }
 
 
 export interface IQueryGetCountryArgs {
-  alpha2: Scalars['String'];
+  alpha2: Scalars['String']['input'];
 }
 
 
 export interface IQueryGetJobArgs {
-  id: Scalars['String'];
+  id: Scalars['String']['input'];
 }
 
 
 export interface IQueryGetUserArgs {
-  id: Scalars['String'];
+  id: Scalars['String']['input'];
 }
 
 
@@ -510,7 +513,7 @@ export interface IQuerySearchConfigsArgs {
 
 
 export interface IQuerySearchCountryArgs {
-  list?: InputMaybe<Scalars['String']>;
+  list?: InputMaybe<Scalars['String']['input']>;
   search?: InputMaybe<ISearchInput>;
 }
 
@@ -526,48 +529,48 @@ export interface IQuerySearchTimezoneArgs {
 
 export interface IRoleConfigDataDocument {
   graphql_access: Array<IGraphqlAccess>;
-  name: Scalars['String'];
+  name: Scalars['String']['output'];
   resource_access: Array<IAccessDocument>;
 }
 
 export interface IRoleConfigDataInput {
   graphql_access: Array<IGraphqlAccess>;
-  name: Scalars['String'];
+  name: Scalars['String']['output'];
   resource_access: Array<IAccessInput>;
 }
 
 export interface IRoleConfigDocument {
-  _id?: Maybe<Scalars['ObjectId']>;
-  created_by: Scalars['ObjectId'];
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  created_by: Scalars['ObjectId']['output'];
   data: IRoleConfigDataDocument;
   log: ILogOptionsDocument;
-  pack: Scalars['Packages'];
-  title: Scalars['String'];
-  type: Scalars['String'];
-  updated_by: Scalars['ObjectId'];
+  pack: Scalars['Packages']['output'];
+  title: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface IRoleConfigInput {
-  _id?: Maybe<Scalars['ObjectId']>;
-  created_by: Scalars['ObjectId'];
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  created_by: Scalars['ObjectId']['output'];
   data: IRoleConfigDataInput;
   log?: Maybe<ILogOptionsInput>;
-  title: Scalars['String'];
-  updated_by: Scalars['ObjectId'];
+  title: Scalars['String']['output'];
+  updated_by: Scalars['ObjectId']['output'];
 }
 
 export interface ISearchInput {
-  limit?: InputMaybe<Scalars['Int']>;
-  offset?: InputMaybe<Scalars['Int']>;
-  text: Scalars['String'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  text: Scalars['String']['input'];
 }
 
 export interface ISearchScore {
-  score?: Maybe<Scalars['Float']>;
+  score?: Maybe<Scalars['Float']['output']>;
 }
 
 export interface IServerAccess {
-  path: Array<Scalars['String']>;
+  path: Array<Scalars['String']['output']>;
   serverMethod: IServerMethod;
   serverType: IServerType;
 }
@@ -591,7 +594,7 @@ export type IServerType =
   | 'GRAPHQL';
 
 export interface ISubscription {
-  getPing?: Maybe<Scalars['Boolean']>;
+  getPing?: Maybe<Scalars['Boolean']['output']>;
   streamConfig?: Maybe<IMongoStream>;
   streamJob?: Maybe<IMongoStream>;
   streamJobAction?: Maybe<IMongoStream>;
@@ -613,30 +616,30 @@ export interface ISubscriptionStreamJobActionArgs {
 }
 
 export interface ITimeZoneDocument extends ITimeZoneInput {
-  alpha2?: Maybe<Scalars['String']>;
-  dst: Scalars['String'];
-  name: Scalars['String'];
-  std: Scalars['String'];
+  alpha2?: Maybe<Scalars['String']['output']>;
+  dst: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  std: Scalars['String']['output'];
 }
 
 export interface ITimeZoneInput {
-  alpha2?: Maybe<Scalars['String']>;
-  dst: Scalars['String'];
-  name: Scalars['String'];
-  std: Scalars['String'];
+  alpha2?: Maybe<Scalars['String']['output']>;
+  dst: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  std: Scalars['String']['output'];
 }
 
 export interface ITimeZonePagination extends IPagination {
   list: Array<ITimeZoneSearch>;
-  total?: Maybe<Scalars['Int']>;
+  total?: Maybe<Scalars['Int']['output']>;
 }
 
 export interface ITimeZoneSearch extends ISearchScore {
-  alpha2?: Maybe<Scalars['String']>;
-  dst: Scalars['String'];
-  name: Scalars['String'];
-  score?: Maybe<Scalars['Float']>;
-  std: Scalars['String'];
+  alpha2?: Maybe<Scalars['String']['output']>;
+  dst: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  score?: Maybe<Scalars['Float']['output']>;
+  std: Scalars['String']['output'];
 }
 
 export type ITokenType =
@@ -645,31 +648,31 @@ export type ITokenType =
   | 'Bearer';
 
 export interface ITypeOptions {
-  mongoose?: Maybe<Scalars['String']>;
+  mongoose?: Maybe<Scalars['String']['output']>;
 }
 
 export interface IUserDocument extends IMongoId, IMongoTimeStamps {
-  _id: Scalars['ObjectId'];
-  createdAt: Scalars['DateTime'];
-  psw: Scalars['String'];
-  role: Scalars['String'];
-  updatedAt: Scalars['DateTime'];
-  usn: Scalars['String'];
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  psw: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  usn: Scalars['String']['output'];
 }
 
 export interface IUserInput {
-  _id?: Maybe<Scalars['ObjectId']>;
-  psw: Scalars['String'];
-  role: Scalars['String'];
-  usn: Scalars['String'];
+  _id?: Maybe<Scalars['ObjectId']['output']>;
+  psw: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+  usn: Scalars['String']['output'];
 }
 
 export interface IUserOutput extends IMongoId, IMongoTimeStamps {
-  _id: Scalars['ObjectId'];
-  createdAt: Scalars['DateTime'];
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
   role?: Maybe<IRoleConfigDocument>;
-  updatedAt: Scalars['DateTime'];
-  usn: Scalars['String'];
+  updatedAt: Scalars['DateTime']['output'];
+  usn: Scalars['String']['output'];
 }
 
 export type IGetAdminUserDataQueryVariables = Exact<{ [key: string]: never; }>;
@@ -745,168 +748,196 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 ) => TResult | Promise<TResult>;
 
 
-
-/** Mapping between all available schema types and the resolvers types */
-export type IResolversTypes = {
-  AccessDocument: ResolverTypeWrapper<IAccessDocument>;
-  AccessInput: IResolversTypes['AccessDocument'];
-  AccessOptions: ResolverTypeWrapper<IAccessOptions>;
-  AccessStatus: IAccessStatus;
+/** Mapping of interface types */
+export type IResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
+  AccessInput: ( IAccessDocument );
   AccessType: never;
   AuthOptions: never;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   CaptchaOptions: never;
-  ConfigBase: ResolverTypeWrapper<IConfigBase>;
-  ConfigDocument: ResolverTypeWrapper<IConfigDocument>;
-  ConfigDocumentBase: ResolverTypeWrapper<IConfigDocumentBase>;
-  ConfigInput: ResolverTypeWrapper<IConfigInput>;
-  ConfigOutput: ResolverTypeWrapper<IConfigOutput>;
-  ConfigPagination: ResolverTypeWrapper<IConfigPagination>;
-  ConfigSearch: ResolverTypeWrapper<IConfigSearch>;
-  CountryDocument: ResolverTypeWrapper<ICountryDocument>;
-  CountryInput: IResolversTypes['CountryDocument'];
-  CountryPagination: ResolverTypeWrapper<ICountryPagination>;
-  CountrySearch: ResolverTypeWrapper<ICountrySearch>;
-  CountryUpdate: ICountryUpdate;
-  DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
+  CountryInput: ( ICountryDocument );
   DefaultAccessOptions: never;
-  Enabled: IResolversTypes['AccessOptions'];
-  ExpressMethod: IExpressMethod;
-  Float: ResolverTypeWrapper<Scalars['Float']>;
-  GraphqlAccess: ResolverTypeWrapper<IGraphqlAccess>;
-  GraphqlMethod: IGraphqlMethod;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
-  JobActionDocument: ResolverTypeWrapper<IJobActionDocument>;
-  JobActionInput: IResolversTypes['JobActionDocument'] | IResolversTypes['JobActionSearch'];
-  JobActionPagination: ResolverTypeWrapper<IJobActionPagination>;
-  JobActionSearch: ResolverTypeWrapper<IJobActionSearch>;
-  JobBase: IResolversTypes['JobDocument'] | IResolversTypes['JobSearch'];
-  JobDocument: ResolverTypeWrapper<IJobDocument>;
-  JobInput: IResolversTypes['JobSearch'];
-  JobPagination: ResolverTypeWrapper<IJobPagination>;
-  JobSearch: ResolverTypeWrapper<IJobSearch>;
-  JobStatus: IJobStatus;
+  Enabled: ( Omit<IAccessOptions, 'auth' | 'captcha' | 'limit' | 'log' | 'type' | 'types'> & { auth?: Maybe<_RefType['AuthOptions']>, captcha?: Maybe<_RefType['CaptchaOptions']>, limit?: Maybe<_RefType['LimitOptions']>, log: _RefType['LogOptions'], type?: Maybe<_RefType['TypeOptions']>, types?: Maybe<Array<_RefType['AccessType']>> } );
+  JobActionInput: ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } );
+  JobBase: ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } );
+  JobInput: ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } );
   JobStepInput: never;
-  JobStepStatus: IJobStepStatus;
   LimitOptions: never;
   LogOptions: never;
   LogOptionsDocument: never;
   LogOptionsInput: never;
-  MongoId: IResolversTypes['JobActionDocument'] | IResolversTypes['JobActionSearch'] | IResolversTypes['JobDocument'] | IResolversTypes['JobSearch'] | IResolversTypes['UserDocument'] | IResolversTypes['UserOutput'];
+  MongoId: ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( IUserDocument ) | ( IUserOutput );
   MongoIdMeybe: never;
+  MongoTimeStamps: ( IAccessDocument ) | ( Omit<IConfigOutput, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IConfigSearch, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( IMongoTimeStampsType ) | ( IUserDocument ) | ( IUserOutput );
+  MongoTimeStampsMeybe: never;
+  Pagination: ( IConfigPagination ) | ( ICountryPagination ) | ( IJobActionPagination ) | ( IJobPagination ) | ( ITimeZonePagination );
+  SearchScore: ( Omit<IConfigSearch, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( ICountrySearch ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( ITimeZoneSearch );
+  ServerAccess: never;
+  TimeZoneInput: ( ITimeZoneDocument );
+  TypeOptions: never;
+  UserInput: never;
+};
+
+/** Mapping between all available schema types and the resolvers types */
+export type IResolversTypes = {
+  AccessDocument: ResolverTypeWrapper<IAccessDocument>;
+  AccessInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AccessInput']>;
+  AccessOptions: ResolverTypeWrapper<Omit<IAccessOptions, 'auth' | 'captcha' | 'limit' | 'log' | 'type' | 'types'> & { auth?: Maybe<IResolversTypes['AuthOptions']>, captcha?: Maybe<IResolversTypes['CaptchaOptions']>, limit?: Maybe<IResolversTypes['LimitOptions']>, log: IResolversTypes['LogOptions'], type?: Maybe<IResolversTypes['TypeOptions']>, types?: Maybe<Array<IResolversTypes['AccessType']>> }>;
+  AccessStatus: IAccessStatus;
+  AccessType: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AccessType']>;
+  AuthOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AuthOptions']>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CaptchaOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['CaptchaOptions']>;
+  ConfigBase: ResolverTypeWrapper<IConfigBase>;
+  ConfigDocument: ResolverTypeWrapper<Omit<IConfigDocument, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
+  ConfigDocumentBase: ResolverTypeWrapper<Omit<IConfigDocumentBase, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
+  ConfigInput: ResolverTypeWrapper<Omit<IConfigInput, 'log'> & { log?: Maybe<IResolversTypes['LogOptionsInput']> }>;
+  ConfigOutput: ResolverTypeWrapper<Omit<IConfigOutput, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
+  ConfigPagination: ResolverTypeWrapper<IConfigPagination>;
+  ConfigSearch: ResolverTypeWrapper<Omit<IConfigSearch, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
+  CountryDocument: ResolverTypeWrapper<ICountryDocument>;
+  CountryInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['CountryInput']>;
+  CountryPagination: ResolverTypeWrapper<ICountryPagination>;
+  CountrySearch: ResolverTypeWrapper<ICountrySearch>;
+  CountryUpdate: ICountryUpdate;
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
+  DefaultAccessOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['DefaultAccessOptions']>;
+  Enabled: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['Enabled']>;
+  ExpressMethod: IExpressMethod;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  GraphqlAccess: ResolverTypeWrapper<IGraphqlAccess>;
+  GraphqlMethod: IGraphqlMethod;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  JobActionDocument: ResolverTypeWrapper<Omit<IJobActionDocument, 'steps'> & { steps: Array<IResolversTypes['JobStepInput']> }>;
+  JobActionInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['JobActionInput']>;
+  JobActionPagination: ResolverTypeWrapper<IJobActionPagination>;
+  JobActionSearch: ResolverTypeWrapper<Omit<IJobActionSearch, 'steps'> & { steps: Array<IResolversTypes['JobStepInput']> }>;
+  JobBase: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['JobBase']>;
+  JobDocument: ResolverTypeWrapper<Omit<IJobDocument, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
+  JobInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['JobInput']>;
+  JobPagination: ResolverTypeWrapper<IJobPagination>;
+  JobSearch: ResolverTypeWrapper<Omit<IJobSearch, 'log'> & { log?: Maybe<IResolversTypes['LogOptionsInput']> }>;
+  JobStatus: IJobStatus;
+  JobStepInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['JobStepInput']>;
+  JobStepStatus: IJobStepStatus;
+  LimitOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LimitOptions']>;
+  LogOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LogOptions']>;
+  LogOptionsDocument: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LogOptionsDocument']>;
+  LogOptionsInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LogOptionsInput']>;
+  MongoId: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['MongoId']>;
+  MongoIdMeybe: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['MongoIdMeybe']>;
   MongoOperationType: IMongoOperationType;
-  MongoStream: ResolverTypeWrapper<IMongoStream>;
+  MongoStream: ResolverTypeWrapper<Omit<IMongoStream, 'documentKey'> & { documentKey: IResolversTypes['MongoId'] }>;
   MongoStreamInput: IMongoStreamInput;
   MongoStreamNameSpace: ResolverTypeWrapper<IMongoStreamNameSpace>;
   MongoStreamUpdateDescription: ResolverTypeWrapper<IMongoStreamUpdateDescription>;
-  MongoTimeStamps: IResolversTypes['AccessDocument'] | IResolversTypes['ConfigOutput'] | IResolversTypes['ConfigSearch'] | IResolversTypes['JobActionDocument'] | IResolversTypes['JobActionSearch'] | IResolversTypes['JobDocument'] | IResolversTypes['JobSearch'] | IResolversTypes['MongoTimeStampsType'] | IResolversTypes['UserDocument'] | IResolversTypes['UserOutput'];
-  MongoTimeStampsMeybe: never;
+  MongoTimeStamps: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['MongoTimeStamps']>;
+  MongoTimeStampsMeybe: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['MongoTimeStampsMeybe']>;
   MongoTimeStampsType: ResolverTypeWrapper<IMongoTimeStampsType>;
   MongoUpdateRes: ResolverTypeWrapper<IMongoUpdateRes>;
   Mutation: ResolverTypeWrapper<{}>;
   MySqlRes: ResolverTypeWrapper<IMySqlRes>;
-  Object: ResolverTypeWrapper<Scalars['Object']>;
-  ObjectId: ResolverTypeWrapper<Scalars['ObjectId']>;
-  Packages: ResolverTypeWrapper<Scalars['Packages']>;
-  Pagination: IResolversTypes['ConfigPagination'] | IResolversTypes['CountryPagination'] | IResolversTypes['JobActionPagination'] | IResolversTypes['JobPagination'] | IResolversTypes['TimeZonePagination'];
+  Object: ResolverTypeWrapper<Scalars['Object']['output']>;
+  ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
+  Packages: ResolverTypeWrapper<Scalars['Packages']['output']>;
+  Pagination: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['Pagination']>;
   PermissionType: IPermissionType;
   Query: ResolverTypeWrapper<{}>;
   RoleConfigDataDocument: ResolverTypeWrapper<IRoleConfigDataDocument>;
-  RoleConfigDataInput: ResolverTypeWrapper<IRoleConfigDataInput>;
-  RoleConfigDocument: ResolverTypeWrapper<IRoleConfigDocument>;
-  RoleConfigInput: ResolverTypeWrapper<IRoleConfigInput>;
+  RoleConfigDataInput: ResolverTypeWrapper<Omit<IRoleConfigDataInput, 'resource_access'> & { resource_access: Array<IResolversTypes['AccessInput']> }>;
+  RoleConfigDocument: ResolverTypeWrapper<Omit<IRoleConfigDocument, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
+  RoleConfigInput: ResolverTypeWrapper<Omit<IRoleConfigInput, 'log'> & { log?: Maybe<IResolversTypes['LogOptionsInput']> }>;
   SearchInput: ISearchInput;
-  SearchScore: IResolversTypes['ConfigSearch'] | IResolversTypes['CountrySearch'] | IResolversTypes['JobActionSearch'] | IResolversTypes['JobSearch'] | IResolversTypes['TimeZoneSearch'];
-  ServerAccess: never;
+  SearchScore: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['SearchScore']>;
+  ServerAccess: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['ServerAccess']>;
   ServerMethod: IServerMethod;
   ServerType: IServerType;
-  String: ResolverTypeWrapper<Scalars['String']>;
+  String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
   TimeZoneDocument: ResolverTypeWrapper<ITimeZoneDocument>;
-  TimeZoneInput: IResolversTypes['TimeZoneDocument'];
+  TimeZoneInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['TimeZoneInput']>;
   TimeZonePagination: ResolverTypeWrapper<ITimeZonePagination>;
   TimeZoneSearch: ResolverTypeWrapper<ITimeZoneSearch>;
   TokenType: ITokenType;
-  TypeOptions: never;
+  TypeOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['TypeOptions']>;
   UserDocument: ResolverTypeWrapper<IUserDocument>;
-  UserInput: never;
+  UserInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['UserInput']>;
   UserOutput: ResolverTypeWrapper<IUserOutput>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type IResolversParentTypes = {
   AccessDocument: IAccessDocument;
-  AccessInput: IResolversParentTypes['AccessDocument'];
-  AccessOptions: IAccessOptions;
-  AccessType: never;
-  AuthOptions: never;
-  Boolean: Scalars['Boolean'];
-  CaptchaOptions: never;
+  AccessInput: IResolversInterfaceTypes<IResolversParentTypes>['AccessInput'];
+  AccessOptions: Omit<IAccessOptions, 'auth' | 'captcha' | 'limit' | 'log' | 'type' | 'types'> & { auth?: Maybe<IResolversParentTypes['AuthOptions']>, captcha?: Maybe<IResolversParentTypes['CaptchaOptions']>, limit?: Maybe<IResolversParentTypes['LimitOptions']>, log: IResolversParentTypes['LogOptions'], type?: Maybe<IResolversParentTypes['TypeOptions']>, types?: Maybe<Array<IResolversParentTypes['AccessType']>> };
+  AccessType: IResolversInterfaceTypes<IResolversParentTypes>['AccessType'];
+  AuthOptions: IResolversInterfaceTypes<IResolversParentTypes>['AuthOptions'];
+  Boolean: Scalars['Boolean']['output'];
+  CaptchaOptions: IResolversInterfaceTypes<IResolversParentTypes>['CaptchaOptions'];
   ConfigBase: IConfigBase;
-  ConfigDocument: IConfigDocument;
-  ConfigDocumentBase: IConfigDocumentBase;
-  ConfigInput: IConfigInput;
-  ConfigOutput: IConfigOutput;
+  ConfigDocument: Omit<IConfigDocument, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
+  ConfigDocumentBase: Omit<IConfigDocumentBase, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
+  ConfigInput: Omit<IConfigInput, 'log'> & { log?: Maybe<IResolversParentTypes['LogOptionsInput']> };
+  ConfigOutput: Omit<IConfigOutput, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
   ConfigPagination: IConfigPagination;
-  ConfigSearch: IConfigSearch;
+  ConfigSearch: Omit<IConfigSearch, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
   CountryDocument: ICountryDocument;
-  CountryInput: IResolversParentTypes['CountryDocument'];
+  CountryInput: IResolversInterfaceTypes<IResolversParentTypes>['CountryInput'];
   CountryPagination: ICountryPagination;
   CountrySearch: ICountrySearch;
   CountryUpdate: ICountryUpdate;
-  DateTime: Scalars['DateTime'];
-  DefaultAccessOptions: never;
-  Enabled: IResolversParentTypes['AccessOptions'];
-  Float: Scalars['Float'];
+  DateTime: Scalars['DateTime']['output'];
+  DefaultAccessOptions: IResolversInterfaceTypes<IResolversParentTypes>['DefaultAccessOptions'];
+  Enabled: IResolversInterfaceTypes<IResolversParentTypes>['Enabled'];
+  Float: Scalars['Float']['output'];
   GraphqlAccess: IGraphqlAccess;
-  Int: Scalars['Int'];
-  JobActionDocument: IJobActionDocument;
-  JobActionInput: IResolversParentTypes['JobActionDocument'] | IResolversParentTypes['JobActionSearch'];
+  Int: Scalars['Int']['output'];
+  JobActionDocument: Omit<IJobActionDocument, 'steps'> & { steps: Array<IResolversParentTypes['JobStepInput']> };
+  JobActionInput: IResolversInterfaceTypes<IResolversParentTypes>['JobActionInput'];
   JobActionPagination: IJobActionPagination;
-  JobActionSearch: IJobActionSearch;
-  JobBase: IResolversParentTypes['JobDocument'] | IResolversParentTypes['JobSearch'];
-  JobDocument: IJobDocument;
-  JobInput: IResolversParentTypes['JobSearch'];
+  JobActionSearch: Omit<IJobActionSearch, 'steps'> & { steps: Array<IResolversParentTypes['JobStepInput']> };
+  JobBase: IResolversInterfaceTypes<IResolversParentTypes>['JobBase'];
+  JobDocument: Omit<IJobDocument, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
+  JobInput: IResolversInterfaceTypes<IResolversParentTypes>['JobInput'];
   JobPagination: IJobPagination;
-  JobSearch: IJobSearch;
-  JobStepInput: never;
-  LimitOptions: never;
-  LogOptions: never;
-  LogOptionsDocument: never;
-  LogOptionsInput: never;
-  MongoId: IResolversParentTypes['JobActionDocument'] | IResolversParentTypes['JobActionSearch'] | IResolversParentTypes['JobDocument'] | IResolversParentTypes['JobSearch'] | IResolversParentTypes['UserDocument'] | IResolversParentTypes['UserOutput'];
-  MongoIdMeybe: never;
-  MongoStream: IMongoStream;
+  JobSearch: Omit<IJobSearch, 'log'> & { log?: Maybe<IResolversParentTypes['LogOptionsInput']> };
+  JobStepInput: IResolversInterfaceTypes<IResolversParentTypes>['JobStepInput'];
+  LimitOptions: IResolversInterfaceTypes<IResolversParentTypes>['LimitOptions'];
+  LogOptions: IResolversInterfaceTypes<IResolversParentTypes>['LogOptions'];
+  LogOptionsDocument: IResolversInterfaceTypes<IResolversParentTypes>['LogOptionsDocument'];
+  LogOptionsInput: IResolversInterfaceTypes<IResolversParentTypes>['LogOptionsInput'];
+  MongoId: IResolversInterfaceTypes<IResolversParentTypes>['MongoId'];
+  MongoIdMeybe: IResolversInterfaceTypes<IResolversParentTypes>['MongoIdMeybe'];
+  MongoStream: Omit<IMongoStream, 'documentKey'> & { documentKey: IResolversParentTypes['MongoId'] };
   MongoStreamInput: IMongoStreamInput;
   MongoStreamNameSpace: IMongoStreamNameSpace;
   MongoStreamUpdateDescription: IMongoStreamUpdateDescription;
-  MongoTimeStamps: IResolversParentTypes['AccessDocument'] | IResolversParentTypes['ConfigOutput'] | IResolversParentTypes['ConfigSearch'] | IResolversParentTypes['JobActionDocument'] | IResolversParentTypes['JobActionSearch'] | IResolversParentTypes['JobDocument'] | IResolversParentTypes['JobSearch'] | IResolversParentTypes['MongoTimeStampsType'] | IResolversParentTypes['UserDocument'] | IResolversParentTypes['UserOutput'];
-  MongoTimeStampsMeybe: never;
+  MongoTimeStamps: IResolversInterfaceTypes<IResolversParentTypes>['MongoTimeStamps'];
+  MongoTimeStampsMeybe: IResolversInterfaceTypes<IResolversParentTypes>['MongoTimeStampsMeybe'];
   MongoTimeStampsType: IMongoTimeStampsType;
   MongoUpdateRes: IMongoUpdateRes;
   Mutation: {};
   MySqlRes: IMySqlRes;
-  Object: Scalars['Object'];
-  ObjectId: Scalars['ObjectId'];
-  Packages: Scalars['Packages'];
-  Pagination: IResolversParentTypes['ConfigPagination'] | IResolversParentTypes['CountryPagination'] | IResolversParentTypes['JobActionPagination'] | IResolversParentTypes['JobPagination'] | IResolversParentTypes['TimeZonePagination'];
+  Object: Scalars['Object']['output'];
+  ObjectId: Scalars['ObjectId']['output'];
+  Packages: Scalars['Packages']['output'];
+  Pagination: IResolversInterfaceTypes<IResolversParentTypes>['Pagination'];
   Query: {};
   RoleConfigDataDocument: IRoleConfigDataDocument;
-  RoleConfigDataInput: IRoleConfigDataInput;
-  RoleConfigDocument: IRoleConfigDocument;
-  RoleConfigInput: IRoleConfigInput;
+  RoleConfigDataInput: Omit<IRoleConfigDataInput, 'resource_access'> & { resource_access: Array<IResolversParentTypes['AccessInput']> };
+  RoleConfigDocument: Omit<IRoleConfigDocument, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
+  RoleConfigInput: Omit<IRoleConfigInput, 'log'> & { log?: Maybe<IResolversParentTypes['LogOptionsInput']> };
   SearchInput: ISearchInput;
-  SearchScore: IResolversParentTypes['ConfigSearch'] | IResolversParentTypes['CountrySearch'] | IResolversParentTypes['JobActionSearch'] | IResolversParentTypes['JobSearch'] | IResolversParentTypes['TimeZoneSearch'];
-  ServerAccess: never;
-  String: Scalars['String'];
+  SearchScore: IResolversInterfaceTypes<IResolversParentTypes>['SearchScore'];
+  ServerAccess: IResolversInterfaceTypes<IResolversParentTypes>['ServerAccess'];
+  String: Scalars['String']['output'];
   Subscription: {};
   TimeZoneDocument: ITimeZoneDocument;
-  TimeZoneInput: IResolversParentTypes['TimeZoneDocument'];
+  TimeZoneInput: IResolversInterfaceTypes<IResolversParentTypes>['TimeZoneInput'];
   TimeZonePagination: ITimeZonePagination;
   TimeZoneSearch: ITimeZoneSearch;
-  TypeOptions: never;
+  TypeOptions: IResolversInterfaceTypes<IResolversParentTypes>['TypeOptions'];
   UserDocument: IUserDocument;
-  UserInput: never;
+  UserInput: IResolversInterfaceTypes<IResolversParentTypes>['UserInput'];
   UserOutput: IUserOutput;
 };
 

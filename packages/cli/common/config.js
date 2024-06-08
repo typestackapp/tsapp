@@ -44,6 +44,7 @@ const exec = child_process_1.default.execSync;
 const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e;
     const CWD = options.cwd;
+    const LINK = options.link;
     const core_dir = `${CWD}/packages/core`;
     const module_folder = `${core_dir}/codegen/config`;
     const pack_config_output = `${module_folder}/output.json`;
@@ -237,15 +238,15 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     (0, util_1.writeJsonTypeFile)(pack_config_output);
     const output_dir = `${core_dir}/codegen/next`;
     // delete `${output_dir}/app` and `${output_dir}/public`
-    if (fs_1.default.existsSync(`${output_dir}/app`))
+    if (fs_1.default.existsSync(`${output_dir}/app`) && LINK)
         fs_1.default.rmSync(`${output_dir}/app`, { recursive: true });
-    if (fs_1.default.existsSync(`${output_dir}/public`))
+    if (fs_1.default.existsSync(`${output_dir}/public`) && LINK)
         fs_1.default.rmSync(`${output_dir}/public`, { recursive: true });
     // create output_dir/app
-    if (!fs_1.default.existsSync(`${output_dir}/app`))
+    if (!fs_1.default.existsSync(`${output_dir}/app`) && LINK)
         fs_1.default.mkdirSync(`${output_dir}/app`, { recursive: true });
     // create output_dir/public
-    if (!fs_1.default.existsSync(`${output_dir}/public`))
+    if (!fs_1.default.existsSync(`${output_dir}/public`) && LINK)
         fs_1.default.mkdirSync(`${output_dir}/public`, { recursive: true });
     const linkFolder = (source, target) => {
         // use fs.linkSync to lin each file in source to target
@@ -286,7 +287,8 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             }
             else {
                 // unlink file
-                fs_1.default.unlinkSync(`${target}/${file_name}`);
+                if (LINK)
+                    fs_1.default.unlinkSync(`${target}/${file_name}`);
             }
         }
     };
@@ -310,20 +312,23 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         if (!fs_1.default.existsSync(app_dir))
             continue;
         if (_config.disable_next_alias == true) {
-            linkFolder(app_dir, `${output_dir}/app/`);
+            if (LINK)
+                linkFolder(app_dir, `${output_dir}/app/`);
         }
         else {
-            linkFolder(app_dir, output_app_dir.symlink_path);
+            if (LINK)
+                linkFolder(app_dir, output_app_dir.symlink_path);
         }
         // skip if public_dir does not exist
         if (!fs_1.default.existsSync(public_dir))
             continue;
         // create public symlink
-        if (!fs_1.default.existsSync(output_public_dir.path_to_create))
+        if (LINK && !fs_1.default.existsSync(output_public_dir.path_to_create))
             fs_1.default.mkdirSync(output_public_dir.path_to_create, { recursive: true });
-        if (fs_1.default.existsSync(output_public_dir.symlink_path))
+        if (LINK && fs_1.default.existsSync(output_public_dir.symlink_path))
             fs_1.default.unlinkSync(output_public_dir.symlink_path);
-        fs_1.default.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir');
+        if (LINK)
+            fs_1.default.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir');
     }
     // if layout.tsx does not exist create it
     if (!fs_1.default.existsSync(`${output_dir}/app/layout.tsx`)) {

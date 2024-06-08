@@ -10,6 +10,7 @@ const exec = child_process.execSync
 
 export type ConfigOptions = {
     cwd: string
+    link: boolean // create symlinks
 }
 
 export type tsappDependencies = {
@@ -18,6 +19,7 @@ export type tsappDependencies = {
 
 export const config = async (options: ConfigOptions) => {
     const CWD = options.cwd
+    const LINK = options.link
     const core_dir = `${CWD}/packages/core`
     const module_folder = `${core_dir}/codegen/config`
     const pack_config_output = `${module_folder}/output.json`
@@ -238,13 +240,12 @@ export const config = async (options: ConfigOptions) => {
 
     const output_dir = `${core_dir}/codegen/next`
     // delete `${output_dir}/app` and `${output_dir}/public`
-    if(fs.existsSync(`${output_dir}/app`)) fs.rmSync(`${output_dir}/app`, { recursive:true })
-    if(fs.existsSync(`${output_dir}/public`)) fs.rmSync(`${output_dir}/public`, { recursive:true })
-
+    if(fs.existsSync(`${output_dir}/app`) && LINK) fs.rmSync(`${output_dir}/app`, { recursive:true })
+    if(fs.existsSync(`${output_dir}/public`) && LINK) fs.rmSync(`${output_dir}/public`, { recursive:true })
     // create output_dir/app
-    if(!fs.existsSync(`${output_dir}/app`)) fs.mkdirSync(`${output_dir}/app`, { recursive:true })
+    if(!fs.existsSync(`${output_dir}/app`) && LINK) fs.mkdirSync(`${output_dir}/app`, { recursive:true })
     // create output_dir/public
-    if(!fs.existsSync(`${output_dir}/public`)) fs.mkdirSync(`${output_dir}/public`, { recursive:true })
+    if(!fs.existsSync(`${output_dir}/public`) && LINK) fs.mkdirSync(`${output_dir}/public`, { recursive:true })
 
 
     const linkFolder = (source: string, target: string) => {
@@ -268,7 +269,7 @@ export const config = async (options: ConfigOptions) => {
                 // if target file dosent exist create it
                 if(!fs.existsSync(target_file)) {
                     fs.linkSync(source_file, target_file)
-                }else{
+                }else {
                     console.log(`File ${target_file} already exists`)
                 }
             }
@@ -287,7 +288,7 @@ export const config = async (options: ConfigOptions) => {
                 unlinkFolder(`${target}/${file_name}`)
             } else {
                 // unlink file
-                fs.unlinkSync(`${target}/${file_name}`)
+                if(LINK) fs.unlinkSync(`${target}/${file_name}`)
             }
         }
     }
@@ -314,18 +315,18 @@ export const config = async (options: ConfigOptions) => {
         if(!fs.existsSync(app_dir)) continue
 
         if(_config.disable_next_alias == true) {
-            linkFolder(app_dir, `${output_dir}/app/`)
+            if(LINK) linkFolder(app_dir, `${output_dir}/app/`)
         }else {
-            linkFolder(app_dir, output_app_dir.symlink_path)
+            if(LINK) linkFolder(app_dir, output_app_dir.symlink_path)
         }
 
         // skip if public_dir does not exist
         if(!fs.existsSync(public_dir)) continue
         
         // create public symlink
-        if(!fs.existsSync(output_public_dir.path_to_create)) fs.mkdirSync(output_public_dir.path_to_create, { recursive:true })
-        if(fs.existsSync(output_public_dir.symlink_path)) fs.unlinkSync(output_public_dir.symlink_path)
-        fs.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir')
+        if(LINK && !fs.existsSync(output_public_dir.path_to_create)) fs.mkdirSync(output_public_dir.path_to_create, { recursive:true })
+        if(LINK && fs.existsSync(output_public_dir.symlink_path)) fs.unlinkSync(output_public_dir.symlink_path)
+        if(LINK) fs.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir')
     }
 
     // if layout.tsx does not exist create it
