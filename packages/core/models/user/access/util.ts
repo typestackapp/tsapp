@@ -1,7 +1,7 @@
 
 import crypto from "crypto"
 import type { IAccessStatus, IPermissionType } from '@typestackapp/core/codegen/system'
-import type { GraphqlServerConfig } from '@typestackapp/core/common/server'
+import type { GraphqlServerConfig } from '../../../common/service'
 import type { RoleConfigDocument } from '@typestackapp/core/models/config/role'
 import type { AccessCheckOptions } from "@typestackapp/core/models/user/access/middleware"
 import type { AccessOutput } from "@typestackapp/core/models/user/access"

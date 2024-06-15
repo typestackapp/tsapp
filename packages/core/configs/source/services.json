@@ -22,43 +22,43 @@
         },
         "services": {
             "next_dev": {
-                "script": "./packages/core/common/services/next.js",
-                "args": "--watch './packages/core/common/services/next.js'"
+                "script": "./packages/core/common/service/next.js",
+                "args": "--watch './packages/core/common/service/next.js'"
             },
             "next_prod": {
-                "script": "./packages/core/common/services/next.js",
+                "script": "./packages/core/common/service/next.js",
                 "args": ""
             },
             "express_dev": {
-                "script": "./packages/core/common/services/express.js",
+                "script": "./packages/core/common/service/express.js",
                 "args": "--watch './packages/*/express/**/*.js' --watch './packages/*/common/**/*.js' --watch './packages/*/models/**/*.js' --watch './packages/core/codegen/config/output.ts'"
             },
             "express_prod": {
-                "script": "./packages/core/common/services/express.js",
+                "script": "./packages/core/common/service/express.js",
                 "args": ""
             },
             "jobs_dev": {
-                "script": "./packages/core/common/services/jobs.js",
+                "script": "./packages/core/common/service/jobs.js",
                 "args": "--watch './packages/*/common/**/*.js' --watch './packages/*/models/**/*.js' --watch './packages/core/codegen/config/output.ts'"
             },
             "jobs_prod": {
-                "script": "./packages/core/common/services/jobs.js",
+                "script": "./packages/core/common/service/jobs.js",
                 "args": ""
             },
             "graphql_dev": {
-                "script": "./packages/core/common/services/graphql.js",
+                "script": "./packages/core/common/service/graphql.js",
                 "args": "--watch './packages/*/graphql/**/*' --watch './packages/*/common/**/*.js' --watch './packages/*/models/**/*.js' --watch './packages/core/codegen/config/output.ts'"
             },
             "graphql_prod": {
-                "script": "./packages/core/common/services/graphql.js",
+                "script": "./packages/core/common/service/graphql.js",
                 "args": ""
             },
             "consumers_dev": {
-                "script": "./packages/core/common/services/consumers.js",
+                "script": "./packages/core/common/service/consumers.js",
                 "args": "--watch './packages/*/consumers/**/*.js' --watch './packages/*/express/**/*.js' --watch './packages/*/common/**/*.js' --watch './packages/*/models/**/*.js' --watch './packages/core/codegen/config/output.ts'"
             },
             "consumers_prod": {
-                "script": "./packages/core/common/services/consumers.js",
+                "script": "./packages/core/common/service/consumers.js",
                 "args": ""
             }
         }

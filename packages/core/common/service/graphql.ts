@@ -15,7 +15,7 @@ import cors from 'cors'
 import { json } from 'body-parser'
 
 import { AccessRequest, applyMiddlewareToGraphqlModule, upsertRouterDocs, validateUserToken } from '@typestackapp/core/models/user/access/middleware'
-import { TSAppGraphqlPlugin, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core/common/server'
+import { TSAppGraphqlPlugin, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core/common/service'
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
 
 import { makeExecutableSchema } from '@graphql-tools/schema'

@@ -1,5 +1,3 @@
-// import type { GraphqlResovlerModule, GraphqlRouter, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core'
-// import type { Config, Packages } from '@typestackapp/core/codegen/config'
 import fs from 'fs'
 import path from 'path'
 import { merge } from 'lodash'

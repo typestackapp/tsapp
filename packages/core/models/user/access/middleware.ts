@@ -7,7 +7,7 @@ import { UserDocument, UserModel } from '@typestackapp/core/models/user'
 import { IAccessInput, ITokenType, IPermissionType, IExpressMethod, IGraphqlMethod } from '@typestackapp/core'
 import { IServerAccess, IAccessOptions } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
-import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '@typestackapp/core/common/server'
+import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '../../../common/service'
 import { Maybe } from 'graphql/jsutils/Maybe'
 import { Packages, env } from "@typestackapp/core"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'

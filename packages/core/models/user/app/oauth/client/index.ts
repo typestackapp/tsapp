@@ -1,5 +1,5 @@
 import type { BearerToken } from "@typestackapp/core/models/user/util"
-import type { ExpressResponse } from "@typestackapp/core/common/server"
+import type { ExpressResponse } from "../../../../../common/service"
 import type { OauthAppData } from "@typestackapp/core/models/user/app/oauth"
 import { Optional } from "utility-types"
 

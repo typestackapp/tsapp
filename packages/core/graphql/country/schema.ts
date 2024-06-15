@@ -1,4 +1,4 @@
-import { GraphqlRouter } from '../../common/server'
+import { GraphqlRouter } from '../../common/service'
 import { Pagination, SearchScore } from '../common/schema'
 
 export const CountryInput = `

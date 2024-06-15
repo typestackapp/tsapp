@@ -1,3 +1,4 @@
+"use server"
 import type { UserDocument } from '@typestackapp/core/models/user'
 import type { EmailConfigDocument } from '@typestackapp/core/models/config/email'
 import type { ChannelConfigDocument } from '@typestackapp/core/models/config/channel'
@@ -10,7 +11,7 @@ import tsapp from "@typestackapp/core/codegen/tsapp.json"
 import config from "@typestackapp/core/codegen/config/output.json"
 import {T as Config} from "@typestackapp/core/codegen/config/output"
 
-export * from "@typestackapp/core/common/server"
+export * from "./common/service"
 export type * from "@typestackapp/core/codegen/system"
 
 export { config }

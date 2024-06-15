@@ -1,4 +1,4 @@
-import { GraphqlRouter } from '@typestackapp/core/common/server'
+import { GraphqlRouter } from 'common/service'
 
 export const Pagination = `
     total: Int
