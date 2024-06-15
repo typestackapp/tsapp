@@ -4,7 +4,7 @@ import DB from "@typestackapp/core/common/db"
 async function initilize() {
     await DB.getInstance()
     const module = await import("@typestackapp/core/common/rabbitmq/connection")
-    module.ConnectionInstance.start_consumers = true
+    module.Connection.start_consumers = true
     module.ConnectionList.initilize()
 }
 

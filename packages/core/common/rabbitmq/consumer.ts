@@ -2,7 +2,7 @@ import { Connection as RabbitmqConnection, Channel, Message, Replies } from "amq
 import { Types } from "mongoose"
 import { ConsumerInput } from "../../models/config/consumer"
 import { ChannelConfigDocument, ChannelConfigModel } from "../../models/config/channel"
-import { ConnectionInstance } from "./connection"
+import { Connection } from "./connection"
 import { config, rcs } from "@typestackapp/core"
 
 export type ConsumerOnMessage = ( msg: Message | null ) => void
@@ -37,7 +37,7 @@ export class ConsumerList {
         // find all channels in services array
         const channels = await ChannelConfigModel.find({ "data.services": service })
         for await(const channel_config of channels) {
-            const consumer_channel = await ConnectionInstance.newChannel(conn, channel_config.data.options)
+            const consumer_channel = await Connection.newChannel(conn, channel_config.data.options)
             await this.newQueue(consumer_channel, channel_config)
 
             for await(const consumer of channel_config.data.consumers) {
@@ -86,16 +86,13 @@ export class ConsumerList {
     }
 
     async recconectConsumers(conn: RabbitmqConnection, any_channel: Channel): Promise<void> {
-
         // remove all consumers
         for await(const consumer of this.consumers) {
             await this.removeConsumer(any_channel, consumer.getConsumer._id)
             .catch(err => `Warning, recconectConsumers removeConsumer id: ${consumer.getConsumer._id}: ${err}`)
         }
         this.consumers = []
-
         await this.initilize(conn)
-
     }
 }
 

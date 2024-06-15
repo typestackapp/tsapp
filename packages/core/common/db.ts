@@ -29,7 +29,7 @@ type Connections = {
     }
 }
 
-export type Connection<TPackage extends Packages> = Connections[TPackage]
+export type DbConnection<TPackage extends Packages> = Connections[TPackage]
 
 
 export default class DB {

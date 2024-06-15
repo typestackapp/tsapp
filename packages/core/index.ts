@@ -5,8 +5,8 @@ import type { ChannelConfigDocument } from '@typestackapp/core/models/config/cha
 import type { TokenDocument } from '@typestackapp/core/models/user/token'
 import type { JobList } from '@typestackapp/core/common/job'
 
-import { Connection as DbConnection } from "@typestackapp/core/common/db"
-import { Connection as RmqConnection } from "@typestackapp/core/common/rabbitmq/connection"
+import { DbConnection } from "@typestackapp/core/common/db"
+import { RmqConnection } from "@typestackapp/core/common/rabbitmq/connection"
 import tsapp from "@typestackapp/core/codegen/tsapp.json"
 import config from "@typestackapp/core/codegen/config/output.json"
 import {T as Config} from "@typestackapp/core/codegen/config/output"
