@@ -20,7 +20,7 @@ export function getPackageVersion(pack: Packages): string {
     return JSON.parse(_pack).version
 }
 
-export function extractArg(args, arg_name, required){
+export function extractArg(args: any, arg_name: string, required: boolean) {
     const arg_value = args[arg_name]
     if(!arg_value && required){
         throw new Error(`Start server argument ${arg_name} is required`)
@@ -28,9 +28,9 @@ export function extractArg(args, arg_name, required){
     return arg_value
 }
 
-export function getDefaultOpts(options) {
+export function getDefaultOpts(options: any) {
 
-    function isEnabled(input, overwrite) {
+    function isEnabled(input: any, overwrite: any) {
         if(typeof overwrite == 'boolean') return overwrite
         if(input == undefined) return undefined
         if(Array.isArray(input)) return undefined
@@ -38,7 +38,7 @@ export function getDefaultOpts(options) {
         return true
     }
 
-    function getDefault(input, defaults) {
+    function getDefault(input: any, defaults: any) {
         if(input == undefined) return undefined
         const enabled = isEnabled(input, input?.enabled)
         if(enabled == undefined) return undefined
@@ -69,14 +69,14 @@ export function getDefaultOpts(options) {
     }
 }
 
-export function buidCountryConfig(tsapp_src, output_folder) {
+export function buidCountryConfig(tsapp_src: string, output_folder: string) {
     const source_file = `${tsapp_src}/countrys.json`
     const dest_file = `${output_folder}/countrys.json`
 
     // copy source file to dest file
     fs.copyFileSync(source_file, dest_file)
 
-    function cleanCountryList(list) {
+    function cleanCountryList(list: any[]) {
         const new_list = []
         for(let country of list) {
             // convert form stirng to int
@@ -95,9 +95,9 @@ export function buidCountryConfig(tsapp_src, output_folder) {
     const list = cleanCountryList(countrys.DATA.list)
     const tz = countrys.DATA.tz
 
-    function generateCountryList(list, tz_list) {
+    function generateCountryList(list: any[], tz_list: any[]) {
 
-        function resolveTimeZones(alpha2, tz_list) {
+        function resolveTimeZones(alpha2: string, tz_list: any[]) {
             const tz_list_arr = []
 
             for(let i = 0; i < tz_list.length; i++) {
@@ -114,7 +114,7 @@ export function buidCountryConfig(tsapp_src, output_folder) {
             return tz_list_arr
         }
 
-        var country_list = {}
+        var country_list: { [key: string]: any } = {}
 
         for(let i = 0; i < list.length; i++) {
             const country = list[i]
@@ -128,7 +128,7 @@ export function buidCountryConfig(tsapp_src, output_folder) {
         return country_list
     }
 
-    function resolveCountry(alpha2, country_list) {
+    function resolveCountry(alpha2: string, country_list: any) {
         return country_list[alpha2]
     }
 
@@ -141,8 +141,10 @@ export function buidCountryConfig(tsapp_src, output_folder) {
         
         // if list value is object 
         if(typeof list_value === "object" && !Array.isArray(list_value)) {
-            for(let [country_key, country_value] of Object.entries(list_value)) {
-                countrys_json[list_key][country_key] = {...resolveCountry(country_key, country_list), ...country_value}
+            let _list_value = list_value as {}
+            for(let [country_key, country_value] of Object.entries(_list_value)) {
+                let _country_value = (isObject(country_value)) ? country_value as {} : {}
+                countrys_json[list_key][country_key] = {...resolveCountry(country_key, country_list), ..._country_value}
                 // console.log(countrys_json[list_key][country_key])
             }
             continue
@@ -168,7 +170,7 @@ export function buidCountryConfig(tsapp_src, output_folder) {
     fs.writeFileSync(dest_file, JSON.stringify(country_output, null, 4))
 }
 
-export function copyConfigs(src_folder, dest_folder) {
+export function copyConfigs(src_folder: string, dest_folder: string) {
     const files = fs.readdirSync(src_folder)
 
     // create destination folder if not exist
@@ -184,21 +186,21 @@ export function copyConfigs(src_folder, dest_folder) {
     }
 }
 
-export function writePublicFile(dest_file, content) {
+export function writePublicFile(dest_file: string, content: any) {
     const file_content = JSON.stringify(content, null, 4)
     const file_path = dest_file.replace('.json', '.public.json')
     fs.writeFileSync(file_path, file_content)
     writeJsonTypeFile(file_path)
 }
 
-export function writeJsonTypeFile(dest_file) {
+export function writeJsonTypeFile(dest_file: string) {
     const file_content = `export type T = ${fs.readFileSync(dest_file, 'utf8')}`
     const file_path = dest_file.replace('.json', '.ts')
     fs.writeFileSync(file_path, file_content)
 }
 
 // updates single configuration file
-export function getConfigFile(dest_file, mod_file = undefined) {
+export function getConfigFile(dest_file: string, mod_file: string | undefined = undefined) {
     // if dest file not exist, copy source file
     let mod_config = {}
 
@@ -219,23 +221,23 @@ export function getConfigFile(dest_file, mod_file = undefined) {
     }
 }
 
-export function isArray(value){
+export function isArray(value: any){
     return Array.isArray(value)
 }
 
-export function isObject(obj){
+export function isObject(obj: any){
     return typeof obj === "object" && !isArray(obj) && obj !== null && !isUndefined(obj)
 }
 
-export function isEmpty(obj){
+export function isEmpty(obj: any){
     return Object.keys(obj).length === 0
 }
 
-export function isUndefined(value){
+export function isUndefined(value: any){
     return typeof value === "undefined"
 }
 
-export function objKeysIncludes(obj, prefix){
+export function objKeysIncludes(obj: any, prefix: string){
     for(const k in obj) {
         if(isObject(obj[k]) && objKeysIncludes(obj[k], prefix)) {
             return true
@@ -249,7 +251,7 @@ export function objKeysIncludes(obj, prefix){
     return false
 }
 
-export function cleanObjKeyNames(obj, prefix, export_public, is_public_obj){
+export function cleanObjKeyNames(obj: any, prefix: string, export_public: boolean, is_public_obj: boolean){
     // deep copy object
     obj = JSON.parse(JSON.stringify(obj))
 
@@ -277,7 +279,7 @@ export function cleanObjKeyNames(obj, prefix, export_public, is_public_obj){
     return obj
 }
 
-export function cleanDestObject(dest_obj, is_public_obj = false, is_root_obj = true){
+export function cleanDestObject(dest_obj: any, is_public_obj: boolean = false, is_root_obj: boolean = true){
     dest_obj = JSON.parse(JSON.stringify(dest_obj))
     if(dest_obj === undefined) return {}
 
@@ -308,7 +310,7 @@ export function cleanDestObject(dest_obj, is_public_obj = false, is_root_obj = t
 }
 
 // updates object key values
-export function getConfigObj(mod_obj, dest_obj, export_public, is_root_obj = true) {
+export function getConfigObj(mod_obj: any, dest_obj: any, export_public: boolean, is_root_obj: boolean = true) {
     // deep copy object
     dest_obj = JSON.parse(JSON.stringify(dest_obj))
     mod_obj = JSON.parse(JSON.stringify(mod_obj))
@@ -371,7 +373,7 @@ export function getConfigObj(mod_obj, dest_obj, export_public, is_root_obj = tru
     return dest_obj;
 }
 
-export function mergeWithoutPublicRemoval(mod_obj, dest_obj) {
+export function mergeWithoutPublicRemoval(mod_obj: any, dest_obj: any) {
     if(Object.keys(mod_obj).length === 0) return dest_obj
 
     for(let key in mod_obj){
@@ -388,7 +390,7 @@ export function mergeWithoutPublicRemoval(mod_obj, dest_obj) {
     return dest_obj;
 }
 
-export function addDefaultValues(obj, filename, pack) {
+export function addDefaultValues(obj: any, filename: string, pack: string) {
     
     if(filename == "captcha.json") {
         if(obj?.ACTIVE){
@@ -413,7 +415,7 @@ export function addDefaultValues(obj, filename, pack) {
     }
 
     if(filename == "access.json") {
-        const set_defaults = (_config) => {
+        const set_defaults = (_config: any) => {
             // if empty object
             if(Object.keys(_config).length == 0 || !_config?.ACTIVE) return _config
     
@@ -456,7 +458,7 @@ export function getGraphqlRouterConfigs(): GraphqlServerConfig[] {
         const conf = pack.graphql.ACTIVE
 
         for(const [server_key, server] of Object.entries(conf)) {
-            const srv_input: Partial<GraphqlServerConfig> = server
+            const srv_input: Partial<GraphqlServerConfig> = server as any
 
             const srv = {
                 name: server_key,
@@ -472,12 +474,12 @@ export function getGraphqlRouterConfigs(): GraphqlServerConfig[] {
             } satisfies GraphqlServerConfig
 
             //foreach document add path
-            srv.documents.forEach((doc, index) => {
+            srv.documents.forEach((doc: any, index: any) => {
                 srv.documents[index] = `${process.cwd()}/node_modules/${doc}`
             })
 
             //foreach schema add path
-            srv.modules.forEach((module, index) => {
+            srv.modules.forEach((module: any, index: any) => {
                 srv.modules[index] = `${process.cwd()}/node_modules/${module}`
             })
 

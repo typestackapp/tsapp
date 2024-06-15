@@ -132,8 +132,10 @@ function buidCountryConfig(tsapp_src, output_folder) {
         countrys_json[list_key] = {};
         // if list value is object 
         if (typeof list_value === "object" && !Array.isArray(list_value)) {
-            for (let [country_key, country_value] of Object.entries(list_value)) {
-                countrys_json[list_key][country_key] = Object.assign(Object.assign({}, resolveCountry(country_key, country_list)), country_value);
+            let _list_value = list_value;
+            for (let [country_key, country_value] of Object.entries(_list_value)) {
+                let _country_value = (isObject(country_value)) ? country_value : {};
+                countrys_json[list_key][country_key] = Object.assign(Object.assign({}, resolveCountry(country_key, country_list)), _country_value);
                 // console.log(countrys_json[list_key][country_key])
             }
             continue;
