@@ -1,8 +1,9 @@
-import { Schema, Document, Model } from "mongoose"
+import { Schema, Document, Model, Types, FilterQuery } from "mongoose"
 import type { ILogOptionsDocument, ILogOptionsInput } from "@typestackapp/core"
+import type { MongooseDocument } from "@typestackapp/core/models/util"
 
 export interface LogOptionsDocument extends ILogOptionsDocument {
-    add(doc: Document): Promise<null | LogDocument>
+    add(doc: MongooseDocument): Promise<null | LogDocument>
 }
 export interface LogOptionsInput extends ILogOptionsInput {}
 export const logOptionsSchema = new Schema<LogOptionsDocument, Model<LogOptionsDocument>, LogOptionsDocument>({
@@ -10,11 +11,11 @@ export const logOptionsSchema = new Schema<LogOptionsDocument, Model<LogOptionsD
     max: { type: Number, required: true, index: true, default: 1000 },
 },{ _id: false })
 
-export type LogInput<TDoc = Document> = {
-    doc: TDoc
+export type LogInput = {
+    doc: MongooseDocument
 }
 
-export interface LogDocument extends Document, LogInput {
+export interface LogDocument extends LogInput {
     collectionName?: string
     modelName?: string
 }
@@ -54,4 +55,4 @@ logOptionsSchema.methods.add = async function(doc){
     return null
 }
 
-export const LogModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model('logs', logSchema)
+export const LogModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<LogDocument, Model<LogDocument>>('logs', logSchema)

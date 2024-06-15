@@ -36,8 +36,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
-// import type { GraphqlResovlerModule, GraphqlRouter, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core'
-// import type { Config, Packages } from '@typestackapp/core/codegen/config'
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const lodash_1 = require("lodash");
@@ -438,7 +436,7 @@ function getGraphqlRouterConfigs() {
 exports.getGraphqlRouterConfigs = getGraphqlRouterConfigs;
 // Recursively process all graphql schema files in the given directories
 function getGraphqlModules(config_1, options_1) {
-    return __awaiter(this, arguments, void 0, function* (config, options, directories = undefined) {
+    return __awaiter(this, arguments, void 0, function* (config, options, directories = []) {
         let schema = "";
         let resolvers = {};
         let routers = [];

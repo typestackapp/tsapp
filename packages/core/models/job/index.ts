@@ -1,14 +1,15 @@
 
-import { Document, Model, ObjectId, Schema, Types } from "mongoose"
+import { Document, Model, Schema, Types } from "mongoose"
 import { IJobInput, IJobDocument } from "@typestackapp/core"
 import { IJobActionInput, IJobStepInput } from "@typestackapp/core"
 import { LogOptionsDocument, logOptionsSchema } from "@typestackapp/core/models/log"
+import { MongooseDocument } from "@typestackapp/core/models/util"
 
 export interface JobInput<TParams, TData = undefined> extends IJobInput { params: TParams, data: TData }
 export interface JobActionInput extends IJobActionInput { steps: JobStepInput<any>[]}
 export interface JobStepInput<TData> extends IJobStepInput { data: TData }
 
-export interface JobActionDocument extends Document, JobActionInput {
+export type JobActionDocument = MongooseDocument & JobActionInput & {
     getStep<TStep>(step_identifier: string | undefined): JobStepInput<TStep> | undefined
 }
 
@@ -17,7 +18,7 @@ export interface JobDocument<TParams, TData = undefined> extends Document, IJobD
     params: TParams,
     data: TData,
     log: LogOptionsDocument,
-    callback: () => Promise<void>
+    onTick: () => Promise<void>
     action: () => Promise<JobActionDocument>
 }
 

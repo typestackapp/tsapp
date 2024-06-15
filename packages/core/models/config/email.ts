@@ -2,6 +2,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport"
 import { ConfigModel, ConfigInput } from "."
 import { Model, Schema, Document } from 'mongoose'
 import { Address } from "nodemailer/lib/mailer"
+import { MongooseDocument } from "@typestackapp/core/models/util"
 
 export const pack = "@typestackapp/core"
 export const type = "EmailConfig"
@@ -14,7 +15,7 @@ export interface EmailConfigInput extends ConfigInput {
     }
 }
 
-export interface EmailConfigDocument extends EmailConfigInput, Document {
+export type EmailConfigDocument = EmailConfigInput & MongooseDocument & {
     pack: typeof pack
     type: typeof type
 }

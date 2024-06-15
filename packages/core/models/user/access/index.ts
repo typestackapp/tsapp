@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose"
+import mongoose, { Document, Model, Schema, Types } from "mongoose"
 import { IAccessInput, ITokenType } from '@typestackapp/core'
 import { IAccessDocument, IServerAccess, IAccessOptions } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
@@ -53,7 +53,7 @@ export type UserAccessLogDocument = UserAccessLogInput & Document & {
     updatedAt: Date
 }
 
-export type UserAccessDocument = UserAccessInput & Document & {
+export type UserAccessDocument = UserAccessInput & Document<Types.ObjectId> & {
     createdAt: Date
     updatedAt: Date
 }

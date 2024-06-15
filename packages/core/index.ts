@@ -1,4 +1,3 @@
-"use server"
 import type { UserDocument } from '@typestackapp/core/models/user'
 import type { EmailConfigDocument } from '@typestackapp/core/models/config/email'
 import type { ChannelConfigDocument } from '@typestackapp/core/models/config/channel'

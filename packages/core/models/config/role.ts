@@ -2,6 +2,7 @@ import { IRoleConfigInput } from "@typestackapp/core"
 import { accessSchema } from "@typestackapp/core/models/user/access"
 import { ConfigModel, ConfigInput } from "@typestackapp/core/models/config"
 import { Model, Schema, Document } from 'mongoose'
+import { MongooseDocument } from "@typestackapp/core/models/util"
 
 export const pack = "@typestackapp/core"
 export const type = "RoleConfig"
@@ -9,7 +10,7 @@ export const discriminator = `${pack}:${type}`
 
 export type RoleConfigInput = IRoleConfigInput
 
-export interface RoleConfigDocument extends RoleConfigInput, Document {
+export type RoleConfigDocument = RoleConfigInput & MongooseDocument & {
     type: typeof type
     pack: typeof pack
 }

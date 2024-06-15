@@ -1,6 +1,7 @@
 
                 import { DeepRequired } from 'utility-types'
                 import { Packages } from '@typestackapp/core'
+                import type { Types as MongooseTypes } from 'mongoose'
     
                 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
@@ -22,7 +23,7 @@ export interface Scalars {
   Float: { input: number; output: number; }
   DateTime: { input: Date; output: Date; }
   Object: { input: any; output: any; }
-  ObjectId: { input: any; output: any; }
+  ObjectId: { input: MongooseTypes.ObjectId; output: MongooseTypes.ObjectId; }
   Packages: { input: Packages; output: Packages; }
 }
 
@@ -678,7 +679,7 @@ export interface IUserOutput extends IMongoId, IMongoTimeStamps {
 export type IGetAdminUserDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IGetAdminUserDataQuery = { getCurrentUser?: { _id: any, usn: string, role?: { _id?: any | null, title: string, pack: Packages, type: string, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType> }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } } | null } | null };
+export type IGetAdminUserDataQuery = { getCurrentUser?: { _id: MongooseTypes.ObjectId, usn: string, role?: { _id?: MongooseTypes.ObjectId | null, title: string, pack: Packages, type: string, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType> }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } } | null } | null };
 
 
 

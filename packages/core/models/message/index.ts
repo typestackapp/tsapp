@@ -1,11 +1,12 @@
 import { Packages } from "@typestackapp/core";
-import mongoose, { Schema } from 'mongoose'
+import { MongooseDocument } from "@typestackapp/core/models/util";
+import { Schema } from 'mongoose'
 
 export interface MessageInput<TData> {
     data: TData
 }
 
-export interface MessageDocument<TData> extends mongoose.Document, MessageInput<TData> {
+export interface MessageDocument<TData> extends MongooseDocument, MessageInput<TData> {
     pack: Packages
     type: string
     createdAt: Date

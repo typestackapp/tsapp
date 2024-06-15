@@ -79,7 +79,7 @@ const campaignSchema = new Schema<CampaignDocument, Model<CampaignDocument>, Cam
     }
 })
 
-campaignSchema.methods.callback = async function(){
+campaignSchema.methods.onTick = async function(){
     // TODO
     // prepeare data
     // call producer(data)

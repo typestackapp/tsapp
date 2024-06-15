@@ -1,6 +1,6 @@
 
 import crypto from "crypto"
-import type { IAccessStatus, IPermissionType } from '@typestackapp/core/codegen/system'
+import type { IAccessInput, IAccessStatus, IPermissionType } from '@typestackapp/core/codegen/system'
 import type { GraphqlServerConfig } from '../../../common/service'
 import type { RoleConfigDocument } from '@typestackapp/core/models/config/role'
 import type { AccessCheckOptions } from "@typestackapp/core/models/user/access/middleware"
@@ -34,7 +34,7 @@ export async function checkRoleAccessToGraphqlService(role: RoleConfigDocument, 
 }
 
 
-export function checkAccessToAllResources( has_access: AccessOutput[], access_required: AccessOutput[]){
+export function checkAccessToAllResources( has_access: AccessOutput[] | IAccessInput[], access_required: AccessOutput[] | IAccessInput[]){
     const ok: AccessCheckOptions[] = []
     const bad: AccessCheckOptions[] = []
     for(const required of access_required) {
@@ -63,7 +63,7 @@ export function checkAccessToAllResources( has_access: AccessOutput[], access_re
     }
 }
 
-export function checkResourceAccess( user_has_access: AccessOutput[], options: AccessCheckOptions ): boolean {
+export function checkResourceAccess( user_has_access: AccessOutput[] | IAccessInput[], options: AccessCheckOptions ): boolean {
     const enabled_access_status: IAccessStatus[] = ["Enabled", "EnabledByUser"]
     const required_permission: IPermissionType | undefined = options.auth?.permission || undefined
     const required_resource = options.resource

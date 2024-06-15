@@ -41,6 +41,7 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
                             Object: 'any',
                             DateTime: 'Date',
                             Packages: 'Packages',
+                            ObjectId: 'MongooseTypes.ObjectId',
                         },
                         enumsAsTypes: true,
                         skipTypename: true,
@@ -56,6 +57,7 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
                             Object: 'any',
                             DateTime: 'any',
                             Packages: 'any',
+                            ObjectId: 'any',
                         },
                         enumsAsTypes: true,
                         skipTypename: true,
@@ -73,6 +75,7 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
             file_result = `
                 import { DeepRequired } from 'utility-types'
                 import { Packages } from '@typestackapp/core'
+                import type { Types as MongooseTypes } from 'mongoose'
     
                 ${file_result}
     

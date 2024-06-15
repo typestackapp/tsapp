@@ -1,11 +1,12 @@
 import { Schema, Document } from 'mongoose'
 import type { IConfigInput, IConfigDocument, IConfigBase  } from '@typestackapp/core'
 import { LogOptionsDocument, logOptionsSchema } from '@typestackapp/core/models/log'
+import { MongooseDocument } from "@typestackapp/core/models/util"
 
 export type ConfigInput = IConfigInput
 export type ConfigBase = IConfigBase
 
-export interface ConfigDocument extends Document, IConfigDocument {
+export type ConfigDocument = MongooseDocument & IConfigDocument & {
     log: LogOptionsDocument
 }
 

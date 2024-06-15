@@ -3,6 +3,7 @@ import { Schema, Document, Model } from "mongoose"
 import { ConfigInput, ConfigModel } from "."
 import { ConsumerInput, consumerSchema } from "./consumer"
 import { Packages } from "@typestackapp/core"
+import { MongooseDocument } from "@typestackapp/core/models/util"
 
 export const pack = "@typestackapp/core"
 export const type = "ChannelConfig"
@@ -30,7 +31,7 @@ export interface ChannelConfigInput extends ConfigInput {
     }
 }
 
-export interface ChannelConfigDocument extends ChannelConfigInput, Document {
+export type ChannelConfigDocument = ChannelConfigInput & MongooseDocument & {
     pack: typeof pack
     type: typeof type
 }

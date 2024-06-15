@@ -32,6 +32,7 @@ export const graphql = async (options: GraphqlOptions) => {
                             Object: 'any',
                             DateTime: 'Date',
                             Packages: 'Packages',
+                            ObjectId: 'MongooseTypes.ObjectId',
                         },
                         enumsAsTypes: true,
                         skipTypename: true,
@@ -47,6 +48,7 @@ export const graphql = async (options: GraphqlOptions) => {
                             Object: 'any',
                             DateTime: 'any',
                             Packages: 'any',
+                            ObjectId: 'any',
                         },
                         enumsAsTypes: true,
                         skipTypename: true,
@@ -66,6 +68,7 @@ export const graphql = async (options: GraphqlOptions) => {
             file_result = `
                 import { DeepRequired } from 'utility-types'
                 import { Packages } from '@typestackapp/core'
+                import type { Types as MongooseTypes } from 'mongoose'
     
                 ${file_result}
     

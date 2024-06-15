@@ -1,7 +1,7 @@
 
 import Cron from 'cron'
-import { Types } from "mongoose"
-import {JobDocument, JobInput, JobModel } from "@typestackapp/core/models/job"
+import { Model, Types } from "mongoose"
+import { JobDocument, JobInput, JobModel } from "@typestackapp/core/models/job"
 import { Packages } from '@typestackapp/core'
 
 interface CronJobDoc extends JobDocument<any> {
@@ -11,7 +11,7 @@ interface CronJobDoc extends JobDocument<any> {
 
 export class CronJob {
     private doc: JobDocument<any>
-    private cron: Cron.CronJob | undefined
+    private cron: Cron.CronJob<null, this> | undefined
 
     constructor(doc: JobDocument<any>) {
         this.doc = doc
@@ -21,7 +21,6 @@ export class CronJob {
 
     private setCron(doc: { run_on_startup?: boolean, cron?: string | null, time_zone?: string }) {
         if(!doc.cron) return this.cron = undefined
-
         this.cron = new Cron.CronJob(
             doc.cron,
             this.onTick,
@@ -49,8 +48,6 @@ export class CronJob {
 
     public async onTick() {
         // create copy of job and start callback
-        const TypedJobModel = this.getJobModel(this.doc.pack, this.doc.type)
-          
         const job_input: JobInput<any, any> = {
             status: "Initilized",
             parent_id: this.doc._id,
@@ -63,13 +60,14 @@ export class CronJob {
             created_by: this.doc.created_by,
             updated_by: this.doc.updated_by
         }
-        
+
+        const TypedJobModel = this.getJobModel(this.doc.pack, this.doc.type)
         const typedJob = new TypedJobModel(job_input)
         await typedJob.save()
 
         try {
             if(this.doc.status == "Disabled") throw "Job is disabled"
-            await typedJob.callback()
+            await typedJob.onTick()
             typedJob.status = "Success"
         } catch (error) {
             console.log(`Error, in Job, pack: ${this.doc.pack}, type: ${this.doc.type}, error msg: ${error}`)
@@ -78,12 +76,11 @@ export class CronJob {
         }
 
         await typedJob.save()
-        return typedJob
     }
 
-    public getJobModel(pack: Packages, type: string): typeof JobModel {
+    public getJobModel(pack: Packages, type: string) {
         if(!JobModel?.discriminators) throw `Error, JobModels are not initialized!`
-        const model = JobModel.discriminators[`${pack}:${type}`] as any
+        const model = JobModel.discriminators[`${pack}:${type}`] as Model<JobDocument<any>>
         if(!model) throw `Error, JobModel with pack: ${pack}, type: ${type} does not exist!`
         return model
     }

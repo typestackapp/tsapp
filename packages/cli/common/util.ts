@@ -494,7 +494,7 @@ export type GetGraphqlModulesOptions = {
 }
 
 // Recursively process all graphql schema files in the given directories
-export async function getGraphqlModules(config: GraphqlServerConfig, options: GetGraphqlModulesOptions, directories: string[] = undefined) {
+export async function getGraphqlModules(config: GraphqlServerConfig, options: GetGraphqlModulesOptions, directories: string[] = []) {
     let schema: string = ""
     let resolvers: GraphqlResovlerModule = {}
     let routers: IGraphqlRouter[] = []

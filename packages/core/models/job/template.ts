@@ -36,7 +36,7 @@ const templateJobSchema = new Schema<TemplateJobDocument, Model<TemplateJobDocum
     }
 })
 
-templateJobSchema.methods.callback = async function(){
+templateJobSchema.methods.onTick = async function() {
     // create new action for job snapshot
     const action = await this.action()
 

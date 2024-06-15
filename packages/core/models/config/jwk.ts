@@ -1,3 +1,4 @@
+import { MongooseDocument } from "@typestackapp/core/models/util"
 import { ConfigModel, ConfigInput } from "@typestackapp/core/models/config"
 import { Model, Schema, Document, Types } from 'mongoose'
 import { JWK } from 'jose'
@@ -24,7 +25,7 @@ export interface JWKConfigInput<Data> extends ConfigInput {
     cacheSeconds: number
 }
 
-export interface JWKConfigDocument<Data> extends JWKConfigInput<Data>, Document {
+export type JWKConfigDocument<Data> = JWKConfigInput<Data> & MongooseDocument & {
     pack: typeof pack
     type: typeof type
 }
