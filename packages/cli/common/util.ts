@@ -16,7 +16,12 @@ export type PackageConfig = {
 }
 
 export function getPackageVersion(pack: Packages): string {
-    const _pack = fs.readFileSync(`${process.cwd()}/node_modules/${pack}/package.json`, 'utf8')
+    const _pack_path = `${process.cwd()}/node_modules/${pack}/package.json`
+
+    // check if package.json exists
+    if(!fs.existsSync(_pack_path)) return "-"
+
+    const _pack = fs.readFileSync(_pack_path, 'utf8')
     return JSON.parse(_pack).version
 }
 

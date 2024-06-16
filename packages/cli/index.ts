@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --no-deprecation
 import type { ConfigOptions } from "./common/config"
 import type { ServiceOptions } from "./common/service"
 import type { GraphqlOptions } from "./common/graphql"

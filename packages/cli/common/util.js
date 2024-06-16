@@ -40,7 +40,11 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const lodash_1 = require("lodash");
 function getPackageVersion(pack) {
-    const _pack = fs_1.default.readFileSync(`${process.cwd()}/node_modules/${pack}/package.json`, 'utf8');
+    const _pack_path = `${process.cwd()}/node_modules/${pack}/package.json`;
+    // check if package.json exists
+    if (!fs_1.default.existsSync(_pack_path))
+        return "-";
+    const _pack = fs_1.default.readFileSync(_pack_path, 'utf8');
     return JSON.parse(_pack).version;
 }
 exports.getPackageVersion = getPackageVersion;

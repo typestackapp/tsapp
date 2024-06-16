@@ -32,14 +32,14 @@ export async function update(options: UpdateOptions) {
     const pack_updates: UpdateDocument[] = [];
     const pack_errors: UpdateDocument[] = [];
 
+    console.log(`Info, updating packages:`)
+
     for (const [pack_key, pack] of Object.entries(core.packages)) {
         const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`
-        console.log(`Info, updating package: ${pack_key}`)
+        const pack_version = getPackageVersion(pack_key)
+        console.log(`Info, ${pack_key}:${pack_version}`)
 
-        if (!fs.existsSync(update_path)) {
-            console.log(`Warning, no update scripts found for package: ${pack_key}`)
-            continue
-        }
+        if (!fs.existsSync(update_path)) continue
 
         // read each file in the update folder
         const files = await fs.promises.readdir(update_path)
@@ -62,7 +62,7 @@ export async function update(options: UpdateOptions) {
 
             const update_input: UpdateInput = {
                 pack: pack_key as any,
-                version: getPackageVersion(pack_key),
+                version: pack_version,
                 log: []
             }
         
@@ -74,7 +74,7 @@ export async function update(options: UpdateOptions) {
             update.log.push({ type: "update", msg: "started" })
 
             const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/')
-            console.log(`Info, running script: ${logFilePath}`)
+            console.log(`Info,  ${logFilePath}`)
             await transaction(session, update)
             .then(async () => {
                 update.log.push({ type: "update", msg: "completed" })

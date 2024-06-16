@@ -57,13 +57,13 @@ function update(options) {
         yield (0, util_1.sleep)(2);
         const pack_updates = [];
         const pack_errors = [];
+        console.log(`Info, updating packages:`);
         for (const [pack_key, pack] of Object.entries(core.packages)) {
             const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`;
-            console.log(`Info, updating package: ${pack_key}`);
-            if (!fs_1.default.existsSync(update_path)) {
-                console.log(`Warning, no update scripts found for package: ${pack_key}`);
+            const pack_version = (0, util_1.getPackageVersion)(pack_key);
+            console.log(`Info, ${pack_key}:${pack_version}`);
+            if (!fs_1.default.existsSync(update_path))
                 continue;
-            }
             // read each file in the update folder
             const files = yield fs_1.default.promises.readdir(update_path);
             for (const file of files) {
@@ -80,13 +80,13 @@ function update(options) {
                 const transaction = module.transaction;
                 const update_input = {
                     pack: pack_key,
-                    version: (0, util_1.getPackageVersion)(pack_key),
+                    version: pack_version,
                     log: []
                 };
                 const update = yield UpdateModel.findOneAndUpdate({ version: update_input.version }, update_input, { upsert: true, new: true });
                 update.log.push({ type: "update", msg: "started" });
                 const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/');
-                console.log(`Info, running script: ${logFilePath}`);
+                console.log(`Info,  ${logFilePath}`);
                 yield transaction(session, update)
                     .then(() => __awaiter(this, void 0, void 0, function* () {
                     update.log.push({ type: "update", msg: "completed" });

@@ -1,6 +1,6 @@
 {
   "include": [
-    "env/**/*",
+    "_/**/*",
     "index.ts",
     "scripts/**/*",
     "common/**/*",
@@ -13,7 +13,7 @@
     "codegen/config/**/*",
     "tailwind/**/*",
     "codegen/next/next.config.ts",
-    "next/**/*", "env.ts", "global.ts", "setup.test.ts", "setup.ts",
+    "next/**/*",
   ],
   "exclude": [
     "node_modules",
