@@ -92,18 +92,18 @@ describe(`Test job type: ${discriminator}`, () => {
         }
 
         const job_input: CampaignInput = {
+            _id: new Types.ObjectId(job_id),
             status: "Initilized",
             description: "Test campaign job",
             data: undefined,
             params: job_params,
             created_by: global.core_tsapp_test.root_user._id,
-            updated_by: global.core_tsapp_test.root_user._id
+            updated_by: global.core_tsapp_test.root_user._id,
+            log: { enabled: false, max: 0 },
         }
 
-        job = new CampaignModel(job_input)
-        job._id = new Types.ObjectId(job_id)
+        job = await CampaignModel.create(job_input)
         await producer(job)
-        job.save()
     })
     
     it('should have all emails sent via rabbitmq Email consumer queue', async () => {

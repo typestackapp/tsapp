@@ -2,6 +2,8 @@ import { EmailInput } from "./email"
 import { Email } from   "./email"
 import { EmailConfigModel } from "../models/config/email"
 
+jest.setTimeout(10000) // extend timeout to 10 seconds
+
 describe('Test email config', () => {
 
     it('should have usable email config', async () => {

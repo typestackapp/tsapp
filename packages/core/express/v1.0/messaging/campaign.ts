@@ -1,5 +1,6 @@
 import { producer, JobParams, CampaignInput, CampaignModel } from "@typestackapp/core/models/job/campaign"
 import { ExpressRouter } from "@typestackapp/core"
+import { Types } from "mongoose"
 const { config } = global.tsapp["@typestackapp/core"]
 export const router = new ExpressRouter()
 
@@ -41,6 +42,7 @@ async (req, res) => {
     }
 
     const new_campaign: CampaignInput = {
+        _id: new Types.ObjectId(),
         created_by: user._id,
         updated_by: user._id,
         status: "Initilized",

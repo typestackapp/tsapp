@@ -5,7 +5,7 @@ import { IJobActionInput, IJobStepInput } from "@typestackapp/core"
 import { LogOptionsDocument, logOptionsSchema } from "@typestackapp/core/models/log"
 import { MongooseDocument } from "@typestackapp/core/models/util"
 
-export interface JobInput<TParams, TData = undefined> extends IJobInput { params: TParams, data: TData }
+export interface JobInput<TParams, TData = undefined> extends IJobInput { _id?: Types.ObjectId, params: TParams, data: TData }
 export interface JobActionInput extends IJobActionInput { steps: JobStepInput<any>[]}
 export interface JobStepInput<TData> extends IJobStepInput { data: TData }
 
@@ -66,19 +66,19 @@ jobSchema.methods.action = async function(){
     return await JobActionModel.create(new_action)
 }
 
-jobSchema.methods.callback = async function() {
+jobSchema.methods.onTick = async function() {
     throw "Job callback not implemented"
 }
 
-jobSchema.pre<JobDocument<any>>('save', async function(next) {
+// log job after save
+jobSchema.post('save', async function() {
     await this.log.add(this)
-    next()
 })
 
-jobSchema.pre('findOneAndUpdate', async function(next) {
+// log job after update
+jobSchema.post('findOneAndUpdate', async function() {
     const job = await this.model.findOne(this.getQuery()) as unknown as JobDocument<any> | null
     if (job) await job.log.add(job)
-    next()
 })
 
 // before delete job, delete all job actions
