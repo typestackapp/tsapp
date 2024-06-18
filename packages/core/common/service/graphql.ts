@@ -22,7 +22,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import mongoose from "mongoose"
-import { getGraphqlModules, getGraphqlRouterConfigs } from '@typestackapp/cli/common/util'
+import { findTSAppRootDir, getGraphqlModules, getGraphqlRouterConfigs } from '@typestackapp/cli/common/util'
 
 
 export function getTSAppGraphqlPlugin(options: GraphqlServerConfig): TSAppGraphqlPlugin {
@@ -61,7 +61,7 @@ initilize()
     httpServer.listen({ port: 8002 })
     const routers: IGraphqlRouter[] = []
 
-    for await (const graphql_server of getGraphqlRouterConfigs()) {
+    for await (const graphql_server of getGraphqlRouterConfigs(findTSAppRootDir() || process.cwd())) {
         // skip if isServer == false
         if(graphql_server.isServer == false) continue
         

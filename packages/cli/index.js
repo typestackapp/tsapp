@@ -48,7 +48,9 @@ const service_options = {
     up: argv === null || argv === void 0 ? void 0 : argv.up,
     env: argv === null || argv === void 0 ? void 0 : argv.env
 };
-const graphql_options = {};
+const graphql_options = {
+    cwd
+};
 const update_options = {
     cwd
 };

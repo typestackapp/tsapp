@@ -455,21 +455,18 @@ export function emptyDir(dir: string){
     }
 }
 
-export function getGraphqlRouterConfigs(): GraphqlServerConfig[] {
+export function getGraphqlRouterConfigs(cwd: string): GraphqlServerConfig[] {
     const _server: GraphqlServerConfig[] = []
-    const config = require(`${process.cwd()}/node_modules/@typestackapp/core`).config as Config
-
+    const config = require(`${cwd}/node_modules/@typestackapp/core`).config as Config
     for(const [package_key, pack] of Object.entries(config) as any) {
         const conf = pack.graphql.ACTIVE
-
         for(const [server_key, server] of Object.entries(conf)) {
-            const srv_input: Partial<GraphqlServerConfig> = server as any
-
+            const srv_input: Partial<GraphqlServerConfig> = server as any            
             const srv = {
                 name: server_key,
                 pack: package_key as Packages,
-                typeDefPath: `${process.cwd()}/node_modules/${package_key}/codegen/${server_key}/index.ts`,
-                clientPath: `${process.cwd()}/node_modules/${package_key}/codegen/${server_key}/client/`,
+                typeDefPath: `${cwd}/node_modules/${package_key}/codegen/${server_key}/index.ts`,
+                clientPath: `${cwd}/node_modules/${package_key}/codegen/${server_key}/client/`,
                 serverPath: `/graphql/${package_key}/${server_key}`,
 
                 isPublic: srv_input?.isPublic || false,
@@ -480,12 +477,12 @@ export function getGraphqlRouterConfigs(): GraphqlServerConfig[] {
 
             //foreach document add path
             srv.documents.forEach((doc: any, index: any) => {
-                srv.documents[index] = `${process.cwd()}/node_modules/${doc}`
+                srv.documents[index] = `${cwd}/node_modules/${doc}`
             })
 
             //foreach schema add path
             srv.modules.forEach((module: any, index: any) => {
-                srv.modules[index] = `${process.cwd()}/node_modules/${module}`
+                srv.modules[index] = `${cwd}/node_modules/${module}`
             })
 
             _server.push(srv)
@@ -501,17 +498,16 @@ export type GetGraphqlModulesOptions = {
 }
 
 // Recursively process all graphql schema files in the given directories
-export async function getGraphqlModules(config: GraphqlServerConfig, options: GetGraphqlModulesOptions, directories: string[] = []) {
+export async function getGraphqlModules(config: GraphqlServerConfig, options: GetGraphqlModulesOptions, directories: string[] | undefined = undefined) {
     let schema: string = ""
     let resolvers: GraphqlResovlerModule = {}
     let routers: IGraphqlRouter[] = []
 
-    if(!directories) directories = config.modules
+    if(!directories) directories = config.modules as string[]
 
     for(const directory of directories) {
         // Read all files and directories from the current directory
         const files = fs.readdirSync(directory);
-    
         for(const file of files) {
             const filePath = path.join(directory, file);
     

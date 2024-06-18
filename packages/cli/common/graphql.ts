@@ -2,11 +2,13 @@ import fs from 'fs'
 import { getGraphqlRouterConfigs, getGraphqlModules } from './util'
 import { generate } from '@graphql-codegen/cli'
 import { Types } from '@graphql-codegen/plugin-helpers'
-export type GraphqlOptions = {}
+export type GraphqlOptions = {
+    cwd: string
+}
 
 export const graphql = async (options: GraphqlOptions) => {
 
-    for (const graphql_server of getGraphqlRouterConfigs()) {
+    for (const graphql_server of getGraphqlRouterConfigs(options.cwd)) {
         var {schema} = await getGraphqlModules(graphql_server, {schema: true, resolvers: false})
 
         // if schema is empty

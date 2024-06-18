@@ -17,7 +17,7 @@ const fs_1 = __importDefault(require("fs"));
 const util_1 = require("./util");
 const cli_1 = require("@graphql-codegen/cli");
 const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
-    for (const graphql_server of (0, util_1.getGraphqlRouterConfigs)()) {
+    for (const graphql_server of (0, util_1.getGraphqlRouterConfigs)(options.cwd)) {
         var { schema } = yield (0, util_1.getGraphqlModules)(graphql_server, { schema: true, resolvers: false });
         // if schema is empty
         if (!schema || schema == "" || schema.length == 0) {

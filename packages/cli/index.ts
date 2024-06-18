@@ -28,7 +28,9 @@ const service_options: ServiceOptions = {
     env: argv?.env
 }
 
-const graphql_options: GraphqlOptions = {}
+const graphql_options: GraphqlOptions = {
+    cwd
+}
 
 const update_options: UpdateOptions = {
     cwd
