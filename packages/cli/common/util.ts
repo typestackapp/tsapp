@@ -455,7 +455,7 @@ export function emptyDir(dir: string){
     }
 }
 
-export function getGraphqlRouterConfigs(cwd: string): GraphqlServerConfig[] {
+export function getGraphqlRouterConfigs(cwd: string): GraphqlServerConfig[] { 
     const _server: GraphqlServerConfig[] = []
     const config = require(`${cwd}/node_modules/@typestackapp/core`).config as Config
     for(const [package_key, pack] of Object.entries(config) as any) {
@@ -468,9 +468,10 @@ export function getGraphqlRouterConfigs(cwd: string): GraphqlServerConfig[] {
                 typeDefPath: `${cwd}/node_modules/${package_key}/codegen/${server_key}/index.ts`,
                 clientPath: `${cwd}/node_modules/${package_key}/codegen/${server_key}/client/`,
                 serverPath: `/graphql/${package_key}/${server_key}`,
-
+                
                 isPublic: srv_input?.isPublic || false,
                 isServer: srv_input?.isServer || false,
+                genClient: srv_input?.genClient || false,
                 modules: srv_input?.modules || [],
                 documents: srv_input?.documents || [],
             } satisfies GraphqlServerConfig

@@ -1,5 +1,5 @@
-import { GraphqlRouter } from '../../common/service'
-import { Pagination, SearchScore } from '../common/schema'
+import { GraphqlRouter } from '@typestackapp/core/common/service'
+import { Pagination, SearchScore } from '@typestackapp/core/graphql/common/schema'
 
 export const CountryInput = `
     name: String! # United States of America

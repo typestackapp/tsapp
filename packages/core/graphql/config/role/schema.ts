@@ -1,4 +1,4 @@
-import { ConfigBase, ConfigDocumentBase } from "../schema"
+import { ConfigBase, ConfigDocumentBase } from "@typestackapp/core/graphql/config/schema"
 
 export const schema = `#graphql
     type GraphqlAccess {

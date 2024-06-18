@@ -24,6 +24,40 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
             console.log(`skipping, empty schema for pack:${graphql_server.pack} name:${graphql_server.name}`);
             continue;
         }
+        const generates = {};
+        generates[graphql_server.typeDefPath] = {
+            plugins: ['typescript', 'typescript-operations', 'typescript-resolvers', 'typed-document-node'],
+            config: {
+                typesPrefix: 'I',
+                declarationKind: 'interface',
+                scalars: {
+                    Object: 'any',
+                    DateTime: 'Date',
+                    Packages: 'Packages',
+                    ObjectId: 'MongooseTypes.ObjectId',
+                },
+                enumsAsTypes: true,
+                skipTypename: true,
+            }
+        };
+        if (graphql_server.genClient == true) {
+            generates[graphql_server.clientPath] = {
+                preset: 'client',
+                presetConfig: {
+                    gqlTagName: 'gql',
+                    typesPrefix: 'I',
+                    declarationKind: 'interface',
+                    scalars: {
+                        Object: 'any',
+                        DateTime: 'any',
+                        Packages: 'any',
+                        ObjectId: 'any',
+                    },
+                    enumsAsTypes: true,
+                    skipTypename: true,
+                }
+            };
+        }
         // write schema to file
         const CodegenConfig = {
             errorsOnly: true,
@@ -31,39 +65,7 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
             verbose: false,
             schema,
             documents: graphql_server.documents,
-            generates: {
-                [graphql_server.typeDefPath]: {
-                    plugins: ['typescript', 'typescript-operations', 'typescript-resolvers', 'typed-document-node'],
-                    config: {
-                        typesPrefix: 'I',
-                        declarationKind: 'interface',
-                        scalars: {
-                            Object: 'any',
-                            DateTime: 'Date',
-                            Packages: 'Packages',
-                            ObjectId: 'MongooseTypes.ObjectId',
-                        },
-                        enumsAsTypes: true,
-                        skipTypename: true,
-                    }
-                },
-                [graphql_server.clientPath]: {
-                    preset: 'client',
-                    presetConfig: {
-                        gqlTagName: 'gql',
-                        typesPrefix: 'I',
-                        declarationKind: 'interface',
-                        scalars: {
-                            Object: 'any',
-                            DateTime: 'any',
-                            Packages: 'any',
-                            ObjectId: 'any',
-                        },
-                        enumsAsTypes: true,
-                        skipTypename: true,
-                    }
-                },
-            }
+            generates
         };
         try {
             // if graphql shema is empty

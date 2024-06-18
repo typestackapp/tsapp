@@ -423,6 +423,7 @@ function getGraphqlRouterConfigs(cwd) {
                 serverPath: `/graphql/${package_key}/${server_key}`,
                 isPublic: (srv_input === null || srv_input === void 0 ? void 0 : srv_input.isPublic) || false,
                 isServer: (srv_input === null || srv_input === void 0 ? void 0 : srv_input.isServer) || false,
+                genClient: (srv_input === null || srv_input === void 0 ? void 0 : srv_input.genClient) || false,
                 modules: (srv_input === null || srv_input === void 0 ? void 0 : srv_input.modules) || [],
                 documents: (srv_input === null || srv_input === void 0 ? void 0 : srv_input.documents) || [],
             };

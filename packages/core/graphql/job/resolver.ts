@@ -1,5 +1,5 @@
 import { IResolvers } from "@typestackapp/core"
-import { GraphqlRouter, StreamListener } from "common/service"
+import { GraphqlRouter, StreamListener } from "@typestackapp/core/common/service"
 import * as j from "@typestackapp/core/models/job"
 import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
 const { config } = global.tsapp["@typestackapp/core"]

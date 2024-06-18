@@ -3,6 +3,7 @@
         "system": {
             "isServer": true,
             "isPublic": false,
+            "genClient": true,
             "modules": [
                 "@typestackapp/core/graphql/"
             ],

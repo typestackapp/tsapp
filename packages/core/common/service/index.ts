@@ -315,6 +315,7 @@ export interface GraphqlServerConfig {
     // options from graphql.json config file
     isServer: boolean // start graphql server
     isPublic: boolean // remove authentification from graphql server, will have public scheam
+    genClient: boolean // generate client queries
     modules: string[] // module file paths 
     documents?: string[] // document file paths, will be used to generate graphql client
 }

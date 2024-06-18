@@ -1,4 +1,4 @@
-import { MongoTimeStamps, Pagination, SearchScore } from '../common/schema'
+import { MongoTimeStamps, Pagination, SearchScore } from '@typestackapp/core/graphql/common/schema'
 
 export const ConfigBase = `
     _id: ObjectId

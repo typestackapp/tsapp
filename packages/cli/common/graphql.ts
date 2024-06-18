@@ -2,6 +2,7 @@ import fs from 'fs'
 import { getGraphqlRouterConfigs, getGraphqlModules } from './util'
 import { generate } from '@graphql-codegen/cli'
 import { Types } from '@graphql-codegen/plugin-helpers'
+
 export type GraphqlOptions = {
     cwd: string
 }
@@ -17,6 +18,43 @@ export const graphql = async (options: GraphqlOptions) => {
             continue
         }
 
+        const generates: Types.Config['generates'] = {}
+
+        generates[graphql_server.typeDefPath] = {
+            plugins: ['typescript', 'typescript-operations', 'typescript-resolvers', 'typed-document-node' ],
+            config: {
+                typesPrefix: 'I',
+                declarationKind: 'interface',
+                scalars: {
+                    Object: 'any',
+                    DateTime: 'Date',
+                    Packages: 'Packages',
+                    ObjectId: 'MongooseTypes.ObjectId',
+                },
+                enumsAsTypes: true,
+                skipTypename: true,
+            }
+        } satisfies Types.ConfiguredOutput | Types.ConfiguredPlugin[]
+
+        if(graphql_server.genClient == true) {
+            generates[graphql_server.clientPath] = {
+                preset: 'client',
+                presetConfig: {
+                    gqlTagName: 'gql',
+                    typesPrefix: 'I',
+                    declarationKind: 'interface',
+                    scalars: {
+                        Object: 'any',
+                        DateTime: 'any',
+                        Packages: 'any',
+                        ObjectId: 'any',
+                    },
+                    enumsAsTypes: true,
+                    skipTypename: true,
+                }
+            } satisfies Types.ConfiguredOutput | Types.ConfiguredPlugin[]
+        }
+
         // write schema to file
         const CodegenConfig: Types.Config = {
             errorsOnly: true,
@@ -24,39 +62,7 @@ export const graphql = async (options: GraphqlOptions) => {
             verbose: false,
             schema,
             documents: graphql_server.documents,
-            generates: {
-                [graphql_server.typeDefPath]: {
-                    plugins: ['typescript', 'typescript-operations', 'typescript-resolvers', 'typed-document-node' ],
-                    config: {
-                        typesPrefix: 'I',
-                        declarationKind: 'interface',
-                        scalars: {
-                            Object: 'any',
-                            DateTime: 'Date',
-                            Packages: 'Packages',
-                            ObjectId: 'MongooseTypes.ObjectId',
-                        },
-                        enumsAsTypes: true,
-                        skipTypename: true,
-                    }
-                },
-                [graphql_server.clientPath]: {
-                    preset: 'client',
-                    presetConfig: {
-                        gqlTagName: 'gql',
-                        typesPrefix: 'I',
-                        declarationKind: 'interface',
-                        scalars: {
-                            Object: 'any',
-                            DateTime: 'any',
-                            Packages: 'any',
-                            ObjectId: 'any',
-                        },
-                        enumsAsTypes: true,
-                        skipTypename: true,
-                    }
-                },
-            }
+            generates
         }
 
         try {
