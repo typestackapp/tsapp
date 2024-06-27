@@ -4,18 +4,17 @@ import { AccessTokenJWTPayload, AccessTokenPayloadVerified, BearerKeyOptions, ad
 import { decodeApiKey } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenOutput } from "@typestackapp/core/models/user/token/apikey"
 import { UserDocument, UserModel } from '@typestackapp/core/models/user'
-import { IAccessInput, ITokenType, IPermissionType, IExpressMethod, IGraphqlMethod } from '@typestackapp/core'
+import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod } from '@typestackapp/core'
 import { IServerAccess, IAccessOptions } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
 import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '../../../common/service'
-import { Maybe } from 'graphql/jsutils/Maybe'
 import { Packages, env } from "@typestackapp/core"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
 import { access_token_config_id } from "@typestackapp/core/models/update/main"
 import moment from 'moment'
 import { UserAccessInput, UserAccessLogDocument, UserAccessLogInput, UserAccessLogModel, UserAccessModel, UserDevice } from '@typestackapp/core/models/user/access'
-import { checkResourceAccess, secretCompare } from '@typestackapp/core/models/user/access/util'
+import { AccessValidator, secretCompare } from '@typestackapp/core/models/user/access/util'
 import { OauthAppModel } from '@typestackapp/core/models/user/app/oauth'
 import { getPackageVersion } from '@typestackapp/cli/common/util'
 
@@ -292,15 +291,15 @@ export async function auth( req: AccessRequest, options: IAccessOptions ): Promi
 
     // user key should have access to resource
     if(token_type == "ApiKey") {
-        if(!checkResourceAccess(token.data.access, options))
+        const validator = new AccessValidator(token.data.access)
+        if(!validator.checkAccess(options))
             throw `Auth, user apikey has insuficient permission access to resource: ${getResourceInfo(options)}`
-
     } else if(token_type == "Bearer") {
         const app = await OauthAppModel.findOne({ "data.client_id": token.client_id })
         if(!app)
             throw `Auth, Bearer app:${token.client_id} not found`
-
-        if(!checkResourceAccess(app.data.access, options))
+        const validator = new AccessValidator(app.data.access)
+        if(!validator.checkAccess(options))
             throw `Auth, user app: ${token.client_id} has insuficient permission access to resource: ${getResourceInfo(options)}`
     
     } else if(token_type == "Basic") {
@@ -456,11 +455,4 @@ export const validateBearerKey = async ( access_token: string, options: BearerKe
     const user = await UserModel.findOne({ _id: verified_access_token.payload.user_id })
     if(!user) throw "user not found"
     return { user, token: verified_access_token.payload, token_type: "Bearer" }
-}
-
-export interface AccessCheckOptions extends Pick<IAccessOptions, "pack" | "resource"> {
-    action?: Maybe<IAccessOptions["action"]> | undefined, 
-    auth?: Maybe<{
-        permission?: Maybe<IPermissionType>
-    }>
 }

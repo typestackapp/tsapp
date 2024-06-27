@@ -61,9 +61,7 @@ export type AccessOptions = Enabled & {
 
 export enum AccessStatus {
   Disabled = 'Disabled',
-  DisabledByUser = 'DisabledByUser',
-  Enabled = 'Enabled',
-  EnabledByUser = 'EnabledByUser'
+  Enabled = 'Enabled'
 }
 
 export type AccessType = {

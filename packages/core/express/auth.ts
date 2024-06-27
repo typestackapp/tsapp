@@ -12,7 +12,7 @@ import { z } from "zod"
 import { env } from "@typestackapp/core"
 import { allowed_actions, z_app_filters } from '@typestackapp/core/common/auth'
 import { BearerTokenInput, BearerTokenInputData, BearerTokenModel } from '@typestackapp/core/models/user/token/bearer'
-import { checkAccessToListOfResources } from '@typestackapp/core/models/user/access/util'
+import { AccessValidator } from '@typestackapp/core/models/user/access/util'
 import { CallbackOptions, ClientSession } from '@typestackapp/core/models/user/app/oauth/client'
 import { UserModel } from '@typestackapp/core/models/user'
 import { RoleConfigModel } from '@typestackapp/core/models/config/role'
@@ -73,9 +73,8 @@ async function basicUserAppValidation(client_id: string, roles: string[], action
     if(!app.data.roles.some(role => role_names.includes(role)))
         return { code: "invalid-auth-role-not-allowed", msg: "role not allowed" }
 
-    const access_check = checkAccessToListOfResources(role_access, app.data.access)
-
-    console.log(access_check);
+    const validator = new AccessValidator(role_access)
+    const access_check = validator.checkResourceAccess(app.data.access)
     
     if(!access_check.has_partial_access)
         return { code: "invalid-auth-access", msg: "access not found" }
@@ -489,8 +488,9 @@ export const authRouter = t.router({
         const client_id = opts.input.client_id
         const response_type = opts.input.response_type
         const code = opts.input.code
+        const validator = new AccessValidator([])
 
-        const response: ExpressResponse<{ code: string, access: ReturnType<typeof checkAccessToListOfResources> } | undefined> = {
+        const response: ExpressResponse<{ code: string, access: ReturnType<typeof validator['checkResourceAccess']> } | undefined> = {
             data: undefined,
             error: undefined
         }

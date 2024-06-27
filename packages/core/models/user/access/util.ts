@@ -1,10 +1,10 @@
 
 import crypto from "crypto"
-import type { IAccessInput, IAccessStatus, IPermissionType } from '@typestackapp/core/codegen/system'
-import type { GraphqlServerConfig } from '../../../common/service'
+import type { IAccessInput, IAccessStatus, IPermissionType, IAccessOptions } from '@typestackapp/core/codegen/system'
+import type { GraphqlServerConfig } from '@typestackapp/core/common/service'
 import type { RoleConfigDocument } from '@typestackapp/core/models/config/role'
-import type { AccessCheckOptions } from "@typestackapp/core/models/user/access/middleware"
 import type { AccessOutput } from "@typestackapp/core/models/user/access"
+import type { Maybe } from "graphql/jsutils/Maybe"
 
 export function secretCompare(secret: string, saved_salt_hash: string, iterations: number = 1000, keylen: number = 64, digest: string = 'sha512'): boolean {
     var [salt, hash] = saved_salt_hash.split('.')
@@ -52,97 +52,95 @@ export function arrayToObject(array: [], keyField: string) {
     }, {});
 }
 
-export function checkAccessToListOfResources( 
-    access_provided: AccessOutput[][][] | IAccessInput[][],
-    access_required: AccessOutput[] | IAccessInput[] 
-) {
-    const full_access: ReturnType<typeof checkAccessToResources>[] = []
-    const partial_access: ReturnType<typeof checkAccessToResources>[] = []
-    const no_access: ReturnType<typeof checkAccessToResources>[] = []
+export interface AccessCheckOptions extends Pick<IAccessOptions, "pack" | "resource"> {
+    action?: Maybe<IAccessOptions["action"]> | undefined, 
+    auth?: Maybe<{
+        permission?: Maybe<IPermissionType>
+    }>
+}
 
-    for(const [key, access] of Object.entries(access_provided)) {
-        const result = checkAccessToResources(access, access_required)
-        if(result.has_full_access) {
-            full_access.push(result)
-        }else if(result.has_partial_access) {
-            partial_access.push(result)
-        }else {
-            no_access.push(result)
+export class AccessValidator {
+    private access_provided: AccessOutput[] | IAccessInput[] = []
+
+    constructor(access_provided: AccessOutput[][] | IAccessInput[][] | AccessOutput[] | IAccessInput[]) {
+        for(const access of access_provided) {
+            if(Array.isArray(access)) {
+                this.access_provided.push(...access as any)
+            }else {
+                this.access_provided.push(access as any)
+            }
         }
     }
 
-    return {
-        has_full_access: no_access.length == 0,
-        has_partial_access: partial_access.length > 0 || full_access.length > 0,
-        full_access,
-        partial_access,
-        no_access
+    getAccessProvided() {
+        return this.access_provided
     }
-}
 
-
-export function checkAccessToResources( access_provided: AccessOutput[] | IAccessInput[], access_required: AccessOutput[] | IAccessInput[]) {
-    const has_access: AccessCheckOptions[] = []
-    const no_access: AccessCheckOptions[] = []
-    for(const required of access_required) {
-        for(const permission of required.permissions) {
-            const options: AccessCheckOptions = {
-                resource: required.resource,
-                action: required.action,
-                pack: required.pack,
-                auth: {
-                    permission
+    getOptions(access: AccessOutput | IAccessInput, permission?: IPermissionType): AccessCheckOptions {
+        return {
+            resource: access.resource,
+            action: access.action,
+            pack: access.pack,
+            auth: { permission }
+        }
+    }
+    
+    checkResourceAccess(access_required: AccessOutput[] | IAccessInput[]) {
+        const has_access: AccessCheckOptions[] = []
+        const no_access: AccessCheckOptions[] = []
+        for(const required of access_required) {
+            for(const permission of required.permissions) {
+                const options = this.getOptions(required, permission)
+                if(!this.checkAccess(options)) {
+                    no_access.push(options)
+                }else {
+                    has_access.push(options)
                 }
             }
-            if(!checkResourceAccess(access_provided, options)) {
-                no_access.push(options)
-            }else {
-                has_access.push(options)
-            }
+        }
+    
+        return {
+            has_full_access: no_access.length == 0,
+            has_partial_access: has_access.length > 0,
+            has_access, // list of access required and found
+            no_access // list of access required but not found
         }
     }
-
-    return {
-        has_full_access: no_access.length == 0,
-        has_partial_access: has_access.length > 0,
-        has_access, // list of access required and found
-        no_access // list of access required but not found
+    
+    checkAccess( options: AccessCheckOptions ): boolean {
+        const enabled_access_status: IAccessStatus[] = ["Enabled"]
+        const required_permission: IPermissionType | undefined = options.auth?.permission || undefined
+        const required_resource = options.resource
+        const required_action = options.action
+        const required_pack = options.pack
+    
+        if(required_permission == undefined) return true
+        // TODO integrate pack
+        for(const user_access of this.access_provided) {
+            // pack keys should match
+            if(user_access.pack != required_pack) continue
+    
+            // resource keys should match
+            if(user_access.resource != required_resource) continue
+    
+            // user access should be enabled
+            if(!enabled_access_status.includes(user_access.status)) continue
+    
+            // access via top level resource
+            if( true
+                && user_access.action == undefined 
+                && user_access.resource == required_resource
+                && user_access.permissions.includes(required_permission)
+            ) return true
+    
+            // access via lower level action
+            if( true
+                && user_access.action == required_action 
+                && user_access.resource == required_resource
+                && user_access.permissions.includes(required_permission)
+            ) return true
+        }
+    
+        return false
     }
-}
-
-export function checkResourceAccess( user_has_access: AccessOutput[] | IAccessInput[], options: AccessCheckOptions ): boolean {
-    const enabled_access_status: IAccessStatus[] = ["Enabled", "EnabledByUser"]
-    const required_permission: IPermissionType | undefined = options.auth?.permission || undefined
-    const required_resource = options.resource
-    const required_action = options.action
-    const required_pack = options.pack
-
-    if(required_permission == undefined) return true
-    // TODO integrate pack
-    for(const user_access of user_has_access) {
-        // pack keys should match
-        if(user_access.pack != required_pack) continue
-
-        // resource keys should match
-        if(user_access.resource != required_resource) continue
-
-        // user access should be enabled
-        if(!enabled_access_status.includes(user_access.status)) continue
-
-        // access via top level resource
-        if( true
-            && user_access.action == undefined 
-            && user_access.resource == required_resource
-            && user_access.permissions.includes(required_permission)
-        ) return true
-
-        // access via lower level action
-        if( true
-            && user_access.action == required_action 
-            && user_access.resource == required_resource
-            && user_access.permissions.includes(required_permission)
-        ) return true
-    }
-
-    return false
 }

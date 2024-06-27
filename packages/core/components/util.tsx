@@ -5,9 +5,8 @@ import TSAppClient from '@typestackapp/core/models/user/app/oauth/client/tsapp'
 import { ValuesType } from 'utility-types'
 import { useQuery } from "@apollo/client"
 import { context } from '@typestackapp/core/components/global'
-import { checkResourceAccess } from '@typestackapp/core/models/user/access/util'
+import { AccessCheckOptions, AccessValidator } from '@typestackapp/core/models/user/access/util'
 import type { AuthOutput } from "@typestackapp/core/express/auth"
-import type { AccessCheckOptions } from '@typestackapp/core/models/user/access/middleware'
 import { gql } from '@typestackapp/core/codegen/system/client'
 import { Packages } from '@typestackapp/core'
 
@@ -227,8 +226,7 @@ export function AdminAppList({ open, path, apps, app }: {
 }) {
   const globalContext = React.useContext(context)
   const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
-  // TODO const access = data?.getCurrentUser?.roles?.data.resource_access
-  const access = []
+  const access = data?.getCurrentUser?.roles?.map( role => role.data.resource_access )
   const [adminApps, setAdminApps] = React.useState<AdminApps | undefined>(globalContext?.apps?.state)
 
   // watch app change
@@ -237,14 +235,14 @@ export function AdminAppList({ open, path, apps, app }: {
 
     // remove unaccessible apps
     const _apps = apps.filter((app) => {
-      const options: AccessCheckOptions = {
+      const access_required: AccessCheckOptions = {
         pack: app.pack as Packages,
         resource: app.resource,
         action: app.action,
         auth: { permission: "Read" }
       }
-      const has_access = checkResourceAccess(access, options)
-      return has_access
+      const validator = new AccessValidator(access)
+      return validator.checkAccess(access_required)
     })
 
     if(!globalContext?.apps?.state) {
@@ -344,10 +342,10 @@ export function AdminAppList({ open, path, apps, app }: {
     ))}
   </div>
 }
- 
+
 export function Main({ children }: {
   children: React.ReactNode 
-}){
+}) {
   return (
     <main className='h-full overflow-y-auto overflow-x-hidden'>
       {children}
@@ -444,7 +442,7 @@ export function Admin({ path, apps, app, children }: {
       </div>
 
       <div className='flex-grow overflow-y-auto bg-gray-50'>
-        <AdminAppList apps={apps} app={app} open={isOpened} path={path}/>
+        <AdminAppList apps={apps} app={app} open={true} path={path}/>
       </div>
     </div>
   }
@@ -462,14 +460,14 @@ export function Admin({ path, apps, app, children }: {
         </svg>
       </Link>
       
+      <div className='flex-grow'></div>
+
       {/* user */}
       <div className='hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.4} stroke="currentColor" className="w-9 h-9 max-md:w-10 max-md:h-10">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>
       </div>
-      
-      <div className='flex-grow'></div>
 
       {/* apps */}
       <div onClick={() => setIsOpened(!isOpened)} className='hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>

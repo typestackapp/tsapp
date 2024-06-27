@@ -66,9 +66,7 @@ export interface IAccessOptions extends IEnabled {
 
 export type IAccessStatus =
   | 'Disabled'
-  | 'DisabledByUser'
-  | 'Enabled'
-  | 'EnabledByUser';
+  | 'Enabled';
 
 export interface IAccessType {
   info?: Maybe<Array<Scalars['String']['output']>>;

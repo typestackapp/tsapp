@@ -36,7 +36,7 @@ export const Enabled = `
 `
 
 export const DefaultAccessOptions = `
-    resource: String! # used in checkResourceAccess() to check if user has access to resource
+    resource: String! # used in checkAccess() to check if user has access to resource
     pack: Packages! # package name
     action: String! # any string value used to namespace AccessOptions
     resourceAction: String! # resource and action names combined
@@ -324,8 +324,6 @@ export default `#graphql
     enum AccessStatus {
         Enabled
         Disabled
-        EnabledByUser
-        DisabledByUser
     }
 
     enum TokenType {
