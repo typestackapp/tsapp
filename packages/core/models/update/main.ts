@@ -172,7 +172,7 @@ export const transaction: Transaction = async (session, update) => {
         _id: system_admin_id,
         usn: env.TSAPP_INIT_EMAIL,
         psw: secretHash(env.TSAPP_INIT_PSW),
-        role: "SystemAdmin"
+        roles: ["SystemAdmin"]
     }
     await UserModel.findOneAndUpdate<UserInput>(
         { _id: system_admin_id },

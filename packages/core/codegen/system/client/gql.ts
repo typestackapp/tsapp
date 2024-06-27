@@ -13,7 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      role {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n": types.GetAdminUserDataDocument,
+    "#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      roles {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n": types.GetAdminUserDataDocument,
 };
 
 /**
@@ -33,7 +33,7 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      role {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      role {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n"];
+export function gql(source: "#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      roles {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      roles {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

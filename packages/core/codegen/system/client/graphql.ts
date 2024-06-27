@@ -695,7 +695,7 @@ export type UserDocument = MongoId & MongoTimeStamps & {
   _id: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTime']['output'];
   psw: Scalars['String']['output'];
-  role: Scalars['String']['output'];
+  roles: Array<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   usn: Scalars['String']['output'];
 };
@@ -703,7 +703,7 @@ export type UserDocument = MongoId & MongoTimeStamps & {
 export type UserInput = {
   _id?: Maybe<Scalars['ObjectId']['output']>;
   psw: Scalars['String']['output'];
-  role: Scalars['String']['output'];
+  roles: Array<Scalars['String']['output']>;
   usn: Scalars['String']['output'];
 };
 
@@ -711,7 +711,7 @@ export type UserOutput = MongoId & MongoTimeStamps & {
   __typename?: 'UserOutput';
   _id: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTime']['output'];
-  role?: Maybe<RoleConfigDocument>;
+  roles?: Maybe<Array<RoleConfigDocument>>;
   updatedAt: Scalars['DateTime']['output'];
   usn: Scalars['String']['output'];
 };
@@ -719,7 +719,7 @@ export type UserOutput = MongoId & MongoTimeStamps & {
 export type GetAdminUserDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAdminUserDataQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserOutput', _id: any, usn: string, role?: { __typename?: 'RoleConfigDocument', _id?: any | null, title: string, pack: any, type: string, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource: string, action?: string | null, permissions: Array<PermissionType> }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } } | null } | null };
+export type GetAdminUserDataQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserOutput', _id: any, usn: string, roles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, pack: any, type: string, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource: string, action?: string | null, permissions: Array<PermissionType> }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null } | null };
 
 
-export const GetAdminUserDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminUserData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"usn"}},{"kind":"Field","name":{"kind":"Name","value":"role"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetAdminUserDataQuery, GetAdminUserDataQueryVariables>;
+export const GetAdminUserDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminUserData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"usn"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetAdminUserDataQuery, GetAdminUserDataQueryVariables>;

@@ -3,7 +3,7 @@ import { MongoId, MongoIdMeybe, MongoTimeStamps } from "@typestackapp/core/graph
 export const UserInput = `
     usn: String!
     psw: String!
-    role: String!
+    roles: [String!]!
 `
 
 export default `#graphql
@@ -20,7 +20,7 @@ export default `#graphql
 
     type UserOutput implements MongoId & MongoTimeStamps {
         usn: String!
-        role: RoleConfigDocument
+        roles: [RoleConfigDocument!]
         ${MongoId}
         ${MongoTimeStamps}
     }

@@ -30,12 +30,12 @@ router.resolvers.Query.getUser = {
     }
 }
 
-router.resolvers.UserOutput.role = {
+router.resolvers.UserOutput.roles = {
     access: config.access.ACTIVE.User.getUserRole,
     resolve: async (parent, args, context, info) => {
         if(!context.user) return null
-        const role = await RoleConfigModel.findOne({ "data.name": context.user.role })
-        if(!role) return null
-        return role.toJSON()
+        const roles = await RoleConfigModel.find({ "data.name": { $in: context.user.roles } })
+        if(!roles || roles.length === 0) return null
+        return roles.map( role => role.toJSON() )
     }
 }

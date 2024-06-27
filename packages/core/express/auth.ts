@@ -12,7 +12,7 @@ import { z } from "zod"
 import { env } from "@typestackapp/core"
 import { allowed_actions, z_app_filters } from '@typestackapp/core/common/auth'
 import { BearerTokenInput, BearerTokenInputData, BearerTokenModel } from '@typestackapp/core/models/user/token/bearer'
-import { checkAccessToAllResources } from '@typestackapp/core/models/user/access/util'
+import { checkAccessToListOfResources } from '@typestackapp/core/models/user/access/util'
 import { CallbackOptions, ClientSession } from '@typestackapp/core/models/user/app/oauth/client'
 import { UserModel } from '@typestackapp/core/models/user'
 import { RoleConfigModel } from '@typestackapp/core/models/config/role'
@@ -51,7 +51,7 @@ const clearCookie = (res: Response, name: string) => {
     })
 }
 
-async function basicUserAppValidation(client_id: string, role: string, actions?: ["login" | "register" | "grant"]) {
+async function basicUserAppValidation(client_id: string, roles: string[], actions?: ["login" | "register" | "grant"]) {
     const app = await OauthAppModel.findOne({
         "actions": { $in: actions || allowed_actions },
         "data.client_id": client_id
@@ -60,17 +60,22 @@ async function basicUserAppValidation(client_id: string, role: string, actions?:
     if(!app) 
         return { code: "invalid-auth-app-not-found", msg: "app not found" }
 
-    const role_config = await RoleConfigModel.findOne({
-        "data.name": role
+    const role_configs = await RoleConfigModel.find({
+        "data.name": { $in: roles }
     })
 
-    if(!role_config) 
+    const role_names = role_configs.map( role => role.data.name )
+    const role_access = role_configs.map( role => role.data.resource_access )
+
+    if(!role_configs || role_configs.length === 0)
         return { code: "invalid-auth-role-not-found", msg: "role not found" }
 
-    if(!app.data.roles.includes(role_config.data.name)) 
+    if(!app.data.roles.some(role => role_names.includes(role)))
         return { code: "invalid-auth-role-not-allowed", msg: "role not allowed" }
 
-    const access_check = checkAccessToAllResources(role_config.data.resource_access, app.data.access)
+    const access_check = checkAccessToListOfResources(role_access, app.data.access)
+
+    console.log(access_check);
     
     if(!access_check.has_partial_access)
         return { code: "invalid-auth-access", msg: "access not found" }
@@ -80,7 +85,7 @@ async function basicUserAppValidation(client_id: string, role: string, actions?:
         msg: "ok",
         access_check,
         app,
-        role_config
+        role_configs
     }
 }
 
@@ -111,7 +116,7 @@ export const tokenRouter = t.router({
                 return response
             }
 
-            const is_valid = await basicUserAppValidation(client_id, req.user.role)
+            const is_valid = await basicUserAppValidation(client_id, req.user.roles)
             if(is_valid.code != "ok") {
                 response.error = is_valid
                 return response
@@ -485,7 +490,7 @@ export const authRouter = t.router({
         const response_type = opts.input.response_type
         const code = opts.input.code
 
-        const response: ExpressResponse<{ code: string, access: ReturnType<typeof checkAccessToAllResources> } | undefined> = {
+        const response: ExpressResponse<{ code: string, access: ReturnType<typeof checkAccessToListOfResources> } | undefined> = {
             data: undefined,
             error: undefined
         }
@@ -502,7 +507,7 @@ export const authRouter = t.router({
             return response
         }
 
-        const is_valid = await basicUserAppValidation(client_id, req.user.role, ["grant"])
+        const is_valid = await basicUserAppValidation(client_id, req.user.roles, ["grant"])
         const access_check = is_valid.access_check
         if(is_valid.code != "ok" || !access_check) {
             response.error = is_valid

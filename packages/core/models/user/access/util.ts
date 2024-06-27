@@ -23,9 +23,21 @@ export function randomSecret(str_length: number): string {
     return rand.toString('base64').slice(0, str_length);
 }
 
+export async function checkRolesAccessToGraphqlService(roles: RoleConfigDocument[], options: Pick<GraphqlServerConfig, "pack" | "name">): Promise<boolean> {
+    for(const role of roles) {
+        if(await checkRoleAccessToGraphqlService(role, options) === true) {
+            return true
+        }
+    }
+    const role_names = roles.map( role => role.data.name ).toString()
+    throw `Roles ${role_names} does not have access to ${options.pack}`
+}
+
 export async function checkRoleAccessToGraphqlService(role: RoleConfigDocument, options: Pick<GraphqlServerConfig, "pack" | "name">): Promise<boolean> {
     const graphql_access = role.data.graphql_access.find( access => access.pack === options.pack )
-    if (!graphql_access) throw `Role ${role.data.name} not have access to ${options.pack}`
+    if (!graphql_access) {
+        return false
+    }
 
     const services = graphql_access.services
     if (!services.includes(options.name)) `Role ${role.data.name} not have access to ${options.pack}:${options.name}`
@@ -33,10 +45,45 @@ export async function checkRoleAccessToGraphqlService(role: RoleConfigDocument, 
     return true
 }
 
+export function arrayToObject(array: [], keyField: string) {
+    return array.reduce((obj, item) => {
+        obj[item[keyField]] = item;
+        return obj;
+    }, {});
+}
 
-export function checkAccessToAllResources( has_access: AccessOutput[] | IAccessInput[], access_required: AccessOutput[] | IAccessInput[]){
-    const ok: AccessCheckOptions[] = []
-    const bad: AccessCheckOptions[] = []
+export function checkAccessToListOfResources( 
+    access_provided: AccessOutput[][][] | IAccessInput[][],
+    access_required: AccessOutput[] | IAccessInput[] 
+) {
+    const full_access: ReturnType<typeof checkAccessToResources>[] = []
+    const partial_access: ReturnType<typeof checkAccessToResources>[] = []
+    const no_access: ReturnType<typeof checkAccessToResources>[] = []
+
+    for(const [key, access] of Object.entries(access_provided)) {
+        const result = checkAccessToResources(access, access_required)
+        if(result.has_full_access) {
+            full_access.push(result)
+        }else if(result.has_partial_access) {
+            partial_access.push(result)
+        }else {
+            no_access.push(result)
+        }
+    }
+
+    return {
+        has_full_access: no_access.length == 0,
+        has_partial_access: partial_access.length > 0 || full_access.length > 0,
+        full_access,
+        partial_access,
+        no_access
+    }
+}
+
+
+export function checkAccessToResources( access_provided: AccessOutput[] | IAccessInput[], access_required: AccessOutput[] | IAccessInput[]) {
+    const has_access: AccessCheckOptions[] = []
+    const no_access: AccessCheckOptions[] = []
     for(const required of access_required) {
         for(const permission of required.permissions) {
             const options: AccessCheckOptions = {
@@ -47,19 +94,19 @@ export function checkAccessToAllResources( has_access: AccessOutput[] | IAccessI
                     permission
                 }
             }
-            if(!checkResourceAccess(has_access, options)) {
-                bad.push(options)
+            if(!checkResourceAccess(access_provided, options)) {
+                no_access.push(options)
             }else {
-                ok.push(options)
+                has_access.push(options)
             }
         }
     }
 
     return {
-        has_all_access: bad.length == 0,
-        has_partial_access: ok.length > 0,
-        ok, // list of access required and found
-        bad // list of access required but not found
+        has_full_access: no_access.length == 0,
+        has_partial_access: has_access.length > 0,
+        has_access, // list of access required and found
+        no_access // list of access required but not found
     }
 }
 
