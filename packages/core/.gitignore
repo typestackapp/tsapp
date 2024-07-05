@@ -1,9 +1,12 @@
+# tsapp
+node_modules
 !docker/*
 /**/*.js
 /**/*.map
 /**/*.d.ts
+
+# core
 logs
-apps
 codegen/tsapp.json
 codegen/config
 codegen/haproxy
@@ -14,4 +17,3 @@ configs/letsencrypt
 configs/mongo
 configs/codeserver
 configs/wireguard
-node_modules
