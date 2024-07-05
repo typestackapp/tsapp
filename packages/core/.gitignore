@@ -1,6 +1,7 @@
 !docker/*
 /**/*.js
 /**/*.map
+/**/*.d.ts
 logs
 apps
 codegen/tsapp.json

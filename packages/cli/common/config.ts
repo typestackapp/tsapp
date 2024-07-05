@@ -1,7 +1,8 @@
 import fs from 'fs'
 import { 
     copyConfigs, getConfigFile, mergeWithoutPublicRemoval, writeJsonTypeFile, 
-    writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareDockerFile 
+    writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareDockerFile, 
+    mkDirRecursive 
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
@@ -31,7 +32,7 @@ export const config = async (options: ConfigOptions) => {
     fs.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify(tsapp, null, 4))
 
     // create module_folder if it dosent exist
-    if(!fs.existsSync(`${module_folder}/source`)) fs.mkdirSync(`${module_folder}/source`, { recursive:true })
+    if(!fs.existsSync(`${module_folder}/source`)) mkDirRecursive(`${module_folder}/source`)
 
     // create empty config file before building
     if(!fs.existsSync(pack_config_output)) fs.writeFileSync(pack_config_output, JSON.stringify({}, null, 4))
@@ -49,10 +50,10 @@ export const config = async (options: ConfigOptions) => {
             package_errors = true
         }
     }
-    if(package_errors){
-        console.log("Please install the packages above")
+    if(package_errors) {
+        console.log("Please install the packages above with npm install")
         return
-    }else{
+    }else {
         console.log("All packages are installed")
     }
 
@@ -164,11 +165,11 @@ export const config = async (options: ConfigOptions) => {
         const output_folder = `${CWD}/node_modules/${_package}/configs/output/`
 
         // if module_output dosent exist create it
-        !fs.existsSync(module_output) && fs.mkdirSync(module_output, { recursive:true })
+        !fs.existsSync(module_output) && mkDirRecursive(module_output)
         // if mod_folder dosent exist create it
-        !fs.existsSync(mod_folder) && fs.mkdirSync(mod_folder, { recursive:true })
+        !fs.existsSync(mod_folder) && mkDirRecursive(mod_folder)
         // if output_folder dosent exist create it
-        !fs.existsSync(output_folder) && fs.mkdirSync(output_folder, { recursive:true })
+        !fs.existsSync(output_folder) && mkDirRecursive(output_folder)
         // if source_folder dosent exist skip
         if(!fs.existsSync(source_folder)) continue
     
@@ -252,7 +253,7 @@ export const config = async (options: ConfigOptions) => {
         // use fs.linkSync to lin each file in source to target
 
         // if target dosent exist create it
-        if(!fs.existsSync(target)) fs.mkdirSync(target, { recursive:true })
+        if(!fs.existsSync(target)) mkDirRecursive(target)
 
         // foreach file in source
         for(const file_name of fs.readdirSync(source)) {
@@ -262,15 +263,15 @@ export const config = async (options: ConfigOptions) => {
             // if file is a folder
             if(fs.lstatSync(source_file).isDirectory()) {
                 // if target folder dosent exist create it
-                if(!fs.existsSync(target_file)) fs.mkdirSync(target_file, { recursive:true })
+                if(!fs.existsSync(target_file)) mkDirRecursive(target_file)
                 // link folder
                 linkFolder(source_file, target_file)
-            }else{
+            }else {
                 // if target file dosent exist create it
                 if(!fs.existsSync(target_file)) {
                     fs.linkSync(source_file, target_file)
                 }else {
-                    console.log(`File ${target_file} already exists`)
+                    console.log(`Warning, File ${target_file} already exists`)
                 }
             }
         }
@@ -303,7 +304,8 @@ export const config = async (options: ConfigOptions) => {
             symlink_path
         }
     }
-    unlinkFolder(`${output_dir}/app`)
+
+    if(LINK && fs.existsSync(`${output_dir}/app`)) unlinkFolder(`${output_dir}/app`)
 
     for(const [pack_key, _config] of Object.entries(packages) as any) {
         const output_app_dir = getSymLink(`${output_dir}/app/${_config.alias}`)
@@ -324,13 +326,13 @@ export const config = async (options: ConfigOptions) => {
         if(!fs.existsSync(public_dir)) continue
         
         // create public symlink
-        if(LINK && !fs.existsSync(output_public_dir.path_to_create)) fs.mkdirSync(output_public_dir.path_to_create, { recursive:true })
+        if(LINK && !fs.existsSync(output_public_dir.path_to_create)) mkDirRecursive(output_public_dir.path_to_create)
         if(LINK && fs.existsSync(output_public_dir.symlink_path)) fs.unlinkSync(output_public_dir.symlink_path)
         if(LINK) fs.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir')
     }
 
     // if layout.tsx does not exist create it
-    if(!fs.existsSync(`${output_dir}/app/layout.tsx`)) {
+    if(fs.existsSync(`${output_dir}/app/`) && !fs.existsSync(`${output_dir}/app/layout.tsx`)) {
         const layout = `
             import React from 'react'
             export default function RootLayout( { children } : { children: React.ReactNode } ) {

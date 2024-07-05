@@ -71,7 +71,7 @@ function update(options) {
                 // use .js files only
                 if (file.split(".").pop() != "js")
                     continue;
-                // use .js file only if .ts file exists
+                // use .js file only if .d.ts file exists
                 if (!fs_1.default.existsSync(`${update_path}/${file.replace('.js', '.ts')}`))
                     continue;
                 const module = yield Promise.resolve(`${filePath}`).then(s => __importStar(require(s)));

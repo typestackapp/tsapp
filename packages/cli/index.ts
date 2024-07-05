@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node --no-deprecation
+#!/usr/bin/env node
 import type { ConfigOptions } from "./common/config"
 import type { ServiceOptions } from "./common/service"
 import type { GraphqlOptions } from "./common/graphql"
@@ -19,7 +19,7 @@ if(!cwd) process.exit(1)
 
 const config_options: ConfigOptions = {
     cwd,
-    link: argv?.link,
+    link: (argv.link == undefined)? true : argv.link
 }
 
 const service_options: ServiceOptions = {

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { merge } from 'lodash'
+import merge from '../lib/merge'
 
 type Config = any
 type Packages = any
@@ -524,8 +524,8 @@ export async function getGraphqlModules(config: GraphqlServerConfig, options: Ge
                 if(file.split(".").pop() != "js")
                     continue
 
-                // use .js file only if .ts file exists
-                if(!fs.existsSync(filePath.replace('.js', '.ts')))
+                // use .js file only if .d.ts file exists
+                if(!fs.existsSync(filePath.replace('.js', '.d.ts')))
                     continue
 
                 // if options.resolvers is true
@@ -650,4 +650,17 @@ export function findTSAppRootDir() {
 
 export async function sleep(seconds: number) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+}
+
+export function mkDirRecursive(dir: string) {
+    if (!fs.existsSync(dir)) {
+        const dirs = dir.split('/')
+        let _dir = ''
+        for(const d of dirs) {
+            _dir += d + '/'
+            if (!fs.existsSync(_dir)){
+                fs.mkdirSync(_dir)
+            }
+        }
+    }
 }

@@ -1,6 +1,4 @@
 {
-  "name": "@typestackapp/main",
-  "version": "0.0.4",
   "workspaces": ["packages/*"],
   "tsapp": {
     "packages": {

@@ -50,7 +50,7 @@ export async function update(options: UpdateOptions) {
             if(file.split(".").pop() != "js")
                 continue
 
-            // use .js file only if .ts file exists
+            // use .js file only if .d.ts file exists
             if(!fs.existsSync(`${update_path}/${file.replace('.js', '.ts')}`))
                 continue
 

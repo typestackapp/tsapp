@@ -4,8 +4,8 @@
       "common/**/*"
     ],
     "exclude": [
-      "../core/codegen/next/**/*.tsx",
-      "node_modules"
+      "node_modules",
+      "./lib/**/*",
     ],
     "compilerOptions": {
       /* Visit https://aka.ms/tsconfig.json to read more about this file */

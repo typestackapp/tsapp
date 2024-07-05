@@ -55,7 +55,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     fs_1.default.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify(tsapp, null, 4));
     // create module_folder if it dosent exist
     if (!fs_1.default.existsSync(`${module_folder}/source`))
-        fs_1.default.mkdirSync(`${module_folder}/source`, { recursive: true });
+        (0, util_1.mkDirRecursive)(`${module_folder}/source`);
     // create empty config file before building
     if (!fs_1.default.existsSync(pack_config_output))
         fs_1.default.writeFileSync(pack_config_output, JSON.stringify({}, null, 4));
@@ -73,7 +73,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     if (package_errors) {
-        console.log("Please install the packages above");
+        console.log("Please install the packages above with npm install");
         return;
     }
     else {
@@ -175,11 +175,11 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         const mod_folder = `${CWD}/node_modules/${_package}/configs/mod/`;
         const output_folder = `${CWD}/node_modules/${_package}/configs/output/`;
         // if module_output dosent exist create it
-        !fs_1.default.existsSync(module_output) && fs_1.default.mkdirSync(module_output, { recursive: true });
+        !fs_1.default.existsSync(module_output) && (0, util_1.mkDirRecursive)(module_output);
         // if mod_folder dosent exist create it
-        !fs_1.default.existsSync(mod_folder) && fs_1.default.mkdirSync(mod_folder, { recursive: true });
+        !fs_1.default.existsSync(mod_folder) && (0, util_1.mkDirRecursive)(mod_folder);
         // if output_folder dosent exist create it
-        !fs_1.default.existsSync(output_folder) && fs_1.default.mkdirSync(output_folder, { recursive: true });
+        !fs_1.default.existsSync(output_folder) && (0, util_1.mkDirRecursive)(output_folder);
         // if source_folder dosent exist skip
         if (!fs_1.default.existsSync(source_folder))
             continue;
@@ -252,7 +252,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         // use fs.linkSync to lin each file in source to target
         // if target dosent exist create it
         if (!fs_1.default.existsSync(target))
-            fs_1.default.mkdirSync(target, { recursive: true });
+            (0, util_1.mkDirRecursive)(target);
         // foreach file in source
         for (const file_name of fs_1.default.readdirSync(source)) {
             const source_file = `${source}/${file_name}`;
@@ -261,7 +261,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             if (fs_1.default.lstatSync(source_file).isDirectory()) {
                 // if target folder dosent exist create it
                 if (!fs_1.default.existsSync(target_file))
-                    fs_1.default.mkdirSync(target_file, { recursive: true });
+                    (0, util_1.mkDirRecursive)(target_file);
                 // link folder
                 linkFolder(source_file, target_file);
             }
@@ -271,7 +271,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                     fs_1.default.linkSync(source_file, target_file);
                 }
                 else {
-                    console.log(`File ${target_file} already exists`);
+                    console.log(`Warning, File ${target_file} already exists`);
                 }
             }
         }
@@ -302,7 +302,8 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             symlink_path
         };
     };
-    unlinkFolder(`${output_dir}/app`);
+    if (LINK && fs_1.default.existsSync(`${output_dir}/app`))
+        unlinkFolder(`${output_dir}/app`);
     for (const [pack_key, _config] of Object.entries(packages)) {
         const output_app_dir = getSymLink(`${output_dir}/app/${_config.alias}`);
         const output_public_dir = getSymLink(`${output_dir}/public/${pack_key}`);
@@ -324,14 +325,14 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             continue;
         // create public symlink
         if (LINK && !fs_1.default.existsSync(output_public_dir.path_to_create))
-            fs_1.default.mkdirSync(output_public_dir.path_to_create, { recursive: true });
+            (0, util_1.mkDirRecursive)(output_public_dir.path_to_create);
         if (LINK && fs_1.default.existsSync(output_public_dir.symlink_path))
             fs_1.default.unlinkSync(output_public_dir.symlink_path);
         if (LINK)
             fs_1.default.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir');
     }
     // if layout.tsx does not exist create it
-    if (!fs_1.default.existsSync(`${output_dir}/app/layout.tsx`)) {
+    if (fs_1.default.existsSync(`${output_dir}/app/`) && !fs_1.default.existsSync(`${output_dir}/app/layout.tsx`)) {
         const layout = `
             import React from 'react'
             export default function RootLayout( { children } : { children: React.ReactNode } ) {

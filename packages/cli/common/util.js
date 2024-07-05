@@ -35,10 +35,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
+exports.mkDirRecursive = exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const lodash_1 = require("lodash");
+const merge_1 = __importDefault(require("../lib/merge"));
 function getPackageVersion(pack) {
     const _pack_path = `${process.cwd()}/node_modules/${pack}/package.json`;
     // check if package.json exists
@@ -459,15 +459,15 @@ function getGraphqlModules(config_1, options_1) {
                     // Recursive call to process files in nested directories
                     const _module = yield getGraphqlModules(config, options, [filePath]);
                     schema += _module.schema;
-                    resolvers = (0, lodash_1.merge)(resolvers, _module.resolvers);
+                    resolvers = (0, merge_1.default)(resolvers, _module.resolvers);
                     routers.push(..._module.routers);
                 }
                 else {
                     // use .js files only
                     if (file.split(".").pop() != "js")
                         continue;
-                    // use .js file only if .ts file exists
-                    if (!fs_1.default.existsSync(filePath.replace('.js', '.ts')))
+                    // use .js file only if .d.ts file exists
+                    if (!fs_1.default.existsSync(filePath.replace('.js', '.d.ts')))
                         continue;
                     // if options.resolvers is true
                     // and file ends with .resolver.js
@@ -479,7 +479,7 @@ function getGraphqlModules(config_1, options_1) {
                             for (const [key, graphql_router] of Object.entries(graphql_module)) {
                                 // if module has default export and it's an object
                                 if (graphql_router && typeof graphql_router != "string" && graphql_router.resolvers) {
-                                    resolvers = (0, lodash_1.merge)(resolvers, graphql_router.getResolvers());
+                                    resolvers = (0, merge_1.default)(resolvers, graphql_router.getResolvers());
                                     routers.push(...graphql_router.getRouters(config));
                                 }
                             }
@@ -588,3 +588,16 @@ function sleep(seconds) {
     });
 }
 exports.sleep = sleep;
+function mkDirRecursive(dir) {
+    if (!fs_1.default.existsSync(dir)) {
+        const dirs = dir.split('/');
+        let _dir = '';
+        for (const d of dirs) {
+            _dir += d + '/';
+            if (!fs_1.default.existsSync(_dir)) {
+                fs_1.default.mkdirSync(_dir);
+            }
+        }
+    }
+}
+exports.mkDirRecursive = mkDirRecursive;

@@ -1,0 +1,1 @@
+export default function merge(obj: any, obj2: any): any 

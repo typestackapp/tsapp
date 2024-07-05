@@ -1,4 +1,4 @@
-#!/usr/bin/env -S node --no-deprecation
+#!/usr/bin/env node
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -41,7 +41,7 @@ if (!cwd)
     process.exit(1);
 const config_options = {
     cwd,
-    link: argv === null || argv === void 0 ? void 0 : argv.link,
+    link: (argv.link == undefined) ? true : argv.link
 };
 const service_options = {
     cwd,
