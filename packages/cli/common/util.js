@@ -35,17 +35,60 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mkDirRecursive = exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = void 0;
+exports.mkDirRecursive = exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = exports.getPackageConfigs = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const merge_1 = __importDefault(require("../lib/merge"));
+function getPackageConfigs() {
+    var _a;
+    const packages = {};
+    const cwd = findTSAppRootDir();
+    const packages_path = `${cwd}/packages/`;
+    const main = `${cwd}/package.json`;
+    const main_package = JSON.parse(fs_1.default.readFileSync(main, 'utf8'));
+    const packages_list = (_a = main_package === null || main_package === void 0 ? void 0 : main_package.tsapp) === null || _a === void 0 ? void 0 : _a.packages;
+    if (!packages_list) {
+        console.log(`Error, missing packages in ${main}`);
+        return packages;
+    }
+    if (!packages_list["@typestackapp/core"]) {
+        console.log(`Error, missing @typestackapp/core in ${main}`);
+        return packages;
+    }
+    for (const [pack_key, pack] of Object.entries(packages_list)) {
+        // loacate package in packages_path
+        const installed_packages = fs_1.default.readdirSync(packages_path);
+        let alias = undefined;
+        let version = undefined;
+        for (const installed_pack of installed_packages) {
+            const pack_path = `${packages_path}${installed_pack}/package.json`;
+            // check if package if package.json exists
+            if (!fs_1.default.existsSync(pack_path))
+                continue;
+            const pack = JSON.parse(fs_1.default.readFileSync(pack_path, 'utf8'));
+            if (pack.name == pack_key) {
+                alias = installed_pack;
+                version = pack.version;
+                break;
+            }
+        }
+        if (!alias || !version) {
+            console.log(`Error, missing ${pack_key} in ${packages_path}`);
+            continue;
+        }
+        packages[pack_key] = Object.assign(Object.assign({}, pack), { alias,
+            version });
+    }
+    // console.log(packages)
+    return packages;
+}
+exports.getPackageConfigs = getPackageConfigs;
 function getPackageVersion(pack) {
-    const _pack_path = `${process.cwd()}/node_modules/${pack}/package.json`;
-    // check if package.json exists
-    if (!fs_1.default.existsSync(_pack_path))
+    var _a, _b;
+    const packages = getPackageConfigs();
+    if (!((_a = packages[pack]) === null || _a === void 0 ? void 0 : _a.version))
         return "-";
-    const _pack = fs_1.default.readFileSync(_pack_path, 'utf8');
-    return JSON.parse(_pack).version;
+    return (_b = packages[pack]) === null || _b === void 0 ? void 0 : _b.version;
 }
 exports.getPackageVersion = getPackageVersion;
 function extractArg(args, arg_name, required) {

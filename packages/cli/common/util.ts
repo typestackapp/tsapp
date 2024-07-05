@@ -3,26 +3,80 @@ import path from 'path'
 import merge from '../lib/merge'
 
 type Config = any
-type Packages = any
+type Packages = string
 type GraphqlResovlerModule = any
 type GraphqlRouter<T> = any
 type GraphqlServerConfig = any
 type IGraphqlRouter = any
 
-export type PackageConfig = {
-    alias?: string | null,
-    title: string,
-    apps: "open" | "grow" | "default"
+export function getPackageConfigs() {
+    const packages: {
+        [key: string]: {
+            haproxy?: { 
+                rewrite: boolean
+            },
+            disable_next_alias?: true,
+            version: string, 
+            alias: string 
+        } 
+    } = {}
+
+    const cwd = findTSAppRootDir()
+    const packages_path = `${cwd}/packages/`
+    const main = `${cwd}/package.json`
+    const main_package = JSON.parse(fs.readFileSync(main, 'utf8'))
+    const packages_list = main_package?.tsapp?.packages
+
+    if(!packages_list) {
+        console.log(`Error, missing packages in ${main}`)
+        return packages
+    }
+
+    if(!packages_list["@typestackapp/core"]) {
+        console.log(`Error, missing @typestackapp/core in ${main}`)
+        return packages
+    }
+
+    for(const [pack_key, pack] of Object.entries(packages_list) as any) {
+        // loacate package in packages_path
+        const installed_packages = fs.readdirSync(packages_path)
+        let alias: string | undefined = undefined
+        let version: string | undefined = undefined
+
+        for(const installed_pack of installed_packages) {
+            const pack_path = `${packages_path}${installed_pack}/package.json`
+
+            // check if package if package.json exists
+            if(!fs.existsSync(pack_path)) continue
+
+            const pack = JSON.parse(fs.readFileSync(pack_path, 'utf8'))
+            if(pack.name == pack_key) {
+                alias = installed_pack
+                version = pack.version
+                break
+            }
+        }
+
+        if(!alias || !version) {
+            console.log(`Error, missing ${pack_key} in ${packages_path}`)
+            continue
+        }
+
+        packages[pack_key] = {
+            ...pack,
+            alias,
+            version,
+        }
+    }
+
+    // console.log(packages)
+    return packages
 }
 
 export function getPackageVersion(pack: Packages): string {
-    const _pack_path = `${process.cwd()}/node_modules/${pack}/package.json`
-
-    // check if package.json exists
-    if(!fs.existsSync(_pack_path)) return "-"
-
-    const _pack = fs.readFileSync(_pack_path, 'utf8')
-    return JSON.parse(_pack).version
+    const packages = getPackageConfigs()
+    if(!packages[pack]?.version) return "-"
+    return packages[pack]?.version
 }
 
 export function extractArg(args: any, arg_name: string, required: boolean) {

@@ -58,9 +58,9 @@ function update(options) {
         const pack_updates = [];
         const pack_errors = [];
         console.log(`Info, updating packages:`);
-        for (const [pack_key, pack] of Object.entries(core.packages)) {
+        for (const [pack_key, pack] of Object.entries((0, util_1.getPackageConfigs)())) {
             const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`;
-            const pack_version = (0, util_1.getPackageVersion)(pack_key);
+            const pack_version = pack.version;
             console.log(`Info, ${pack_key}:${pack_version}`);
             if (!fs_1.default.existsSync(update_path))
                 continue;

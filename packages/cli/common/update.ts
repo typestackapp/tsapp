@@ -1,6 +1,6 @@
 import fs from "fs"
 import type { Transaction, UpdateInput, UpdateDocument } from "@typestackapp/core/models/update"
-import { getPackageVersion, sleep } from "./util"
+import { getPackageConfigs, sleep } from "./util"
 
 export type UpdateOptions = {
     cwd: string // current working directory
@@ -34,9 +34,9 @@ export async function update(options: UpdateOptions) {
 
     console.log(`Info, updating packages:`)
 
-    for (const [pack_key, pack] of Object.entries(core.packages)) {
+    for (const [pack_key, pack] of Object.entries(getPackageConfigs())) {
         const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`
-        const pack_version = getPackageVersion(pack_key)
+        const pack_version = pack.version
         console.log(`Info, ${pack_key}:${pack_version}`)
 
         if (!fs.existsSync(update_path)) continue

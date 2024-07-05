@@ -2,7 +2,7 @@ import fs from 'fs'
 import { 
     copyConfigs, getConfigFile, mergeWithoutPublicRemoval, writeJsonTypeFile, 
     writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareDockerFile, 
-    mkDirRecursive 
+    mkDirRecursive, getPackageConfigs
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
@@ -26,7 +26,7 @@ export const config = async (options: ConfigOptions) => {
     const pack_config_output = `${module_folder}/output.json`
     const pack_config_ts_output = `${module_folder}/output.ts`
     const tsapp = (await import(`${CWD}/package.json`)).tsapp
-    const packages = tsapp.packages
+    const packages = getPackageConfigs()
 
     //write json to core/codegen/tsapp.json
     fs.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify(tsapp, null, 4))
@@ -44,27 +44,27 @@ export const config = async (options: ConfigOptions) => {
     // -------------------- PACKAGES --------------------
     // check if packages are installed
     var package_errors = false
-    for(const [pack_key, _config] of Object.entries(packages) as any) {
-        if(!fs.existsSync(`${CWD}/node_modules/${pack_key}`)) {
-            console.log(`Error: Package ${pack_key} is not installed`)
+    for(const [pack_key, _config] of Object.entries(packages)) {
+        const package_reachable = fs.existsSync(`${CWD}/packages/${_config.alias}`)
+        if(!package_reachable) {
+            console.log(`Error: Package ${pack_key} is not accessiable via alias ${_config.alias}`)
             package_errors = true
         }
     }
+
     if(package_errors) {
-        console.log("Please install the packages above with npm install")
+        console.log(`Error: Fix package errors before continuing`)
         return
-    }else {
-        console.log("All packages are installed")
     }
 
     // -------------------- HAPROXY --------------------
     // create haproxy
     let haproxy_output_file_content: {[key: string]: string} = {}
     // foreach package
-    for(const [pack_key, _config] of Object.entries(packages) as any) {
+    for(const [pack_key, _config] of Object.entries(packages)) {
         // skip if _config.haproxy.rewrite is false
         if(_config.haproxy?.rewrite !== true) continue
-        const haproxy_input_folder = `${CWD}/node_modules/${pack_key}/haproxy/`
+        const haproxy_input_folder = `${CWD}/packages/${_config.alias}/haproxy/`
         
         // check if directory is empty and exists
         if(!fs.existsSync(haproxy_input_folder) || fs.readdirSync(haproxy_input_folder).length === 0) continue
@@ -84,7 +84,7 @@ export const config = async (options: ConfigOptions) => {
     }
     // write haproxy file
     let haproxy_output_content = ""
-    const haproxy_output_folder = `${CWD}/node_modules/@typestackapp/core/codegen/haproxy`
+    const haproxy_output_folder = `${CWD}/packages/core/codegen/haproxy`
     const haproxy_output_file = `${haproxy_output_folder}/proxy.cfg`
     const haproxy_order = ["resolvers", "global", "defaults", "frontend", "backend" ]
     const haproxy_output_content_order: {file_name: string, content: string}[] = []
@@ -122,9 +122,9 @@ export const config = async (options: ConfigOptions) => {
         emptyDir(output_folder)
 
         // foreach installed package
-        for(const [pack_key, _config] of Object.entries(packages) as any) {
+        for(const [pack_key, _config] of Object.entries(packages)) {
             env_vars["ALIAS"] = _config.alias
-            const docker_folder = `${CWD}/node_modules/${pack_key}/docker/`
+            const docker_folder = `${CWD}/packages/${_config.alias}/docker/`
             const docker_global_file_path = `${docker_folder}/compose.global.yml`
             const docker_global_file = fs.existsSync(docker_global_file_path)? fs.readFileSync(docker_global_file_path) : ""
 
@@ -160,9 +160,9 @@ export const config = async (options: ConfigOptions) => {
     // for each tsapp module in package.json create output config
     for(const [_package, _config] of Object.entries(packages)) {
         const module_output = `${module_folder}/source/${_package}`
-        const source_folder = `${CWD}/node_modules/${_package}/configs/source/`
-        const mod_folder = `${CWD}/node_modules/${_package}/configs/mod/`
-        const output_folder = `${CWD}/node_modules/${_package}/configs/output/`
+        const source_folder = `${CWD}/packages/${_config.alias}/configs/source/`
+        const mod_folder = `${CWD}/packages/${_config.alias}/configs/mod/`
+        const output_folder = `${CWD}/packages/${_config.alias}/configs/output/`
 
         // if module_output dosent exist create it
         !fs.existsSync(module_output) && mkDirRecursive(module_output)
@@ -201,9 +201,9 @@ export const config = async (options: ConfigOptions) => {
     const configs = {} as any
 
     // merge each module config into one
-    for(const [_package, _config] of Object.entries(packages) as any) {
+    for(const [_package, _config] of Object.entries(packages)) {
         const output_folder = `${module_folder}/source/${_package}/`
-        const input_folder = `${CWD}/node_modules/${_package}/configs/output/`
+        const input_folder = `${CWD}/packages/${_config.alias}/configs/output/`
 
         // create package config
         !configs[_package] && (configs[_package] = {})
@@ -307,11 +307,11 @@ export const config = async (options: ConfigOptions) => {
 
     if(LINK && fs.existsSync(`${output_dir}/app`)) unlinkFolder(`${output_dir}/app`)
 
-    for(const [pack_key, _config] of Object.entries(packages) as any) {
+    for(const [pack_key, _config] of Object.entries(packages)) {
         const output_app_dir = getSymLink(`${output_dir}/app/${_config.alias}`)
         const output_public_dir = getSymLink(`${output_dir}/public/${pack_key}`)
-        const app_dir = `${CWD}/node_modules/${pack_key}/next/app/`
-        const public_dir = `${CWD}/node_modules/${pack_key}/next/public/`
+        const app_dir = `${CWD}/packages/${_config.alias}/next/app/`
+        const public_dir = `${CWD}/packages/${_config.alias}/next/public/`
 
         // skip if next_dir does not exist
         if(!fs.existsSync(app_dir)) continue
