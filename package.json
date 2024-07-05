@@ -3,7 +3,6 @@
   "tsapp": {
     "packages": {
       "@typestackapp/core": {
-        "alias": "core",
         "haproxy": { "rewrite": true },
         "disable_next_alias": true
       }
