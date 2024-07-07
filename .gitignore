@@ -1,6 +1,4 @@
 # tsapp
-*.env
-!example.env
 compose.*
 Dockerfile.*
 logs/*

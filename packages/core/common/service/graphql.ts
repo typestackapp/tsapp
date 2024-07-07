@@ -1,4 +1,4 @@
-import { env } from "@typestackapp/core"
+import { tsapp } from "@typestackapp/core/env"
 import DB from "@typestackapp/core/common/db"
 DB.getInstance()
 
@@ -114,7 +114,7 @@ initilize()
         )
 
         console.log(`---GRAPHQL ${graphql_server.pack} ${graphql_server.name} SERVER INFO-------`)
-        console.log(`SERVER:  https://${env.SERVER_DOMAIN_NAME}${graphql_server.serverPath}`)
+        console.log(`SERVER:  https://${tsapp.env.TSAPP_DOMAIN_NAME}${graphql_server.serverPath}`)
         console.log(`------------------------------------------------------`)
     }
 

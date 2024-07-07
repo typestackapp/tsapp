@@ -4,14 +4,14 @@ services:
     restart: always
     networks:
       default_network:
-        ipv4_address: ${IP_WIREGUARD}
+        ipv4_address: ${WIREGUARD_IP}
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=${TIME_ZONE}
+      - TZ=${TSAPP_TIME_ZONE}
       - SERVERURL=${WIREGUARD_SERVERURL}
       - PEERS=${WIREGUARD_PEERS}
       - ALLOWEDIPS=${WIREGUARD_ALLOWEDIPS}
@@ -21,6 +21,6 @@ services:
       - ../packages/${ALIAS}/configs/wireguard/config:/config
       - /lib/modules:/lib/modules
     ports:
-      - ${PORT_WIREGUARD}:51820/udp
+      - ${WIREGUARD_PORT}:51820/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1

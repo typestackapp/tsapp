@@ -3,7 +3,7 @@ echo "--------------------------------------"
 echo "---------------PROXY------------------"
 echo "--------------------------------------"
 
-SERVER=${SERVER_DOMAIN_NAME}
+SERVER=${TSAPP_DOMAIN_NAME}
 
 # RENEW CERTS
 while true

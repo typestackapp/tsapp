@@ -1,4 +1,4 @@
-import { env } from "@typestackapp/core"
+import { tsapp } from "@typestackapp/core/env"
 import DB from "@typestackapp/core/common/db"
 DB.getInstance()
 
@@ -44,7 +44,7 @@ initilize()
     const nextConfig = (await import(conf_dir)).default
 
     const next_options: NextServerOptions = {
-        dev: env.TYPE == "dev",
+        dev: tsapp.env.TSAPP_ENV_TYPE == "dev",
         port,
         dir,
         quiet: false,
@@ -68,7 +68,7 @@ initilize()
 .finally(() => {
     // CONSOLE LOG SERVER INFO
     console.log(`------------------NEXT SERVER INFO---------------------`)
-    console.log(`SERVER :  https://${env.SERVER_DOMAIN_NAME}`)
-    console.log(`ENV    :  env.TYPE: ${env.TYPE}`)
+    console.log(`SERVER :  https://${tsapp.env.TSAPP_DOMAIN_NAME}`)
+    console.log(`ENV    :  env.TYPE: ${tsapp.env.TSAPP_ENV_TYPE}`)
     console.log(`-------------------------------------------------------`)
 })

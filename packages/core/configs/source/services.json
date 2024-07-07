@@ -6,14 +6,14 @@
                 {"template": "pm2_dev", "service": "express_dev", "name": "EXPRESS" },
                 {"template": "pm2_dev", "service": "jobs_dev", "name": "JOBS" }, 
                 {"template": "pm2_dev", "service": "graphql_dev", "name": "GRAPHQL" },
-                {"template": "pm2_dev", "service": "consumers_dev", "name": "CONSUMER-TSAPP", "e": {"RCS": "tsapp"} }
+                {"template": "pm2_dev", "service": "consumers_dev", "name": "CONSUMER-TSAPP", "e": {"TSAPP_RCS": "tsapp"} }
             ],
             "prod": [
                 {"template": "pm2_prod", "service": "next_prod", "name": "NEXT" },
                 {"template": "pm2_prod", "service": "express_prod", "name": "EXPRESS" },
                 {"template": "pm2_prod", "service": "jobs_prod", "name": "JOBS" }, 
                 {"template": "pm2_prod", "service": "graphql_prod", "name": "GRAPHQL" },
-                {"template": "pm2_prod", "service": "consumers_prod", "name": "CONSUMER-TSAPP", "e": {"RCS": "tsapp"} }
+                {"template": "pm2_prod", "service": "consumers_prod", "name": "CONSUMER-TSAPP", "e": {"TSAPP_RCS": "tsapp"} }
             ]
         },
         "templates": {

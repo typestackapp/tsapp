@@ -5,7 +5,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: ${DEFAULT_NETWORK_SUBNET}
+        - subnet: ${TSAPP_SUBNET}
 volumes:
   mongo-db:
   rabbitmq:

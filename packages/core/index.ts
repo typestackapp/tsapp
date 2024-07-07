@@ -6,17 +6,19 @@ import type { JobList } from '@typestackapp/core/common/job'
 
 import { DbConnection } from "@typestackapp/core/common/db"
 import { RmqConnection } from "@typestackapp/core/common/rabbitmq/connection"
-import tsapp from "@typestackapp/core/codegen/tsapp.json"
+import { tsapp } from "@typestackapp/core/env"
+import tsapp_config from "@typestackapp/core/codegen/tsapp.json"
 import config from "@typestackapp/core/codegen/config/output.json"
-import {T as Config} from "@typestackapp/core/codegen/config/output"
+import { T as Config} from "@typestackapp/core/codegen/config/output"
+import { getPackageConfigs } from '@typestackapp/cli/common/util'
 
 export * from "./common/service"
 export type * from "@typestackapp/core/codegen/system"
 
 export { config }
 export type { Config }
-export const packages = tsapp.packages
-export type Packages = keyof typeof packages
+export const packages = getPackageConfigs() as {[key in Packages]: ReturnType<typeof getPackageConfigs>[string]}
+export type Packages = keyof typeof tsapp_config.packages
 
 declare global {
     var tsapp : {
@@ -35,23 +37,6 @@ export interface ServerGlobals<TPackage extends Packages> {
     config: Config[TPackage]
     db: DbConnection<TPackage>
     rmq: RmqConnection<TPackage>
-    // job: any // JobList<TPackage>
-    // type: { configs, jobs, consumers }
-}
-
-export const env = {
-    TYPE: process.env.ENV as "prod" | "dev",
-    TIME_ZONE: process.env.TIME_ZONE as string, // example: "America/Sao_Paulo"
-    TSAPP_INIT_EMAIL: process.env.TSAPP_INIT_EMAIL as string,
-    TSAPP_INIT_PSW: process.env.TSAPP_INIT_PSW as string,
-    IP_CERTBOT: process.env.IP_CERTBOT as string, // example: "10.44.44.44"
-    IP_HAPROXY: process.env.IP_HAPROXY as string, // example: "10.44.44.44"
-    IP_RABBITMQ: process.env.IP_RABBITMQ as string, // example: "10.44.44.44"
-    IP_MONGO_MASTER: process.env.IP_MONGO_MASTER as string, // example: "10.44.44.44"
-    IP_TSAPP: process.env.IP_TSAPP as string, // example: "10.44.44.44"
-    SERVER_DOMAIN_NAME: process.env.SERVER_DOMAIN_NAME as string, // example: "@typestackapp"
-    PORT_HAPROXY_TSAPP: process.env.PORT_HAPROXY_TSAPP as string, // example: "7443" | "443"
-    RCS: process.env.RCS as string, // rabbitmq consumer services, example: "core,example"
 }
 
 for(const pack of Object.keys(packages) as Packages[]) {
@@ -62,7 +47,7 @@ for(const pack of Object.keys(packages) as Packages[]) {
 
 // RABBITMQ CONSUMER SERVICES
 export const rcs: string[] = []
-if( env.RCS || env.RCS !== "" ) {
-    const c_serv = env.RCS?.split(",")
+if( tsapp.env.TSAPP_RCS || tsapp.env.TSAPP_RCS !== "" ) {
+    const c_serv = tsapp.env.TSAPP_RCS?.split(",")
     if(c_serv) rcs.push(...c_serv)
 }

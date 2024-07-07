@@ -4,11 +4,10 @@ import { AccessTokenJWTPayload, AccessTokenPayloadVerified, BearerKeyOptions, ad
 import { decodeApiKey } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenOutput } from "@typestackapp/core/models/user/token/apikey"
 import { UserDocument, UserModel } from '@typestackapp/core/models/user'
-import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod } from '@typestackapp/core'
-import { IServerAccess, IAccessOptions } from '@typestackapp/core'
+import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod, IServerAccess, IAccessOptions, Packages } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
-import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '../../../common/service'
-import { Packages, env } from "@typestackapp/core"
+import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '@typestackapp/core/common/service'
+import { tsapp } from "@typestackapp/core/env"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
 import { access_token_config_id } from "@typestackapp/core/models/update/main"
@@ -443,7 +442,7 @@ export const validateApiKey = async ( base64: string ): Promise<ValidUserToken> 
 
 export const validateBearerKey = async ( access_token: string, options: BearerKeyOptions = {} ): Promise<ValidUserToken> => {
     const access_jwk = await JWKCache.get<AccessTokenJWKData>(access_token_config_id)
-    const issuer = env.SERVER_DOMAIN_NAME
+    const issuer = tsapp.env.TSAPP_DOMAIN_NAME
     const access_token_key = await jose.importJWK(access_jwk.key)
     const verified_access_token = await jose.jwtVerify(access_token, access_token_key, { issuer }) as AccessTokenPayloadVerified
     const extendedTime = options.accessTokenExtendTime || access_jwk.data.extendTime

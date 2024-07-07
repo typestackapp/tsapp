@@ -6,6 +6,7 @@ import {
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
+import { ENV } from './env'
 
 const exec = child_process.execSync
 
@@ -29,7 +30,7 @@ export const config = async (options: ConfigOptions) => {
     const packages = getPackageConfigs()
 
     //write json to core/codegen/tsapp.json
-    fs.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify(tsapp, null, 4))
+    fs.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify({...tsapp, packages}, null, 4))
 
     // create module_folder if it dosent exist
     if(!fs.existsSync(`${module_folder}/source`)) mkDirRecursive(`${module_folder}/source`)
@@ -47,13 +48,13 @@ export const config = async (options: ConfigOptions) => {
     for(const [pack_key, _config] of Object.entries(packages)) {
         const package_reachable = fs.existsSync(`${CWD}/packages/${_config.alias}`)
         if(!package_reachable) {
-            console.log(`Error: Package ${pack_key} is not accessiable via alias ${_config.alias}`)
+            console.error(`Error:\t Package ${pack_key} is not accessiable via alias ${_config.alias}`)
             package_errors = true
         }
     }
 
     if(package_errors) {
-        console.log(`Error: Fix package errors before continuing`)
+        console.error(`Error:\t Fix package errors before continuing`)
         return
     }
 
@@ -75,7 +76,7 @@ export const config = async (options: ConfigOptions) => {
             const file_name = haproxy_input_file.split('.').slice(0, -1).join(' ')
             const haproxy_input_file_path = `${haproxy_input_folder}/${haproxy_input_file}`
             if(!fs.existsSync(haproxy_input_file_path)) {
-                console.log(`Error: File ${haproxy_input_file_path} does not exist`)
+                console.error(`Error:\t File ${haproxy_input_file_path} does not exist`)
                 continue
             }
             const file_content = fs.readFileSync(haproxy_input_file_path, 'utf8')
@@ -106,25 +107,70 @@ export const config = async (options: ConfigOptions) => {
     fs.writeFileSync(haproxy_output_file, haproxy_output_content)
 
 
-    // -------------------- DOCKER --------------------
-    // create docker compose files
-    // foreach env file
-    const env_files = fs.readdirSync(CWD).filter(file => file.includes('.env') && !file.includes('example.'))
-    for(const env_file of env_files) {
-        const env_file_name = env_file.split('.').slice(0, -1).join('.')
-        const env_vars = await prepareEnvVars(`${CWD}/${env_file}`)
-        const output_folder = `${CWD}/docker-${env_file_name}/`
+    // ---------------- DOCKER / ENV --------------------
+    for(const [pack_key, _config] of Object.entries(packages)) {
+        const pack_folder = `${CWD}/packages/${_config.alias}`
+        const docker_folder = `${pack_folder}/docker/`
+        const env_files = fs.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.'))
+        const env_ts_file = `${pack_folder}/env.ts`
+        const env_js_file = `${pack_folder}/env.js`
+        const empty_docker_dirs: string[] = []
+        let skip_validation = false
 
-        // create project folder if not exists
-        fs.existsSync(`${output_folder}`) || fs.mkdirSync(`${output_folder}`)
+        if(!fs.existsSync(env_ts_file) && !fs.existsSync(env_js_file) && env_files.length > 0) {
+            console.warn(`Missing env.js, will use .env ${env_files.join(', ')} files as is`)
+            skip_validation = true
+        }
 
-        // remove all files in output_folder
-        emptyDir(output_folder)
+        if(!skip_validation) {
+            try {
+                const env_js = (await import(`${pack_folder}/env.js`)) as {[key: string]: ENV<any>}
 
-        // foreach installed package
-        for(const [pack_key, _config] of Object.entries(packages)) {
+                // create example file
+                let example_file: string = ''
+                for(const [env_key, env] of Object.entries(env_js)) {
+                    if(env_key === "default") continue
+                    example_file += '# ' + env_key + '\n' + env.exampleFile + '\n\n'
+                }
+                // save example file
+                if(example_file !== '') fs.writeFileSync(`${pack_folder}/example.env`, example_file)
+                
+                // validate existing package env files
+                for(const env_file of env_files) {
+                    const env_vars = await prepareEnvVars(`${pack_folder}/${env_file}`)
+                    for(const [env_key, env] of Object.entries(env_js)) {
+                        if(env_key === "default") continue
+                        const result = env.zod.safeParse(env_vars)
+                        if(result.success === false) {
+                            console.warn(`Validating ${_config.alias}/${env_file} with: ${_config.alias}/env.ts:${env_key}:`)
+                            let errors = result.error.errors.map((error: any) => `    ${error.path.join('.')}: ${error.message}`)
+                            console.warn(errors.join('\n'))
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(`Error while validating env files in packages/${_config.alias} error: ${error}`)
+            }
+        }
+
+        for(const env_file of env_files) {
+            const env_file_name = env_file.split('.')[0]
+            const env_file_tags = env_file.split('.').slice(1).slice(0, -1)
+            const env_file_tag: string = env_file_tags.length > 0? `.${env_file_tags.join('.')}` : ''
+            const env_vars = await prepareEnvVars(`${pack_folder}/${env_file}`)
+            const output_folder = `${CWD}/docker-${env_file_name}/`
+    
+            // create project folder if not exists
+            fs.existsSync(`${output_folder}`) || fs.mkdirSync(`${output_folder}`)
+    
+            // remove once all files in output_folder
+            if(!empty_docker_dirs.includes(output_folder)) {
+                emptyDir(output_folder)
+                empty_docker_dirs.push(output_folder)
+            }
+    
             env_vars["ALIAS"] = _config.alias
-            const docker_folder = `${CWD}/packages/${_config.alias}/docker/`
+            
             const docker_global_file_path = `${docker_folder}/compose.global.yml`
             const docker_global_file = fs.existsSync(docker_global_file_path)? fs.readFileSync(docker_global_file_path) : ""
 
@@ -137,20 +183,20 @@ export const config = async (options: ConfigOptions) => {
             for(const cfile of compose_files) {
                 const input_file_path = `${docker_folder}/${cfile}`
                 const docker_file_name = cfile.replace('.yml', '').replace('compose.', '')
-                const output_file_path = `${output_folder}/compose.${_config.alias}.${docker_file_name}.yml`
+                const output_file_path = `${output_folder}/compose.${_config.alias}.${docker_file_name}${env_file_tag}.yml`
                 // console.log(`Creating ${output_file_path}`)
                 // console.log(`Using ${input_file_path}`)
-                prepareDockerFile(docker_global_file, env_vars, input_file_path, output_file_path, env_file)
+                prepareDockerFile(docker_global_file, env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`)
             }
 
             const docker_files = fs.readdirSync(docker_folder)?.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'))
             for(const dfile of docker_files) {
                 const input_file_path = `${docker_folder}/${dfile}`
                 const compose_file_name = dfile.replace('Dockerfile.', '')
-                const output_file_path = `${output_folder}/Dockerfile.${_config.alias}.${compose_file_name}`
+                const output_file_path = `${output_folder}/Dockerfile.${_config.alias}.${compose_file_name}${env_file_tag}`
                 // console.log(`Creating ${output_file_path}`)
                 // console.log(`Using ${input_file_path}`)
-                prepareDockerFile("", env_vars, input_file_path, output_file_path, env_file)
+                prepareDockerFile("", env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`)
             }
         }
     }
@@ -192,8 +238,8 @@ export const config = async (options: ConfigOptions) => {
 
                 fs.writeFileSync(output_file, JSON.stringify(merged_file, null, 4))
             } catch (error) {
-                console.log(`Error merging ${output_file} and ${mod_file}`)
-                console.log(error)
+                console.error(`Error while merging ${output_file} and ${mod_file}`)
+                console.error(error)
             }
         }
     }
@@ -271,7 +317,7 @@ export const config = async (options: ConfigOptions) => {
                 if(!fs.existsSync(target_file)) {
                     fs.linkSync(source_file, target_file)
                 }else {
-                    console.log(`Warning, File ${target_file} already exists`)
+                    console.warn(`File ${target_file} already exists`)
                 }
             }
         }

@@ -1,4 +1,5 @@
-import { env, packages, Packages, ExpressRouter } from "@typestackapp/core"
+import { packages, Packages, ExpressRouter } from "@typestackapp/core"
+import { tsapp } from "@typestackapp/core/env"
 import DB from "@typestackapp/core/common/db"
 DB.getInstance()
 
@@ -40,6 +41,6 @@ initilize().then(async () => {
 .finally(() => {
     // CONSOLE LOG SERVER INFO
     console.log(`------------------API SERVER INFO---------------------`)
-    console.log(`SERVER :  https://${env.SERVER_DOMAIN_NAME}/api`)
+    console.log(`SERVER :  https://${tsapp.env.TSAPP_DOMAIN_NAME}/api`)
     console.log(`------------------------------------------------------`)
 })

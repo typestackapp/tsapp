@@ -7,7 +7,7 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     networks:
       default_network:
-        ipv4_address: ${IP_RABBITMQ}
+        ipv4_address: ${RABBITMQ_IP}
     volumes:
       - rabbitmq:/var/lib/rabbitmq/
       - rabbitmq:/var/log/rabbitmq/

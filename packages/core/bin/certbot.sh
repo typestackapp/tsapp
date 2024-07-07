@@ -5,7 +5,7 @@ echo "--------------------------------------"
 
 INIT=${CERTBOT_INIT:-"false"}
 EMAIL="-m ${CERTBOT_EMAIL}"
-SERVER=${SERVER_DOMAIN_NAME}
+SERVER=${TSAPP_DOMAIN_NAME}
 CERTBOT_SELFSIGNED=${CERTBOT_SELFSIGNED:-"false"}
 CHAIN="/etc/letsencrypt/live/${SERVER}/fullchain.pem /home/ssl/${SERVER}/fullchain.pem"
 KEY="/etc/letsencrypt/live/${SERVER}/privkey.pem /home/ssl/${SERVER}/privkey.pem"
@@ -15,14 +15,14 @@ EXTRA_DOMAIN_NAMES=${CERTBOT_EXTRA_DOMAIN_NAMES:-""}
 if [ "$EXTRA_DOMAIN_NAMES" = "undefined" ]; then
     EXTRA_DOMAIN_NAMES=""
 fi
-DOMAINS="-d ${SERVER_DOMAIN_NAME} ${EXTRA_DOMAIN_NAMES}"
+DOMAINS="-d ${TSAPP_DOMAIN_NAME} ${EXTRA_DOMAIN_NAMES}"
 
 # install nginx and serve well known challenge in background
 apk add nginx
 nginx -g 'pid /tmp/nginx.pid; daemon off;' &
 
 echo "--------------------------------------"
-echo "INIT="$INIT
+echo "CERTBOT_INIT="$CERTBOT_INIT
 echo "CERTBOT_SELFSIGNED="$CERTBOT_SELFSIGNED
 echo "SERVER="$SERVER
 echo "DOMAINS="$DOMAINS
@@ -36,7 +36,7 @@ trap exit TERM
 while true
 do  
     # initialize certbot on first run
-    if [ "$INIT" = "false" ]; then
+    if [ "$CERTBOT_INIT" = "false" ]; then
         INIT="true"
         echo "initializing certbot"
         eval "certbot certonly --webroot --debug-challenges --webroot-path /var/www/wk/ ${DOMAINS} ${EMAIL} --agree-tos --force-renewal --non-interactive"

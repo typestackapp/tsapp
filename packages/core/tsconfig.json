@@ -2,6 +2,7 @@
   "include": [
     "_/**/*",
     "index.ts",
+    "env.ts",
     "common/**/*",
     "models/**/*",
     "consumers/**/*",

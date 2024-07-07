@@ -8,7 +8,7 @@ import { AccessTokenJWKData, RefreshTokenJWKData, JWKCache } from "@typestackapp
 import * as jose from 'jose'
 import moment, { unitOfTime } from "moment"
 import mongoose, { Types } from "mongoose"
-import { env } from "@typestackapp/core"
+import { tsapp } from "@typestackapp/core/env"
 import { GrantType, OauthAppModel } from "@typestackapp/core/models/user/app/oauth"
 import { TokenStatus } from "@typestackapp/core/models/user/token"
 
@@ -113,7 +113,7 @@ export async function newRefreshToken(user: UserDocument, client_id: string, gra
     const refresh_token_key = await jose.importJWK(refresh_jwk.key)
     const access_token_key = await jose.importJWK(access_jwk.key)
     const token_id = options._id || new mongoose.Types.ObjectId()
-    const issuer = options.issuer || env.SERVER_DOMAIN_NAME
+    const issuer = options.issuer || tsapp.env.TSAPP_DOMAIN_NAME
     const status = options.status || "active"
 
     const refreshTokenExtendTime = options.refreshTokenExtendTime || refresh_jwk.data.extendTime
@@ -192,7 +192,7 @@ export async function newAccessToken( refresh_token: string, access_token: strin
     const refresh_jwk = await JWKCache.get<RefreshTokenJWKData>(refresh_token_config_id)
     const refresh_token_key = await jose.importJWK(refresh_jwk.key)
     const access_token_key = await jose.importJWK(access_jwk.key)
-    const issuer = options.issuer || env.SERVER_DOMAIN_NAME
+    const issuer = options.issuer || tsapp.env.TSAPP_DOMAIN_NAME
 
     const refreshTokenExtendTime = options.refreshTokenExtendTime || refresh_jwk.data.extendTime
     const refreshTokenRenewAfter = options.refreshTokenRenewAfter || refresh_jwk.data.renewAfter

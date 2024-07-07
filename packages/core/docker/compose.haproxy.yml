@@ -6,15 +6,15 @@ services:
     user: root
     environment:
       - CERTBOT_RESTART_TIME=${CERTBOT_RESTART_TIME}
-      - SERVER_DOMAIN_NAME=${SERVER_DOMAIN_NAME}
+      - TSAPP_DOMAIN_NAME=${TSAPP_DOMAIN_NAME}
       - HAPROXY_STATS_AUTH=${HAPROXY_STATS_AUTH}
     networks:
       default_network:
-        ipv4_address: ${IP_HAPROXY}
+        ipv4_address: ${HAPROXY_IP}
     volumes:
       - ../packages/${ALIAS}/codegen/haproxy/proxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
       - ../packages/${ALIAS}/logs/haproxy/:/var/log/
       - ../packages/${ALIAS}/configs/haproxy/ssl/:/home/ssl/
       - ../packages/${ALIAS}/bin/haproxy.sh:/home/scripts/haproxy.sh
     entrypoint: /home/scripts/haproxy.sh
-    ports: ${PORT_HAPROXY}
+    ports: ${HAPROXY_PORT}

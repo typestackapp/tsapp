@@ -9,7 +9,7 @@ import { AccessRequest, middlewares } from "@typestackapp/core/models/user/acces
 import { Types } from 'mongoose'
 import { Response } from 'express'
 import { z } from "zod"
-import { env } from "@typestackapp/core"
+import { tsapp } from "@typestackapp/core/env"
 import { allowed_actions, z_app_filters } from '@typestackapp/core/common/auth'
 import { BearerTokenInput, BearerTokenInputData, BearerTokenModel } from '@typestackapp/core/models/user/token/bearer'
 import { AccessValidator } from '@typestackapp/core/models/user/access/util'
@@ -38,7 +38,7 @@ const setCookie = (res: Response, name: string, value: string, maxAge: number = 
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        maxAge: env.TYPE == "dev"? undefined: maxAge,
+        maxAge: tsapp.env.TSAPP_ENV_TYPE == "dev"? undefined: maxAge,
         path,
     })
 }
@@ -693,7 +693,7 @@ export const authRouter = t.router({
 
         const token_data: BearerTokenInputData = {
             grant_type: "authorization_code",
-            issuer: env.SERVER_DOMAIN_NAME,
+            issuer: tsapp.env.TSAPP_DOMAIN_NAME,
             access: app.data.access,
             token: result.data
         }

@@ -6,9 +6,9 @@ import { OauthAppInput, OauthAppModel } from "@typestackapp/core/models/user/app
 import { Transaction } from "@typestackapp/core/models/update"
 import { secretHash, randomSecret } from "@typestackapp/core/models/user/access/util"
 import { UserInput, UserModel } from "@typestackapp/core/models/user"
-import { env, config, Config, Packages } from "@typestackapp/core"
+import { config, Config, Packages, IAccessInput } from "@typestackapp/core"
 import { AccessDocument } from "@typestackapp/core/models/user/access"
-import { IAccessInput } from "@typestackapp/core"
+import { tsapp, haproxy } from "@typestackapp/core/env"
 
 export const system_admin_id = new Types.ObjectId("62082b4a4a13ab628afc0cce")
 export const refresh_token_config_id = new Types.ObjectId("62082b4a4a13ab628afc0ccd")
@@ -39,11 +39,11 @@ export function getAllAccessInputs(): AccessDocument[] {
 }
 
 export const transaction: Transaction = async (session, update) => {
-    const host = `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_HAPROXY_TSAPP}`
+    const host = `https://${tsapp.env.TSAPP_DOMAIN_NAME}:${haproxy.env.HAPROXY_TSAPP_PORT}`
 
     // ADD JWT FOR REFRESH TOKEN
     const refresh_token_config = await JWKConfigModel.findOne({ _id: refresh_token_config_id }, {}, { session })
-    if(!refresh_token_config || env.TYPE == "dev") {
+    if(!refresh_token_config || tsapp.env.TSAPP_ENV_TYPE == "dev") {
         const pair = await generateKeyPair("RS256")
         const key = await exportJWK(pair.privateKey)
         const refresh_token_config_input: JWKConfigInput<RefreshTokenJWKData> = {
@@ -51,12 +51,12 @@ export const transaction: Transaction = async (session, update) => {
             created_by: system_admin_id,
             updated_by: system_admin_id,
             title: "Default refresh token jwt config",
-            cacheSeconds: env.TYPE == "dev" ? 20 : 3600,
+            cacheSeconds: tsapp.env.TSAPP_ENV_TYPE == "dev" ? 20 : 3600,
             key,
             data: {
-                renewBefore: env.TYPE == "dev" ? "20s" : "60s",
-                extendTime: env.TYPE == "dev" ? "2m" : "30d",
-                renewAfter: env.TYPE == "dev" ? `60s` : `30d`,
+                renewBefore: tsapp.env.TSAPP_ENV_TYPE == "dev" ? "20s" : "60s",
+                extendTime: tsapp.env.TSAPP_ENV_TYPE == "dev" ? "2m" : "30d",
+                renewAfter: tsapp.env.TSAPP_ENV_TYPE == "dev" ? `60s` : `30d`,
                 extendLifeTime: true,
                 headerAlg: "RS256",
             }
@@ -74,7 +74,7 @@ export const transaction: Transaction = async (session, update) => {
 
     // ADD JWT FOR ACCESS TOKEN
     const access_token_config = await JWKConfigModel.findOne({ _id: access_token_config_id }, {}, { session })
-    if(!access_token_config || env.TYPE == "dev") {
+    if(!access_token_config || tsapp.env.TSAPP_ENV_TYPE == "dev") {
         const pair = await generateKeyPair("RS256")
         const key = await exportJWK(pair.privateKey)
         const access_token_config_input: JWKConfigInput<AccessTokenJWKData> = {
@@ -82,11 +82,11 @@ export const transaction: Transaction = async (session, update) => {
             created_by: system_admin_id,
             updated_by: system_admin_id,
             title: "Default access token jwt config",
-            cacheSeconds: env.TYPE == "dev" ? 20 : 3600,
+            cacheSeconds: tsapp.env.TSAPP_ENV_TYPE == "dev" ? 20 : 3600,
             key,
             data:{
-                renewBefore: env.TYPE == "dev" ? "10s" : "60s",
-                extendTime: env.TYPE == "dev" ? "24h" : "30m",
+                renewBefore: tsapp.env.TSAPP_ENV_TYPE == "dev" ? "10s" : "60s",
+                extendTime: tsapp.env.TSAPP_ENV_TYPE == "dev" ? "24h" : "30m",
                 headerAlg: "RS256",
             }
         }
@@ -142,11 +142,11 @@ export const transaction: Transaction = async (session, update) => {
             ],
             callback_url: `${host}/auth/callback/5125b186995939a4b263b835670aab334787815b`,
             redirect_url: `${host}/admin`,
-            token_url: env.TYPE == "dev" ? `http://${env.IP_TSAPP}:8000/api/auth/token` : `${host}/api/auth/token` 
+            token_url: tsapp.env.TSAPP_ENV_TYPE == "dev" ? `http://${tsapp.env.TSAPP_IP}:8000/api/auth/token` : `${host}/api/auth/token` 
         },
-        icon: `https://${env.SERVER_DOMAIN_NAME}:${env.PORT_HAPROXY_TSAPP}/public/logo.png`,
-        name: env.SERVER_DOMAIN_NAME,
-        description: `Use ${env.SERVER_DOMAIN_NAME} account`,
+        icon: `https://${tsapp.env.TSAPP_DOMAIN_NAME}:${haproxy.env.HAPROXY_TSAPP_PORT}/public/logo.png`,
+        name: tsapp.env.TSAPP_DOMAIN_NAME,
+        description: `Use ${tsapp.env.TSAPP_DOMAIN_NAME} account`,
         created_by: system_admin_id,
         updated_by: system_admin_id
     }
@@ -170,8 +170,8 @@ export const transaction: Transaction = async (session, update) => {
     // UPDATE SYSTEM ADMIN USER
     const system_admin_input: UserInput = {
         _id: system_admin_id,
-        usn: env.TSAPP_INIT_EMAIL,
-        psw: secretHash(env.TSAPP_INIT_PSW),
+        usn: tsapp.env.TSAPP_INIT_EMAIL,
+        psw: secretHash(tsapp.env.TSAPP_INIT_PSW),
         roles: ["SystemAdmin"]
     }
     await UserModel.findOneAndUpdate<UserInput>(

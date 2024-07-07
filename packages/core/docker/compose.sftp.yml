@@ -3,9 +3,9 @@ services:
     image: atmoz/sftp
     networks:
       default_network:
-        ipv4_address: ${IP_SFTP}
+        ipv4_address: ${SFTP_IP}
     volumes:
       - ../:/home/tsapp/dev/
       - ../packages/${ALIAS}/configs/sftp/users.conf:/etc/sftp/users.conf
     ports:
-      - "${PORT_SFTP}:22"
+      - "${SFTP_PORT}:22"

@@ -9,11 +9,11 @@ services:
       - ${TSAPP_ENV_FILE}
     networks:
       default_network:
-        ipv4_address: ${IP_TSAPP}
+        ipv4_address: ${TSAPP_IP}
     volumes:
       - ../:/tsapp/
     ports:
-      - "${PORT_TSAPP_NEXT}:80"       # HTTP NEXT
-      - "${PORT_TSAPP_API}:8000"      # HTTP API
-      - "${PORT_TSAPP_GRAPHQL}:8002"  # HTTP GRAPHQL
+      - "${TSAPP_NEXT_PORT}:80"       # HTTP NEXT
+      - "${TSAPP_API_PORT}:8000"      # HTTP API
+      - "${TSAPP_GRAPHQL_PORT}:8002"  # HTTP GRAPHQL
     entrypoint: /tsapp/packages/${ALIAS}/bin/tsapp.sh

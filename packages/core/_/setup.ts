@@ -8,7 +8,7 @@ import { ApiKeyTokenInput, ApiKeyTokenModel } from "@typestackapp/core/models/us
 import { system_admin_id, all_access_inputs } from "@typestackapp/core/models/update/main"
 import { UserModel } from "@typestackapp/core/models/user"
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
-import { env } from "@typestackapp/core"
+import { tsapp } from "@typestackapp/core/env"
 
 export const api_key_id = new Types.ObjectId()
 export const email_config_id = new Types.ObjectId("62091b669343af312f5f1eee")
@@ -17,7 +17,7 @@ export const api_key_secret = newApiKeySecret()
 export const api_key_base64 = encodeApiKey(api_key_id, api_key_secret)
 
 export async function setup() {
-    if (env.TYPE == "prod")
+    if (tsapp.env.TSAPP_ENV_TYPE == "prod")
         throw "Can't run tests in production enviroment"
 
     // initilize rabbitmq connections

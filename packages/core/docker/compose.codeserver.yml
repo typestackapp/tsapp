@@ -5,11 +5,11 @@ services:
     restart: unless-stopped
     networks:
       default_network:
-        ipv4_address: ${IP_CODESERVER}
+        ipv4_address: ${CODESERVER_IP}
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=${TIME_ZONE}
+      - TZ=${TSAPP_TIME_ZONE}
       - PASSWORD=${CODESERVER_PASSWORD} #optional
       - HASHED_PASSWORD=${CODESERVER_HASHED_PASSWORD} #optional
       - SUDO_PASSWORD=${CODESERVER_SUDO_PASSWORD} #optional
@@ -23,4 +23,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker/
     ports:
-      - ${PORT_CODESERVER}:8443
+      - ${CODESERVER_PORT}:8443
