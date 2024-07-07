@@ -1,6 +1,7 @@
 # tsapp
 compose.*
 Dockerfile.*
+*.env
 logs/*
 packages/*
 package-lock.json

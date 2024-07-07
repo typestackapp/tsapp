@@ -551,45 +551,43 @@ function getGraphqlModules(config_1, options_1) {
 }
 exports.getGraphqlModules = getGraphqlModules;
 function prepareEnvVars(env_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const env_file = fs_1.default.readFileSync(env_path);
-        let env_vars = {};
-        // split env file into array
-        const env_array = env_file.toString().split("\n");
-        // loop through array and update env variables
-        for (let i = 0; i < env_array.length; i++) {
-            const env_var = env_array[i].split("=");
-            if (!env_var[1])
-                continue;
-            // remove all starting and ending spaces from env var name
-            const env_var_name = env_var[0].replace(/\t|\s/g, "").replace("#", "");
-            // remove all starting and ending spaces from env var value and remove all " characters
-            var env_var_value_tmp = env_var[1].replace(/^\s+|\s+$/g, "").replace(/"/g, "");
-            // remove all content after # sign
-            env_var_value_tmp = env_var_value_tmp.split("#")[0];
-            // trim spaces from env var value
-            env_var_value_tmp = env_var_value_tmp.trim();
-            // trim ' and  " qoutes from env var value
-            env_var_value_tmp = env_var_value_tmp.replace(/^['"]|['"]$/g, "");
-            const env_var_value = env_var_value_tmp;
-            env_vars[env_var_name] = env_var_value;
-            if (!env_var_value || !env_var_name)
-                continue;
-            env_vars[env_var_name] = env_var_value;
-            // console.log(env_var_name + "=" + env_var_value)
-        }
-        // foreach env var replace ${var} with value
-        for (const [key, value] of Object.entries(env_vars)) {
-            env_vars[key] = value.replace(/\$\{([^}]*)\}/g, function (match, name) {
-                if (!env_vars[name]) {
-                    console.log(`Error, missing env var: ${name}`);
-                    return '';
-                }
-                return env_vars[name];
-            });
-        }
-        return env_vars;
-    });
+    const env_file = fs_1.default.readFileSync(env_path);
+    let env_vars = {};
+    // split env file into array
+    const env_array = env_file.toString().split("\n");
+    // loop through array and update env variables
+    for (let i = 0; i < env_array.length; i++) {
+        const env_var = env_array[i].split("=");
+        if (!env_var[1])
+            continue;
+        // remove all starting and ending spaces from env var name
+        const env_var_name = env_var[0].replace(/\t|\s/g, "").replace("#", "");
+        // remove all starting and ending spaces from env var value and remove all " characters
+        var env_var_value_tmp = env_var[1].replace(/^\s+|\s+$/g, "").replace(/"/g, "");
+        // remove all content after # sign
+        env_var_value_tmp = env_var_value_tmp.split("#")[0];
+        // trim spaces from env var value
+        env_var_value_tmp = env_var_value_tmp.trim();
+        // trim ' and  " qoutes from env var value
+        env_var_value_tmp = env_var_value_tmp.replace(/^['"]|['"]$/g, "");
+        const env_var_value = env_var_value_tmp;
+        env_vars[env_var_name] = env_var_value;
+        if (!env_var_value || !env_var_name)
+            continue;
+        env_vars[env_var_name] = env_var_value;
+        // console.log(env_var_name + "=" + env_var_value)
+    }
+    // foreach env var replace ${var} with value
+    for (const [key, value] of Object.entries(env_vars)) {
+        env_vars[key] = value.replace(/\$\{([^}]*)\}/g, function (match, name) {
+            if (!env_vars[name]) {
+                console.log(`Error, missing env var: ${name}`);
+                return '';
+            }
+            return env_vars[name];
+        });
+    }
+    return env_vars;
 }
 exports.prepareEnvVars = prepareEnvVars;
 function prepareDockerFile(global_compose_file, env_vars, file, output, env_name) {

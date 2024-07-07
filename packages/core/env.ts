@@ -1,4 +1,4 @@
-import { ENV, zod } from "@typestackapp/cli/common/env"
+import { ENV, zod, Default } from "@typestackapp/cli/common/env"
 
 export const tsapp = new ENV(
     zod.object({
@@ -161,3 +161,5 @@ export const codeserver = new ENV(
         CODESERVER_DEFAULT_WORKSPACE: "/tsapp/"
     }
 )
+
+export default [tsapp, haproxy] satisfies Default

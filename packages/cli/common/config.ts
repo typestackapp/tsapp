@@ -6,7 +6,7 @@ import {
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
-import { ENV } from './env'
+import { ENV, EnvObject, Module } from './env'
 
 const exec = child_process.execSync
 
@@ -71,7 +71,7 @@ export const config = async (options: ConfigOptions) => {
         if(!fs.existsSync(haproxy_input_folder) || fs.readdirSync(haproxy_input_folder).length === 0) continue
 
         const haproxy_input_files = fs.readdirSync(haproxy_input_folder)
-
+        
         for(const haproxy_input_file of haproxy_input_files) {
             const file_name = haproxy_input_file.split('.').slice(0, -1).join(' ')
             const haproxy_input_file_path = `${haproxy_input_folder}/${haproxy_input_file}`
@@ -111,7 +111,7 @@ export const config = async (options: ConfigOptions) => {
     for(const [pack_key, _config] of Object.entries(packages)) {
         const pack_folder = `${CWD}/packages/${_config.alias}`
         const docker_folder = `${pack_folder}/docker/`
-        const env_files = fs.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.'))
+        const env_files = fs.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.') && !file.includes('default.'))
         const env_ts_file = `${pack_folder}/env.ts`
         const env_js_file = `${pack_folder}/env.js`
         const empty_docker_dirs: string[] = []
@@ -123,33 +123,18 @@ export const config = async (options: ConfigOptions) => {
         }
 
         if(!skip_validation) {
+            // create exmaple file
             try {
-                const env_js = (await import(`${pack_folder}/env.js`)) as {[key: string]: ENV<any>}
-
-                // create example file
+                const env_js = (await import(`${pack_folder}/env.js`)) as Module
+                // filter out default
                 let example_file: string = ''
                 for(const [env_key, env] of Object.entries(env_js)) {
-                    if(env_key === "default") continue
+                    if(Array.isArray(env)) continue
                     example_file += '# ' + env_key + '\n' + env.exampleFile + '\n\n'
                 }
-                // save example file
                 if(example_file !== '') fs.writeFileSync(`${pack_folder}/example.env`, example_file)
-                
-                // validate existing package env files
-                for(const env_file of env_files) {
-                    const env_vars = await prepareEnvVars(`${pack_folder}/${env_file}`)
-                    for(const [env_key, env] of Object.entries(env_js)) {
-                        if(env_key === "default") continue
-                        const result = env.zod.safeParse(env_vars)
-                        if(result.success === false) {
-                            console.warn(`Validating ${_config.alias}/${env_file} with: ${_config.alias}/env.ts:${env_key}:`)
-                            let errors = result.error.errors.map((error: any) => `    ${error.path.join('.')}: ${error.message}`)
-                            console.warn(errors.join('\n'))
-                        }
-                    }
-                }
             } catch (error) {
-                console.error(`Error while validating env files in packages/${_config.alias} error: ${error}`)
+                console.error(`Error while creating example.env in packages/${_config.alias} error: ${error}`)
             }
         }
 
@@ -157,8 +142,10 @@ export const config = async (options: ConfigOptions) => {
             const env_file_name = env_file.split('.')[0]
             const env_file_tags = env_file.split('.').slice(1).slice(0, -1)
             const env_file_tag: string = env_file_tags.length > 0? `.${env_file_tags.join('.')}` : ''
-            const env_vars = await prepareEnvVars(`${pack_folder}/${env_file}`)
+            const env_file_path = `${pack_folder}/${env_file}`
             const output_folder = `${CWD}/docker-${env_file_name}/`
+            const default_files = [] as string[]
+            let env_vars: EnvObject = prepareEnvVars(env_file_path)
     
             // create project folder if not exists
             fs.existsSync(`${output_folder}`) || fs.mkdirSync(`${output_folder}`)
@@ -168,18 +155,46 @@ export const config = async (options: ConfigOptions) => {
                 emptyDir(output_folder)
                 empty_docker_dirs.push(output_folder)
             }
-    
-            env_vars["ALIAS"] = _config.alias
-            
+
             const docker_global_file_path = `${docker_folder}/compose.global.yml`
             const docker_global_file = fs.existsSync(docker_global_file_path)? fs.readFileSync(docker_global_file_path) : ""
 
             // check if directory is empty and exists
             if(!fs.existsSync(docker_folder) || fs.readdirSync(docker_folder).length === 0) continue
 
+            if(!skip_validation) {
+                // create default.env file
+                try {
+                    const env_js = (await import(`${pack_folder}/env.js`)) as Module
+                    let default_file: string = ''
+                    for(const [env_key, env] of Object.entries(env_js.default)) {
+                        default_file += env.getDefaultEnvFile(env_file)
+                    }
+                    const default_env_file_name = `default.${_config.alias}.${env_file_name}${env_file_tag}.env`
+                    fs.writeFileSync(`${output_folder}/${default_env_file_name}`, default_file)
+                    default_files.push(`"./${default_env_file_name}"`)
+                } catch (error) {
+                    console.error(`Error while creating default.env file in packages/${_config.alias} error: ${error}`)
+                }
+
+                // load extra env vars from deps
+                try {
+                    const env_js = (await import(`${pack_folder}/env.js`)) as Module
+                    for(const [env_key, env] of Object.entries(env_js)) {
+                        if(Array.isArray(env)) continue
+                        const deps_env_vars = env.getDepsEnvVars(env_file)
+                        env_vars = { ...deps_env_vars, ...env_vars }
+                    }
+                } catch (error) {
+                    console.error(`Error while loading deps in packages/${_config.alias} error: ${error}`)
+                }
+            }
+
+            env_vars["@ALIAS"] = _config.alias
+            env_vars["@DEFAULT_FILES"] = `[${default_files.join(', ')}]`
+
+            // foreach docker-compose file in package
             const compose_files = fs.readdirSync(docker_folder)?.filter(file => file.includes('.yml') && !file.includes('global.yml'))
-    
-            // foreach docker file in package
             for(const cfile of compose_files) {
                 const input_file_path = `${docker_folder}/${cfile}`
                 const docker_file_name = cfile.replace('.yml', '').replace('compose.', '')
@@ -189,6 +204,7 @@ export const config = async (options: ConfigOptions) => {
                 prepareDockerFile(docker_global_file, env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`)
             }
 
+            // foreach docker file in package
             const docker_files = fs.readdirSync(docker_folder)?.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'))
             for(const dfile of docker_files) {
                 const input_file_path = `${docker_folder}/${dfile}`

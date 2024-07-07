@@ -132,4 +132,5 @@ exports.codeserver = new env_1.ENV(env_1.zod.object({
     CODESERVER_PROXY_DOMAIN: "codeserver",
     CODESERVER_DEFAULT_WORKSPACE: "/tsapp/"
 });
+exports.default = [exports.tsapp, exports.haproxy];
 //# sourceMappingURL=env.js.map

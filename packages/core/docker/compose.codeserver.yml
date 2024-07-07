@@ -18,8 +18,8 @@ services:
       - DEFAULT_WORKSPACE=${CODESERVER_DEFAULT_WORKSPACE} #optional
     volumes:
       - ../:/tsapp/
-      - ../packages/${ALIAS}/configs/codeserver/:/config/
-      - ../packages/${ALIAS}/bin/codeserver.sh:/init
+      - ../packages/${@ALIAS}/configs/codeserver/:/config/
+      - ../packages/${@ALIAS}/bin/codeserver.sh:/init
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker/
     ports:

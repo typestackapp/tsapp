@@ -6,6 +6,6 @@ services:
         ipv4_address: ${SFTP_IP}
     volumes:
       - ../:/home/tsapp/dev/
-      - ../packages/${ALIAS}/configs/sftp/users.conf:/etc/sftp/users.conf
+      - ../packages/${@ALIAS}/configs/sftp/users.conf:/etc/sftp/users.conf
     ports:
       - "${SFTP_PORT}:22"

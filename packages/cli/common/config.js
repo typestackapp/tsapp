@@ -127,7 +127,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     for (const [pack_key, _config] of Object.entries(packages)) {
         const pack_folder = `${CWD}/packages/${_config.alias}`;
         const docker_folder = `${pack_folder}/docker/`;
-        const env_files = fs_1.default.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.'));
+        const env_files = fs_1.default.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.') && !file.includes('default.'));
         const env_ts_file = `${pack_folder}/env.ts`;
         const env_js_file = `${pack_folder}/env.js`;
         const empty_docker_dirs = [];
@@ -137,43 +137,31 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             skip_validation = true;
         }
         if (!skip_validation) {
+            // create exmaple file
             try {
                 const env_js = (yield Promise.resolve(`${`${pack_folder}/env.js`}`).then(s => __importStar(require(s))));
-                // create example file
+                // filter out default
                 let example_file = '';
                 for (const [env_key, env] of Object.entries(env_js)) {
-                    if (env_key === "default")
+                    if (Array.isArray(env))
                         continue;
                     example_file += '# ' + env_key + '\n' + env.exampleFile + '\n\n';
                 }
-                // save example file
                 if (example_file !== '')
                     fs_1.default.writeFileSync(`${pack_folder}/example.env`, example_file);
-                // validate existing package env files
-                for (const env_file of env_files) {
-                    const env_vars = yield (0, util_1.prepareEnvVars)(`${pack_folder}/${env_file}`);
-                    for (const [env_key, env] of Object.entries(env_js)) {
-                        if (env_key === "default")
-                            continue;
-                        const result = env.zod.safeParse(env_vars);
-                        if (result.success === false) {
-                            console.warn(`Validating ${_config.alias}/${env_file} with: ${_config.alias}/env.ts:${env_key}:`);
-                            let errors = result.error.errors.map((error) => `    ${error.path.join('.')}: ${error.message}`);
-                            console.warn(errors.join('\n'));
-                        }
-                    }
-                }
             }
             catch (error) {
-                console.error(`Error while validating env files in packages/${_config.alias} error: ${error}`);
+                console.error(`Error while creating example.env in packages/${_config.alias} error: ${error}`);
             }
         }
         for (const env_file of env_files) {
             const env_file_name = env_file.split('.')[0];
             const env_file_tags = env_file.split('.').slice(1).slice(0, -1);
             const env_file_tag = env_file_tags.length > 0 ? `.${env_file_tags.join('.')}` : '';
-            const env_vars = yield (0, util_1.prepareEnvVars)(`${pack_folder}/${env_file}`);
+            const env_file_path = `${pack_folder}/${env_file}`;
             const output_folder = `${CWD}/docker-${env_file_name}/`;
+            const default_files = [];
+            let env_vars = (0, util_1.prepareEnvVars)(env_file_path);
             // create project folder if not exists
             fs_1.default.existsSync(`${output_folder}`) || fs_1.default.mkdirSync(`${output_folder}`);
             // remove once all files in output_folder
@@ -181,14 +169,44 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 (0, util_1.emptyDir)(output_folder);
                 empty_docker_dirs.push(output_folder);
             }
-            env_vars["ALIAS"] = _config.alias;
             const docker_global_file_path = `${docker_folder}/compose.global.yml`;
             const docker_global_file = fs_1.default.existsSync(docker_global_file_path) ? fs_1.default.readFileSync(docker_global_file_path) : "";
             // check if directory is empty and exists
             if (!fs_1.default.existsSync(docker_folder) || fs_1.default.readdirSync(docker_folder).length === 0)
                 continue;
+            if (!skip_validation) {
+                // create default.env file
+                try {
+                    const env_js = (yield Promise.resolve(`${`${pack_folder}/env.js`}`).then(s => __importStar(require(s))));
+                    let default_file = '';
+                    for (const [env_key, env] of Object.entries(env_js.default)) {
+                        default_file += env.getDefaultEnvFile(env_file);
+                    }
+                    const default_env_file_name = `default.${_config.alias}.${env_file_name}${env_file_tag}.env`;
+                    fs_1.default.writeFileSync(`${output_folder}/${default_env_file_name}`, default_file);
+                    default_files.push(`"./${default_env_file_name}"`);
+                }
+                catch (error) {
+                    console.error(`Error while creating default.env file in packages/${_config.alias} error: ${error}`);
+                }
+                // load extra env vars from deps
+                try {
+                    const env_js = (yield Promise.resolve(`${`${pack_folder}/env.js`}`).then(s => __importStar(require(s))));
+                    for (const [env_key, env] of Object.entries(env_js)) {
+                        if (Array.isArray(env))
+                            continue;
+                        const deps_env_vars = env.getDepsEnvVars(env_file);
+                        env_vars = Object.assign(Object.assign({}, deps_env_vars), env_vars);
+                    }
+                }
+                catch (error) {
+                    console.error(`Error while loading deps in packages/${_config.alias} error: ${error}`);
+                }
+            }
+            env_vars["@ALIAS"] = _config.alias;
+            env_vars["@DEFAULT_FILES"] = `[${default_files.join(', ')}]`;
+            // foreach docker-compose file in package
             const compose_files = (_b = fs_1.default.readdirSync(docker_folder)) === null || _b === void 0 ? void 0 : _b.filter(file => file.includes('.yml') && !file.includes('global.yml'));
-            // foreach docker file in package
             for (const cfile of compose_files) {
                 const input_file_path = `${docker_folder}/${cfile}`;
                 const docker_file_name = cfile.replace('.yml', '').replace('compose.', '');
@@ -197,6 +215,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 // console.log(`Using ${input_file_path}`)
                 (0, util_1.prepareDockerFile)(docker_global_file, env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`);
             }
+            // foreach docker file in package
             const docker_files = (_c = fs_1.default.readdirSync(docker_folder)) === null || _c === void 0 ? void 0 : _c.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'));
             for (const dfile of docker_files) {
                 const input_file_path = `${docker_folder}/${dfile}`;

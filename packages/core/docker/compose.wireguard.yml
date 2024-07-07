@@ -18,7 +18,7 @@ services:
       - PEERDNS=${WIREGUARD_PEERDNS}
       - INTERNAL_SUBNET=${WIREGUARD_INTERNAL_SUBNET}
     volumes:
-      - ../packages/${ALIAS}/configs/wireguard/config:/config
+      - ../packages/${@ALIAS}/configs/wireguard/config:/config
       - /lib/modules:/lib/modules
     ports:
       - ${WIREGUARD_PORT}:51820/udp

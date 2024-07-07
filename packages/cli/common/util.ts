@@ -624,7 +624,7 @@ export async function getGraphqlModules(config: GraphqlServerConfig, options: Ge
     return {schema, resolvers, routers}
 }
 
-export async function prepareEnvVars(env_path: string) {
+export function prepareEnvVars(env_path: string) {
     const env_file = fs.readFileSync(env_path)
     let env_vars: { [ key: string ]: string } = {}
     // split env file into array
