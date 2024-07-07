@@ -127,7 +127,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     for (const [pack_key, _config] of Object.entries(packages)) {
         const pack_folder = `${CWD}/packages/${_config.alias}`;
         const docker_folder = `${pack_folder}/docker/`;
-        const env_files = fs_1.default.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.') && !file.includes('default.'));
+        const env_files = fs_1.default.readdirSync(pack_folder).filter(file => file.includes('.env') && !file.includes('example.'));
         const env_ts_file = `${pack_folder}/env.ts`;
         const env_js_file = `${pack_folder}/env.js`;
         const empty_docker_dirs = [];
