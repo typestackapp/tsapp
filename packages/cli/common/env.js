@@ -10,24 +10,47 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const util_1 = require("./util");
 class ENV {
-    constructor(zod, example, ...deps) {
-        this._deps = deps;
-        this._zod = zod;
+    constructor(shape, example, options) {
+        this._zod = zod_1.default.object(shape);
         this._example = example;
+        this._options = this.getDefaultOptions(options);
         this._dir = this.getClassInstaceInfo(new Error()).dir;
         this._package = this.getFilePackageJson(this._dir);
     }
+    get example() {
+        return this._example;
+    }
+    get options() {
+        return this._options;
+    }
     get env() {
-        return this.zod.parse(this.vars(process.env));
+        return this.zod.parse(this.filter(process.env));
     }
     get zod() {
-        return this._zod;
+        return zod_1.default.object(this._zod.shape);
     }
-    get deps() {
-        return this._deps;
+    export(shape, example, options) {
+        const _example = Object.assign(Object.assign({}, this._example), example);
+        const env = new ENV(Object.assign(Object.assign({}, this._zod.shape), shape), _example, Object.assign(Object.assign({}, this._options), options));
+        env._dir = this._dir;
+        env._package = this._package;
+        return env;
+    }
+    // generate example .env file
+    exampleFile() {
+        if (!this._example)
+            return undefined;
+        return this.toFile(this._example);
+    }
+    toFile(vars) {
+        return Object.entries(vars).map(([key, value]) => `${key}=${value}`).join("\n");
+    }
+    // finds .env file in package directory and returns parsed env vars
+    getEnvVars(env_file_name) {
+        return this.filter((0, util_1.prepareEnvVars)(`${this._dir}/${env_file_name}`));
     }
     // filter env vars to only include the ones defined in the zod schema
-    vars(env_vars) {
+    filter(env_vars) {
         const vars = {};
         for (const key in env_vars) {
             if (this.zod.shape[key]) {
@@ -36,33 +59,8 @@ class ENV {
         }
         return vars;
     }
-    getDepsEnvVars(env_file_name) {
-        let env_vars = this.vars((0, util_1.prepareEnvVars)(`${this._dir}/${env_file_name}`));
-        for (const dep of this.deps) {
-            env_vars = Object.assign(Object.assign({}, env_vars), dep.getDepsEnvVars(env_file_name));
-        }
-        return env_vars;
-    }
-    // generate default .env file
-    getDefaultEnvFile(env_file_name) {
-        let env_file = '';
-        const env_vars = this.vars((0, util_1.prepareEnvVars)(`${this._dir}/${env_file_name}`));
-        for (const dep of this.deps) {
-            env_file += dep.getDefaultEnvFile(env_file_name) || '';
-        }
-        for (const key in this.zod.shape) {
-            env_file += `${key}=${env_vars[key]}\n`;
-        }
-        return `${env_file} \n`;
-    }
-    // generate example .env file
-    get exampleFile() {
-        if (!this._example)
-            return undefined;
-        return this.toFile(this._example);
-    }
-    toFile(vars) {
-        return Object.entries(vars).map(([key, value]) => `${key}=${value}`).join("\n");
+    getDefaultOptions(options) {
+        return Object.assign({ service: false, example: true, default: false }, options);
     }
     getFilePackageJson(dir) {
         // get package.json file path
