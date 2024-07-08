@@ -14,6 +14,6 @@ command_path=$(command -v tsa) && chmod 777 "$command_path";
 tsa config --link;
 
 # start all package services
-tsa service --up --env=${ENV};
+tsa service --up --env=${TSAPP_ENV_TYPE};
 
 pm2 logs;
