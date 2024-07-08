@@ -5,6 +5,7 @@
     "env.ts",
     "common/**/*",
     "models/**/*",
+    "tailwind/**/*",
     "consumers/**/*",
     "components/**/*",
     "graphql/**/*",
