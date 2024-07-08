@@ -125,7 +125,11 @@ export class ENV<T extends ZodEnvObject> {
         const stack = error.stack;
         if (!stack) throw new Error("Stack trace is required");
         const stackLines = stack.split('\n');
-        const callerLine = stackLines[2]; // The caller is usually the third line in the stack trace
+        
+        // find line that contains "packages/cli/common/env.js"
+        // chose next line 
+        const clineNum = stackLines.findIndex((line) => line.includes("packages/cli/common/env.js")) + 1;
+        const callerLine = stackLines[clineNum]; // The caller is usually the third line in the stack trace
     
         // Extract file path and line number
         const locationMatch = callerLine.match(/\((.*):(\d+):(\d+)\)/);
