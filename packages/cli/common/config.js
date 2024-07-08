@@ -145,7 +145,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             if (!fs_1.default.existsSync(docker_folder) || fs_1.default.readdirSync(docker_folder).length === 0)
                 continue;
             if (!skip_validation) {
-                const default_env_file_name = `default.${_config.alias}.${env_file_name}${env_file_tag}.env`;
+                const default_env_file_name = `.default.${_config.alias}.${env_file}`;
                 default_files.push(`"./${default_env_file_name}"`);
             }
         }

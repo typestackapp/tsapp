@@ -129,7 +129,7 @@ export const config = async (options: ConfigOptions) => {
             // check if directory is empty and exists
             if(!fs.existsSync(docker_folder) || fs.readdirSync(docker_folder).length === 0) continue
             if(!skip_validation) {
-                const default_env_file_name = `default.${_config.alias}.${env_file_name}${env_file_tag}.env`
+                const default_env_file_name = `.default.${_config.alias}.${env_file}`
                 default_files.push(`"./${default_env_file_name}"`)
             }
         }
