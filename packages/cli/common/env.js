@@ -29,6 +29,9 @@ class ENV {
     get zod() {
         return zod_1.default.object(this._zod.shape);
     }
+    validate(env) {
+        return this.zod.safeParse(env);
+    }
     export(shape, example, options) {
         const _example = Object.assign(Object.assign({}, this._example), example);
         const env = new ENV(Object.assign(Object.assign({}, this._zod.shape), shape), _example, Object.assign(Object.assign({}, this._options), options));

@@ -56,8 +56,12 @@ export class ENV<T extends ZodEnvObject> {
         return this.zod.parse(this.filter(process.env));
     }
 
-    public get zod(): zod.ZodObject<T> {
+    private get zod(): zod.ZodObject<T> {
         return zod.object(this._zod.shape);
+    }
+
+    public validate(env: zod.infer<zod.ZodObject<T>>) {
+        return this.zod.safeParse(env);
     }
 
     public export<N extends ZodEnvObject>(shape?: N, example?: Partial<zod.infer<zod.ZodObject<T>>> & zod.infer<zod.ZodObject<N>>, options?: Partial<EnvOptions>) {

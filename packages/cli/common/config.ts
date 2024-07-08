@@ -6,7 +6,7 @@ import {
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
-import { ENV, EnvObject, Module } from './env'
+import { EnvObject, Module } from './env'
 
 const exec = child_process.execSync
 
@@ -224,6 +224,21 @@ export const config = async (options: ConfigOptions) => {
                     }
                 } catch (error) {
                     console.error(`Error while creating default.env file in packages/${_config.alias} error: ${error}`)
+                }
+
+                try { // validate env vars
+                    const env_js = (await import(`${pack_folder}/env.js`)) as Module
+                    for(const [env_key, env] of Object.entries(env_js)) {
+                        if(env_key == "default") continue
+                        const result = env.validate(env.filter(env_vars))
+                        if(result.success === false) {
+                            console.error(`Validating ${_config.alias}/${env_file} with: ${_config.alias}/env.ts:${env_key}:`)
+                            let errors = result.error.errors.map((error: any) => `    ${error.path.join('.')}: ${error.message}`)
+                            console.error(errors.join('\n'))
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error while validating env vars in packages/${_config.alias} error: ${error}`)
                 }
             }
 
