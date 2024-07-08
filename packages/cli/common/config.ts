@@ -207,8 +207,8 @@ export const config = async (options: ConfigOptions) => {
                         if(!env.options.default) continue
                         default_file += `# ${env_key}\n${env.toFile(env.filter(env_vars))}\n\n`
                     }
-                    const default_env_file_name = `.default.${_config.alias}.${env_file_name}${env_file_tag}.env`
-                    if(default_file !== '') fs.writeFileSync(`${output_folder}/${default_env_file_name}`, default_file)
+                    const default_env_file_name = `.default.${_config.alias}.${env_file}`
+                    fs.writeFileSync(`${output_folder}/${default_env_file_name}`, default_file)
                 } catch (error) {
                     console.error(`Error while creating default.env file in packages/${_config.alias} error: ${error}`)
                 }
@@ -218,7 +218,7 @@ export const config = async (options: ConfigOptions) => {
                     for(const [env_key, env] of Object.entries(env_js)) {
                         if(env_key == "default") continue
                         if(!env.options.service) continue
-                        const default_env_file_name = `.service.${_config.alias}.${env_key}.${env_file_name}${env_file_tag}.env`
+                        const default_env_file_name = `.service.${_config.alias}.${env_key}.${env_file}`
                         const service_file = `# ${env_key}\n${env.toFile(env.filter(env_vars))}\n\n`
                         fs.writeFileSync(`${output_folder}/${default_env_file_name}`, service_file)
                     }
