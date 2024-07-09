@@ -428,27 +428,32 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         const output_public_dir = getSymLink(`${output_dir}/public/${pack_key}`);
         const app_dir = `${CWD}/packages/${_config.alias}/next/app/`;
         const public_dir = `${CWD}/packages/${_config.alias}/next/public/`;
-        // skip if next_dir does not exist
-        if (!fs_1.default.existsSync(app_dir))
-            continue;
-        if (_config.disable_next_alias == true) {
+        try {
+            // skip if next_dir does not exist
+            if (!fs_1.default.existsSync(app_dir))
+                continue;
+            if (_config.disable_next_alias == true) {
+                if (LINK)
+                    linkFolder(app_dir, `${output_dir}/app/`);
+            }
+            else {
+                if (LINK)
+                    linkFolder(app_dir, output_app_dir.symlink_path);
+            }
+            // skip if public_dir does not exist
+            if (!fs_1.default.existsSync(public_dir))
+                continue;
+            // create public symlink
+            if (LINK && !fs_1.default.existsSync(output_public_dir.path_to_create))
+                (0, util_1.mkDirRecursive)(output_public_dir.path_to_create);
+            if (LINK && fs_1.default.existsSync(output_public_dir.symlink_path))
+                fs_1.default.unlinkSync(output_public_dir.symlink_path);
             if (LINK)
-                linkFolder(app_dir, `${output_dir}/app/`);
+                fs_1.default.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir');
         }
-        else {
-            if (LINK)
-                linkFolder(app_dir, output_app_dir.symlink_path);
+        catch (error) {
+            console.error(`Error while linking ${app_dir} to ${output_app_dir.symlink_path}`);
         }
-        // skip if public_dir does not exist
-        if (!fs_1.default.existsSync(public_dir))
-            continue;
-        // create public symlink
-        if (LINK && !fs_1.default.existsSync(output_public_dir.path_to_create))
-            (0, util_1.mkDirRecursive)(output_public_dir.path_to_create);
-        if (LINK && fs_1.default.existsSync(output_public_dir.symlink_path))
-            fs_1.default.unlinkSync(output_public_dir.symlink_path);
-        if (LINK)
-            fs_1.default.symlinkSync(public_dir, output_public_dir.symlink_path, 'dir');
     }
     // if layout.tsx does not exist create it
     if (fs_1.default.existsSync(`${output_dir}/app/`) && !fs_1.default.existsSync(`${output_dir}/app/layout.tsx`)) {
