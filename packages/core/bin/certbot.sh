@@ -3,7 +3,7 @@ echo "--------------------------------------"
 echo "--------------CERTBOT-----------------"
 echo "--------------------------------------"
 
-INIT=${CERTBOT_INIT:-"false"}
+CERTBOT_INIT=${CERTBOT_INIT:-"true"}
 EMAIL="-m ${CERTBOT_EMAIL}"
 SERVER=${TSAPP_DOMAIN_NAME}
 CERTBOT_SELFSIGNED=${CERTBOT_SELFSIGNED:-"false"}
@@ -36,7 +36,7 @@ trap exit TERM
 while true
 do  
     # initialize certbot on first run
-    if [ "$CERTBOT_INIT" = "false" ]; then
+    if [ "$CERTBOT_INIT" = "true" ]; then
         INIT="true"
         echo "initializing certbot"
         eval "certbot certonly --webroot --debug-challenges --webroot-path /var/www/wk/ ${DOMAINS} ${EMAIL} --agree-tos --force-renewal --non-interactive"

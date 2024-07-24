@@ -7,7 +7,7 @@ export const tsapp = new ENV(
         TSAPP_ENV_TYPE: zod.string(),
         TSAPP_PORT: zod.string(),
         TSAPP_IP: zod.string().ip(),
-        TSAPP_VOLUME: zod.string().default('["../:/tsapp/"]').optional(),
+        TSAPP_VOLUME: zod.string().default('["../:/tsapp/"]'),
         TSAPP_SUBNET: zod.string(),
         TSAPP_TIME_ZONE: zod.string(),
         TSAPP_ENV_FILE: zod.string(),

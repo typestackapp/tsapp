@@ -6,7 +6,7 @@ exports.tsapp = new env_1.ENV({
     TSAPP_ENV_TYPE: env_1.zod.string(),
     TSAPP_PORT: env_1.zod.string(),
     TSAPP_IP: env_1.zod.string().ip(),
-    TSAPP_VOLUME: env_1.zod.string().default('["../:/tsapp/"]').optional(),
+    TSAPP_VOLUME: env_1.zod.string().default('["../:/tsapp/"]'),
     TSAPP_SUBNET: env_1.zod.string(),
     TSAPP_TIME_ZONE: env_1.zod.string(),
     TSAPP_ENV_FILE: env_1.zod.string(),
