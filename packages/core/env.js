@@ -64,6 +64,8 @@ exports.certbot = new env_1.ENV({
     CERTBOT_RESTART_TIME: "12h",
     CERTBOT_EXTRA_DOMAIN_NAMES: "",
     CERTBOT_EMAIL: "test@test.com"
+}, {
+    default: true,
 });
 exports.mongo = new env_1.ENV({
     MONGO_PORT: env_1.zod.string(),

@@ -4,10 +4,7 @@ services:
     image: haproxy:2.9.6
     restart: always
     user: root
-    environment:
-      - CERTBOT_RESTART_TIME=${CERTBOT_RESTART_TIME}
-      - TSAPP_DOMAIN_NAME=${TSAPP_DOMAIN_NAME}
-      - HAPROXY_STATS_AUTH=${HAPROXY_STATS_AUTH}
+    env_file: ${@DEFAULT_FILES}
     networks:
       default_network:
         ipv4_address: ${HAPROXY_IP}

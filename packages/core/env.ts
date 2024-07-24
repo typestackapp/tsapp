@@ -1,5 +1,7 @@
 import { ENV, zod } from "@typestackapp/cli/common/env"
 
+
+
 export const tsapp = new ENV(
     {
         TSAPP_ENV_TYPE: zod.string(),
@@ -74,6 +76,9 @@ export const certbot = new ENV(
         CERTBOT_RESTART_TIME: "12h",
         CERTBOT_EXTRA_DOMAIN_NAMES: "",
         CERTBOT_EMAIL: "test@test.com"
+    },
+    {
+        default: true,
     }
 )
 
