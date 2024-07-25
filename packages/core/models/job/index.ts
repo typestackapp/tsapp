@@ -67,7 +67,7 @@ jobSchema.methods.action = async function(){
 }
 
 jobSchema.methods.onTick = async function() {
-    throw "Job callback not implemented"
+    throw "Job onTick not implemented"
 }
 
 // log job after save

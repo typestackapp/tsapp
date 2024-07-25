@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { TemplateJobDocument, TemplateJobInput, TemplateJobModel, discriminator } from "./template"
-import { CronJob } from "@typestackapp/core/common/job"
+import { CronJobDoc } from "@typestackapp/core/common/job"
 import { JobActionModel } from "."
 import { LogModel } from "@typestackapp/core/models/log"
 import { Types } from "mongoose"
@@ -8,7 +8,7 @@ import { Types } from "mongoose"
 describe(`Test job type ${discriminator}`, () => {
     const job_id = "63281deb77824ea0ca9190fb"
     let job_input: TemplateJobInput
-    let job: CronJob
+    let job: CronJobDoc
 
     it('should clean up old data', async () => {
         await TemplateJobModel.deleteOne({_id: job_id})

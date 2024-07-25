@@ -1,17 +1,17 @@
 
-import Cron from 'cron'
+import { CronJob } from 'cron'
 import { Model, Types } from "mongoose"
 import { JobDocument, JobInput, JobModel } from "@typestackapp/core/models/job"
 import { Packages } from '@typestackapp/core'
 
-interface CronJobDoc extends JobDocument<any> {
+interface MongoCronJob extends JobDocument<any> {
     type: any
     pack: any
 }
 
-export class CronJob {
+export class CronJobDoc {
     private doc: JobDocument<any>
-    private cron: Cron.CronJob<null, this> | undefined
+    private cron: CronJob<null, this> | undefined
 
     constructor(doc: JobDocument<any>) {
         this.doc = doc
@@ -20,8 +20,12 @@ export class CronJob {
     }
 
     private setCron(doc: { run_on_startup?: boolean, cron?: string | null, time_zone?: string }) {
-        if(!doc.cron) return this.cron = undefined
-        this.cron = new Cron.CronJob(
+        if(!doc.cron) {
+            if(doc.run_on_startup) this.onTick()
+            return this.cron = undefined
+        }
+
+        this.cron = new CronJob(
             doc.cron,
             this.onTick,
             null,
@@ -89,7 +93,7 @@ export class CronJob {
 export class JobList {
     public static readonly query = { status: "Active" }
     private static instance: JobList
-    public list: CronJob[] = []
+    public list: CronJobDoc[] = []
 
     public static async getInstance(load: boolean = false): Promise<JobList> {
         if (JobList.instance) return JobList.instance
@@ -100,27 +104,27 @@ export class JobList {
         .find(JobList.query)
         .cursor()
         .eachAsync(async (doc) => {
-            JobList.instance.add(doc)
+            await JobList.instance.add(doc)
             .catch((err) => console.log(`Error, error while adding new job with id: ${doc._id}, error msg: ${err}`))
         })
 
         return JobList.instance
     }
 
-    public async add( _job: CronJobDoc ): Promise<CronJob> {
+    public async add( _job: MongoCronJob ): Promise<CronJobDoc> {
         // CHECK IF JOB ALREADY EXISTS
         if( this.get(_job._id) ) throw `Error, JOB: ${_job._id}, already exists!`
 
         // CREATE NEW JOB
-        const new_job = new CronJob(_job)
+        const new_job = new CronJobDoc(_job)
 
         // INSERT NEW JOB
-        this.list.push( new_job );
+        this.list.push( new_job ); 
 
         return new_job;
     }
 
-    public get( jobId: Types.ObjectId ): CronJob | null {
+    public get( jobId: Types.ObjectId ): CronJobDoc | null {
         for(const index in this.list) {
             var job = this.list[index];
             if(job.getDoc()._id.equals(jobId)){
