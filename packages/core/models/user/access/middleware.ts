@@ -369,7 +369,7 @@ export async function validateUserToken( req: Request, options?: IAccessOptions)
         authParamKeyName = req.params[options.auth?.authParamKeyName]
     }
 
-    const auth_header = authParamKeyName || req?.headers?.authorization
+    const auth_header = req?.headers?.authorization || authParamKeyName
     if( !auth_header ) throw `Auth, Authorization header or parametre is not set`
 
     let auth: string[] = []
