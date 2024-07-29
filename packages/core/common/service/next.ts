@@ -59,7 +59,7 @@ initilize()
     await app.prepare()
     const handle = app.getRequestHandler()
 
-    server.get("*", (req, res) => {
+    server.all("*", (req, res) => {
         return handle(req, res)
     })
 

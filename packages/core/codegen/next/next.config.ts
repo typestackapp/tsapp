@@ -1,13 +1,16 @@
 import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    experimental: { }, // Required for next 13
+    experimental: {
+        serverActions: {
+          bodySizeLimit: '10mb',
+        },
+    },
     distDir: ".next",
     basePath: undefined,
-    reactStrictMode: true, // Recommended for the pages directory, default in app.
+    reactStrictMode: true,
     swcMinify: true,
     webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
-
         // follow symlink
         // config.resolve.symlinks = true
 
@@ -25,16 +28,17 @@ const nextConfig: NextConfig = {
         // }
 
         // use bable to transpile typescript
-        config.module.rules.push({
-            test: /.(ts|tsx)$/,
-            exclude: /node_modules/,
-            use: [{
-                loader: "babel-loader",
-                options: {
-                    presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
-                }
-            }],
-        })
+        // config.module.rules.push({
+        //     test: /.(ts|tsx)$/,
+        //     exclude: /node_modules/,
+        //     use: [{
+        //         loader: "babel-loader",
+        //         options: {
+        //             presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
+        //         }
+        //     }],
+        // })
+
         return config
     },
     async rewrites() {
