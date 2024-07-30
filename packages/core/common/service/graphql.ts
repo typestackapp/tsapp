@@ -12,7 +12,6 @@ import compression from 'compression'
 import { createServer } from 'http'
 import express from 'express'
 import cors from 'cors'
-import { json } from 'body-parser'
 
 import { AccessRequest, applyMiddlewareToGraphqlModule, upsertRouterDocs, validateUserToken } from '@typestackapp/core/models/user/access/middleware'
 import { TSAppGraphqlPlugin, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core/common/service'
@@ -109,7 +108,7 @@ initilize()
         app.use(
             `${graphql_server.serverPath}`,
             cors<cors.CorsRequest>(),
-            json(),
+            express.json({limit: "100mb"}),
             expressMiddleware<AccessRequest>(server, express_middleware_options)
         )
 

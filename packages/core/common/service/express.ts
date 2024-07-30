@@ -14,8 +14,8 @@ async function initilize() {
 
 initilize().then(async () => {
     const app = express()
-    app.use(express.json())
-    app.use(express.urlencoded({ extended: true }))
+    app.use(express.json({ limit: "100mb" }))
+    app.use(express.urlencoded({ extended: true , limit: "100mb" }))
     const router = express.Router()
     const routers = new ExpressRouter()
     
