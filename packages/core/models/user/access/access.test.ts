@@ -1,7 +1,7 @@
 import { expect } from "chai"
 import moment from "moment"
 import { DeepPartial } from "utility-types"
-import { api_key_base64 } from "@typestackapp/core/_/setup"
+import { api_key_base64, api_key_secret } from "@typestackapp/core/_/setup"
 import { Types } from "mongoose"
 import { newRefreshToken, newAccessToken, BearerToken } from "@typestackapp/core/models/user/util"
 import { BearerTokenModel } from "@typestackapp/core/models/user/token/bearer"
@@ -10,7 +10,7 @@ import { AccessInput, AccessOptions, UserAccessLogModel, UserAccessLogInput } fr
 import { AccessRequest, auth, validateApiKey, validateBearerKey } from "@typestackapp/core/models/user/access/middleware"
 import { AccessValidator, AccessCheckOptions } from "@typestackapp/core/models/user/access/util"
 
-var token: Required<BearerToken>
+var token: Awaited<ReturnType<typeof newRefreshToken>>
 const client_id = default_user_app_client_id
 
 describe('Test Bearer token', () => {
@@ -19,68 +19,78 @@ describe('Test Bearer token', () => {
     })
 
     it('should use valid access token and suceed', async () => {
-        const token_tmp = await newRefreshToken(global.core_tsapp_test.root_user, client_id, "refresh_token", {
+        token = await newRefreshToken(global.core_tsapp_test.root_user, client_id, "refresh_token", {
             time: moment().subtract(10, 'seconds'), // token was created 10 seconds ago
             accessTokenExtendTime: "20s" // access token is valid for 20 seconds
         })
-        await validateBearerKey(token_tmp.output.access.tk, {
+        
+        await validateBearerKey(token.key.access.tk, {
             time: moment().subtract(0, 'seconds'), // token is used now, should be valid and not throw any error
             accessTokenExtendTime: "20s" // access token is valid for 20 seconds
         })
-        token = token_tmp.output
     })
 
     it('should use expired access token and fail', async () => {
-        const token_tmp = await newRefreshToken(global.core_tsapp_test.root_user, client_id, "refresh_token", {
+        token = await newRefreshToken(global.core_tsapp_test.root_user, client_id, "refresh_token", {
             time: moment().subtract(20, 'seconds'), // token was created 20 seconds ago
             accessTokenExtendTime: "10s" // access token is valid for 10 seconds
         })
-        const is_ok = await validateBearerKey(token_tmp.output.access.tk, {
+        
+        const is_ok = await validateBearerKey(token.key.access.tk, {
             time: moment().subtract(0, 'seconds'), // token is used now, should be invalid and throw error
             accessTokenExtendTime: "10s"
         })
         .then(user => false)
         .catch(error => true)
+
         expect(is_ok).to.be.equal(true)
-        token = token_tmp.output
     })
 
-    it('should retrive new new access token', async () => {
-        const token_tmp = token
-        token = (await newAccessToken(token.refresh.tk, token.access.tk, {
+    it('should retrive new access token', async () => {
+        const refresh_token = token.key.refresh.tk
+        const acccess_token = token.key.access.tk
+
+        token = await newAccessToken(refresh_token, acccess_token, {
             time: moment().subtract(0, 'seconds'), // token is used now, should allow to retrive new access token
             accessTokenExtendTime: "10s"
-        })).output
-        expect(token.access.tk).to.be.not.equal(token_tmp.access.tk)
+        })
+
+        expect(token.key.access.tk).to.be.not.equal(acccess_token)
     })
 
-    it('should retrive new new refresh token', async () => {
-        const token_tmp = token
-        token = (await newAccessToken(token.refresh.tk, token.access.tk, {
+    it('should retrive new refresh token', async () => {
+        const refresh_token = token.key.refresh.tk
+        const acccess_token = token.key.access.tk
+
+        token = await newAccessToken(refresh_token, acccess_token, {
             time: moment().subtract(15, 'seconds'),
             refreshTokenRenewBefore: "5s",
             refreshTokenExtendTime: "30s",
             refreshTokenExtendLifetime: true
-        })).output
-        expect(token.refresh.tk).to.be.not.equal(token_tmp.refresh.tk)
+        })
+
+        expect(token.key.refresh.tk).to.be.not.equal(refresh_token)
     })
 
-    it('should not retrive new new refresh token', async () => {
-        const token_tmp = token
-        token = (await newAccessToken(token.refresh.tk, token.access.tk, {
+    it('should not retrive new refresh token', async () => {
+        const refresh_token = token.key.refresh.tk
+        const acccess_token = token.key.access.tk
+
+        token = await newAccessToken(refresh_token, acccess_token, {
             time: moment().subtract(15, 'seconds'),
             refreshTokenRenewBefore: "5s",
             refreshTokenExtendTime: "30s",
             refreshTokenExtendLifetime: false
-        })).output
-        expect(token.refresh.tk).to.be.equal(token_tmp.refresh.tk)
+        })
+        expect(token.key.refresh.tk).to.be.equal(refresh_token)
     })
 })
 
 
 describe('Test ApiKey token', () => {
     beforeAll(async () => {
-        console.log(`Your api key: ApiKey ${api_key_base64}`)
+        // console.log(`Your api key secret: ${api_key_secret}`)
+        console.log(`Your api key: ApiKey%20${api_key_base64}`)
     })
 
     it('should have global apikey', async () => {

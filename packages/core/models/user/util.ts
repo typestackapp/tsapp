@@ -13,8 +13,8 @@ import { GrantType, OauthAppModel } from "@typestackapp/core/models/user/app/oau
 import { TokenStatus } from "@typestackapp/core/models/user/token"
 
 // returns a random secret
-export function newApiKeySecret() {
-    return randomSecret(40)
+export function newApiKeySecret(length: number = 20): string {
+    return randomSecret(length)
 }
 
 // hashses secret to be stored in db as key
@@ -57,9 +57,7 @@ export type BearerKeyOptions = {
 }
 
 export interface OauthTokenPayload {
-    _id: string
     user_id: string
-    client_id: string
     issuer: string
 }
 
@@ -77,6 +75,12 @@ export interface RefreshTokenPayload extends OauthTokenPayload {}
 export interface AccessTokenPayload extends OauthTokenPayload {}
 export interface RefreshTokenJWTPayload extends jose.JWTPayload, RefreshTokenPayload {}
 export interface AccessTokenJWTPayload extends jose.JWTPayload, AccessTokenPayload {}
+
+export type TokenResponse = {
+    doc: BearerTokenDocument, // db hashed tokens
+    key: Required<BearerToken>, // encoded user tokens, `${token_id}:${token}`
+    payload: OauthTokenPayload // token payload
+}
 
 export interface RefreshTokenPayloadVerified {
     payload: RefreshTokenJWTPayload
@@ -104,9 +108,15 @@ export function removeTimeDuration(time: moment.Moment, duration: string): momen
     return _time.subtract(moment.duration(_num[0], letr ))
 }
 
-export async function newRefreshToken(user: UserDocument, client_id: string, grant_type: GrantType, options: BearerKeyOptions)
-: Promise<{doc: BearerTokenDocument, output: Required<BearerToken>, token_payload: OauthTokenPayload}> 
-{
+export function getToken(key: string) {
+    const tokens = key.split(':')
+    const token_id = tokens[0]
+    const token = tokens.slice(1).join(':')
+    if(!token_id || !token) throw "token not found"
+    return [token_id, token]
+}
+
+export async function newRefreshToken(user: UserDocument, client_id: string, grant_type: GrantType, options: BearerKeyOptions): Promise<TokenResponse> {
     const utc_time = options.time || moment.utc()
     const access_jwk = await JWKCache.get<AccessTokenJWKData>(access_token_config_id)
     const refresh_jwk = await JWKCache.get<RefreshTokenJWKData>(refresh_token_config_id)
@@ -131,36 +141,23 @@ export async function newRefreshToken(user: UserDocument, client_id: string, gra
     const app = await OauthAppModel.findOne({"data.client_id": client_id})
     if(!app) throw 'App not found'
 
-    const token_payload: OauthTokenPayload = {
-        _id: token_id.toString(),
+    const payload: OauthTokenPayload = {
         user_id: user._id.toString(),
-        client_id,
         issuer
     }
 
-    const refresh_token = await new jose.SignJWT({...token_payload})
+    const refresh_token = await new jose.SignJWT({...payload})
     .setProtectedHeader({ alg: refresh_jwk.data.headerAlg })
     .setIssuedAt(utc_time.unix())
     .setIssuer(issuer)
     .sign(refresh_token_key)
 
-    const access_token = await new jose.SignJWT({...token_payload})
+    const access_token = await new jose.SignJWT({...payload})
     .setProtectedHeader({ alg: access_jwk.data.headerAlg })
     .setIssuedAt(utc_time.unix())
     .setIssuer(issuer)
     .sign(access_token_key)
     
-    const token: Required<BearerToken> = {
-        refresh: {
-            tk: refresh_token,
-            exp: rt_exp.toISOString()
-        },
-        access: {
-            tk: access_token,
-            exp: at_exp.toISOString()
-        }  
-    }
-
     const key_input: BearerTokenInput = {
         _id: token_id,
         app_id: app._id,
@@ -170,7 +167,16 @@ export async function newRefreshToken(user: UserDocument, client_id: string, gra
             grant_type,
             access: app.data.access,
             issuer,
-            token
+            token: {
+                refresh: {
+                    tk: secretHash(refresh_token),
+                    exp: rt_exp.toISOString()
+                },
+                access: {
+                    tk: secretHash(access_token),
+                    exp: at_exp.toISOString()
+                }
+            }
         }
     }
 
@@ -179,14 +185,24 @@ export async function newRefreshToken(user: UserDocument, client_id: string, gra
 
     return {
         doc: token_doc,
-        token_payload,
-        output: token
+        payload,
+        key: {
+            refresh: {
+                tk: `${token_doc._id}:${refresh_token}`,
+                exp: rt_exp.toISOString()
+            },
+            access: {
+                tk: `${token_doc._id}:${access_token}`,
+                exp: at_exp.toISOString()
+            }
+        }
     }
 }
 
-export async function newAccessToken( refresh_token: string, access_token: string, options: BearerKeyOptions )
-: Promise<{output: Required<BearerToken>, token_payload: OauthTokenPayload}> 
-{
+export async function newAccessToken( refresh_key: string, access_key: string, options: BearerKeyOptions ): Promise<TokenResponse> {
+    let [rt_id, refresh_token] = getToken(refresh_key)
+    let [at_id, access_token] = getToken(access_key)
+
     const utc_time = options.time || moment.utc()
     const access_jwk = await JWKCache.get<AccessTokenJWKData>(access_token_config_id)
     const refresh_jwk = await JWKCache.get<RefreshTokenJWKData>(refresh_token_config_id)
@@ -206,19 +222,20 @@ export async function newAccessToken( refresh_token: string, access_token: strin
     const rt_exp = addTimeDuration(utc_time, refreshTokenExtendTime).toDate()
     const at_exp = addTimeDuration(utc_time, accessTokenExtendTime).toDate()
 
+    console.log(issuer, refresh_token, refresh_token_key)
+
     // decode tokens
     const verified_refresh_token = await jose.jwtVerify(refresh_token, refresh_token_key, {issuer}) as RefreshTokenPayloadVerified
     const verified_access_token = await jose.jwtVerify(access_token, access_token_key, {issuer}) as AccessTokenPayloadVerified
 
     // checck if both tokens has same user_id and _id and client_id
     if(verified_refresh_token.payload.user_id != verified_access_token.payload.user_id) throw 'Invalid refresh token'
-    if(verified_refresh_token.payload._id != verified_access_token.payload._id) throw 'Invalid refresh token'
     if(verified_refresh_token.payload.client_id != verified_access_token.payload.client_id) throw 'Invalid refresh token'
 
     // get user and key docs
     const user_doc = await UserModel.findById(verified_refresh_token.payload.user_id)
     if(!user_doc) throw 'User not found'
-    const token_doc = await BearerTokenModel.findById(verified_refresh_token.payload._id)
+    const token_doc = await BearerTokenModel.findById(rt_id)
     if(!token_doc) throw 'Key not found'
     if(!["active", "initilized"].includes(token_doc.status)) throw `key status: ${token_doc.status} is not valid`
 
@@ -241,7 +258,7 @@ export async function newAccessToken( refresh_token: string, access_token: strin
 
         if(!token_doc.data.token.refresh) throw 'Refresh token is undefined'
         token_doc.data.token.refresh.exp = rt_exp.toISOString()
-        token_doc.data.token.refresh.tk = refresh_token
+        token_doc.data.token.refresh.tk = secretHash(refresh_token)
     }
 
     if(verified_access_token.payload.iat == undefined) throw 'Access token iat is undefined'
@@ -257,24 +274,23 @@ export async function newAccessToken( refresh_token: string, access_token: strin
 
         if(!token_doc.data.token.access) throw 'Access token is undefined'
         token_doc.data.token.access.exp = at_exp.toISOString()
-        token_doc.data.token.access.tk = access_token
+        token_doc.data.token.access.tk = secretHash(access_token)
     }
 
     await token_doc.save()
 
-    const token: Required<BearerToken> = {
-        refresh: {
-            tk: refresh_token,
-            exp: rt_exp.toISOString()
-        },
-        access: {
-            tk: access_token,
-            exp: at_exp.toISOString()
-        }
-    }
-
     return {
-        token_payload: verified_refresh_token.payload,
-        output: token
+        doc: token_doc,
+        payload: verified_refresh_token.payload,
+        key: {
+            refresh: {
+                tk: `${token_doc._id}:${refresh_token}`,
+                exp: rt_exp.toISOString()
+            },
+            access: {
+                tk: `${token_doc._id}:${access_token}`,
+                exp: at_exp.toISOString()
+            }
+        }
     }
 }

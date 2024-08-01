@@ -1,6 +1,6 @@
 import * as jose from 'jose'
 import mongoose from "mongoose"
-import { AccessTokenJWTPayload, AccessTokenPayloadVerified, BearerKeyOptions, addTimeDuration, compareApiKey } from "@typestackapp/core/models/user/util"
+import { AccessTokenJWTPayload, AccessTokenPayloadVerified, BearerKeyOptions, addTimeDuration, compareApiKey, getToken } from "@typestackapp/core/models/user/util"
 import { decodeApiKey } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenOutput } from "@typestackapp/core/models/user/token/apikey"
 import { UserDocument, UserModel } from '@typestackapp/core/models/user'
@@ -72,9 +72,13 @@ type UserToken<Token extends UserTokenOutput | undefined, Type extends ITokenTyp
     token_type: Type
 }
 
+export type BearerTokenOutput = AccessTokenJWTPayload & {
+    _id: string
+}
+
 export type ValidUserToken = 
 | UserToken<ApiKeyTokenOutput, "ApiKey">
-| UserToken<AccessTokenJWTPayload, "Bearer">
+| UserToken<BearerTokenOutput, "Bearer">
 | UserToken<undefined, "Basic">
 
 export type CaptchaOptions = {
@@ -373,7 +377,7 @@ export async function validateUserToken( req: Request, options?: IAccessOptions)
     if( !auth_header ) throw `Auth, Authorization header or parametre is not set`
 
     let auth: string[] = []
-    for (const delimiter of [" ", ":", "%20"]) {
+    for (const delimiter of [" ", "%20"]) {
         auth = auth_header.split(delimiter)
         if (auth.length === 2) break
     }
@@ -430,8 +434,8 @@ export const validateBasicKey = async ( base64: string ): Promise<ValidUserToken
     return { user, token: undefined, token_type: "Basic" }
 }
 
-export const validateApiKey = async ( base64: string ): Promise<ValidUserToken> => {
-    const { _id, secret } = decodeApiKey(base64)
+export const validateApiKey = async ( key: string ): Promise<ValidUserToken> => {
+    const { _id, secret } = decodeApiKey(key)
     const token = await ApiKeyTokenModel.findOne({_id})
     if(!token) throw "api key not found"
     if(!compareApiKey(secret, token)) throw "invalid api key"
@@ -440,7 +444,8 @@ export const validateApiKey = async ( base64: string ): Promise<ValidUserToken> 
     return { user, token: token.toJSON(), token_type: "ApiKey" }
 }
 
-export const validateBearerKey = async ( access_token: string, options: BearerKeyOptions = {} ): Promise<ValidUserToken> => {
+export const validateBearerKey = async ( key: string, options: BearerKeyOptions = {} ): Promise<ValidUserToken> => {
+    const [token_id, access_token] = getToken(key)
     const access_jwk = await JWKCache.get<AccessTokenJWKData>(access_token_config_id)
     const issuer = tsapp.env.TSAPP_DOMAIN_NAME
     const access_token_key = await jose.importJWK(access_jwk.key)
@@ -453,5 +458,5 @@ export const validateBearerKey = async ( access_token: string, options: BearerKe
     
     const user = await UserModel.findOne({ _id: verified_access_token.payload.user_id })
     if(!user) throw "user not found"
-    return { user, token: verified_access_token.payload, token_type: "Bearer" }
+    return { user, token: {...verified_access_token.payload, _id: token_id}, token_type: "Bearer" }
 }

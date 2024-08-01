@@ -1,21 +1,21 @@
 import moment from 'moment'
 import cookie from 'cookie'
+import { Types } from 'mongoose'
+import { Response } from 'express'
+import { z } from "zod"
 import * as trpcExpress from '@trpc/server/adapters/express'
 import { initTRPC, inferAsyncReturnType, inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import { ExpressErrorResponse, ExpressResponse, ExpressRouter } from "@typestackapp/core"
 import { OauthAppModel } from "@typestackapp/core/models/user/app/oauth"
 import { BearerKeyOptions, newAccessToken, newRefreshToken } from "@typestackapp/core/models/user/util"
 import { AccessRequest, middlewares } from "@typestackapp/core/models/user/access/middleware"
-import { Types } from 'mongoose'
-import { Response } from 'express'
-import { z } from "zod"
-import { tsapp } from "@typestackapp/core/env"
 import { allowed_actions, z_app_filters } from '@typestackapp/core/common/auth'
 import { BearerTokenInput, BearerTokenInputData, BearerTokenModel } from '@typestackapp/core/models/user/token/bearer'
 import { AccessValidator } from '@typestackapp/core/models/user/access/util'
 import { CallbackOptions, ClientSession } from '@typestackapp/core/models/user/app/oauth/client'
 import { UserModel } from '@typestackapp/core/models/user'
 import { RoleConfigModel } from '@typestackapp/core/models/config/role'
+import { tsapp } from "@typestackapp/core/env"
 
 const {config} = global.tsapp["@typestackapp/core"]
 export const router = new ExpressRouter()
@@ -122,22 +122,22 @@ export const tokenRouter = t.router({
             }
 
             const token = await newRefreshToken(req.user, client_id, "password", {})
-            const token_expires_at = ( moment(token.output.refresh.exp).unix() - moment.utc().unix() ) * 1000 * 3 
+            const token_expires_at = ( moment(token.key.refresh.exp).unix() - moment.utc().unix() ) * 1000 * 3 
 
-            setCookie(res, `${client_id}_rt`, token.output.refresh.tk, token_expires_at, req.baseUrl)
-            setCookie(res, `${client_id}_at`, token.output.access.tk, token_expires_at, "/")
+            setCookie(res, `${client_id}_rt`, token.key.refresh.tk, token_expires_at, req.baseUrl)
+            setCookie(res, `${client_id}_at`, token.key.access.tk, token_expires_at, "/")
             
             if(req.log) {
                 req.log.user = {
-                    id: new Types.ObjectId(token.token_payload.user_id),
+                    id: new Types.ObjectId(token.payload.user_id),
                     token_type: "Bearer"
                 }
                 await req.log.save()
             }
 
             response.data = {
-                ...token.output,
-                refresh: undefined
+                ...token.key,
+                refresh: undefined // remove refresh token from response
             }
             return response
         } catch (error) {
@@ -181,17 +181,17 @@ export const tokenRouter = t.router({
             }
     
             const token = await newAccessToken(refresh_token, access_token, token_options)
-            const token_expires_at = ( moment(token.output.refresh.exp).unix() - moment.utc().unix() ) * 1000 * 3 
+            const token_expires_at = ( moment(token.key.refresh.exp).unix() - moment.utc().unix() ) * 1000 * 3 
     
-            setCookie(res, `${client_id}_rt`, token.output.refresh.tk, token_expires_at, req.baseUrl)
-            setCookie(res, `${client_id}_at`, token.output.access.tk, token_expires_at, "/")
+            setCookie(res, `${client_id}_rt`, token.key.refresh.tk, token_expires_at, req.baseUrl)
+            setCookie(res, `${client_id}_at`, token.key.access.tk, token_expires_at, "/")
     
             console.log(req.originalUrl);     // baseURL + url
             console.log();         // baseURL
             console.log(req.path);            // url
     
             response.data = {
-                ...token.output,
+                ...token.key,
                 refresh: undefined
             }
             return response
@@ -259,7 +259,7 @@ export const tokenRouter = t.router({
             }
 
             const token = await newRefreshToken(user, client_id, "authorization_code", {})
-            response.data = token.output
+            response.data = token.key
             return response
         } catch (error) {
             response.error = { code: "invalid-auth", msg: `${error}` }
@@ -326,11 +326,10 @@ export const tokenRouter = t.router({
         
             const token = await newAccessToken(token_doc.data.token.refresh.tk, token_doc.data.token.access.tk, token_options)
             token_doc.status = "active"
-            token_doc.data.token.refresh = token.output.refresh
-            token_doc.data.token.access = token.output.access
+            token_doc.data.token.refresh = token.key.refresh
+            token_doc.data.token.access = token.key.access
             await token_doc.save()
-        
-            response.data = token_doc.data.token
+            response.data = token.key
             return response
         } catch (error) {
             response.error = { code: "invalid-auth", msg: `${error}` }
@@ -340,7 +339,7 @@ export const tokenRouter = t.router({
 })
 
 export const authRouter = t.router({
-
+    
     // get app info
     app: t.procedure
     .input(z.object({

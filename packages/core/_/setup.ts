@@ -13,7 +13,7 @@ import { tsapp } from "@typestackapp/core/env"
 export const api_key_id = new Types.ObjectId()
 export const email_config_id = new Types.ObjectId("62091b669343af312f5f1eee")
 export const email_channel_config_id = new Types.ObjectId("63453a61fe9cd72c40188adf")
-export const api_key_secret = newApiKeySecret()
+export const api_key_secret = newApiKeySecret(5)
 export const api_key_base64 = encodeApiKey(api_key_id, api_key_secret)
 
 export async function setup() {
