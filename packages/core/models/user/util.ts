@@ -222,8 +222,6 @@ export async function newAccessToken( refresh_key: string, access_key: string, o
     const rt_exp = addTimeDuration(utc_time, refreshTokenExtendTime).toDate()
     const at_exp = addTimeDuration(utc_time, accessTokenExtendTime).toDate()
 
-    console.log(issuer, refresh_token, refresh_token_key)
-
     // decode tokens
     const verified_refresh_token = await jose.jwtVerify(refresh_token, refresh_token_key, {issuer}) as RefreshTokenPayloadVerified
     const verified_access_token = await jose.jwtVerify(access_token, access_token_key, {issuer}) as AccessTokenPayloadVerified
