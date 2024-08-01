@@ -14,14 +14,14 @@ import express from 'express'
 import cors from 'cors'
 
 import { AccessRequest, applyMiddlewareToGraphqlModule, upsertRouterDocs, validateUserToken } from '@typestackapp/core/models/user/access/middleware'
-import { TSAppGraphqlPlugin, GraphqlServerConfig, IGraphqlRouter } from '@typestackapp/core/common/service'
+import { TSAppGraphqlPlugin, IGraphqlRouter } from '@typestackapp/core/common/service'
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
 
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import mongoose from "mongoose"
-import { findTSAppRootDir, getGraphqlModules, getGraphqlRouterConfigs } from '@typestackapp/cli/common/util'
+import { findTSAppRootDir, getGraphqlModules, getGraphqlRouterConfigs, GraphqlServerConfig } from '@typestackapp/cli/common/util'
 
 
 export function getTSAppGraphqlPlugin(options: GraphqlServerConfig): TSAppGraphqlPlugin {

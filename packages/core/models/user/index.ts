@@ -2,8 +2,8 @@ import { Types, Schema, Document, Model } from "mongoose"
 import { IUserInput, IUserDocument as IUserDocument } from "@typestackapp/core"
 import { accessSchema, AccessDocument } from '@typestackapp/core/models/user/access'
 import { RoleConfigDocument, RoleConfigModel } from "@typestackapp/core/models/config/role"
-import { GraphqlServerConfig } from '../../common/service'
 import { checkRolesAccessToGraphqlService } from "@typestackapp/core/models/user/access/util"
+import { GraphqlServerConfig } from "@typestackapp/cli/common/util"
 
 export type UserInput = IUserInput
 

@@ -59,6 +59,7 @@ export type BearerKeyOptions = {
 export interface OauthTokenPayload {
     user_id: string
     issuer: string
+    client_id: string
 }
 
 export interface Token {
@@ -142,6 +143,7 @@ export async function newRefreshToken(user: UserDocument, client_id: string, gra
     if(!app) throw 'App not found'
 
     const payload: OauthTokenPayload = {
+        client_id,
         user_id: user._id.toString(),
         issuer
     }

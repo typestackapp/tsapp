@@ -16,6 +16,7 @@ import { IGraphqlMethod } from "@typestackapp/core"
 import { Packages, packages } from "@typestackapp/core"
 import { DeepRequired } from "utility-types"
 import { Resolver } from "@apollo/client"
+import { GraphqlServerConfig } from "@typestackapp/cli/common/util"
 
 export type ExpressErrorResponse = {
     code: string
@@ -303,22 +304,6 @@ export class GraphqlRouter<TResolvers extends GraphqlResolverInput<TResolvers>> 
 }
 
 export interface TSAppGraphqlPlugin extends ApolloServerPlugin<AccessRequest> {}
-
-export interface GraphqlServerConfig {
-    // automaticly generated, cant be rewritten
-    name: string // graphql config key name
-    pack: Packages // package name, automaticly generated
-    typeDefPath: string // output path for type definitions
-    clientPath: string // output path for client
-    serverPath: string // rewrite server path,
-
-    // options from graphql.json config file
-    isServer: boolean // start graphql server
-    isPublic: boolean // remove authentification from graphql server, will have public scheam
-    genClient: boolean // generate client queries
-    modules: string[] // module file paths 
-    documents?: string[] // document file paths, will be used to generate graphql client
-}
 
 // listens on mongo change stream
 export class StreamListener<T extends Document = Document> {

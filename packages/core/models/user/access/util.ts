@@ -1,10 +1,10 @@
 
 import crypto from "crypto"
 import type { IAccessInput, IAccessStatus, IPermissionType, IAccessOptions } from '@typestackapp/core/codegen/system'
-import type { GraphqlServerConfig } from '@typestackapp/core/common/service'
 import type { RoleConfigDocument } from '@typestackapp/core/models/config/role'
 import type { AccessOutput } from "@typestackapp/core/models/user/access"
 import type { Maybe } from "graphql/jsutils/Maybe"
+import type { GraphqlServerConfig } from "@typestackapp/cli/common/util"
 
 export function secretCompare(secret: string, saved_salt_hash: string, iterations: number = 1000, keylen: number = 64, digest: string = 'sha512'): boolean {
     var [salt, hash] = saved_salt_hash.split('.')

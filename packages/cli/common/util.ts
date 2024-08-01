@@ -6,8 +6,23 @@ type Config = any
 type Packages = string
 type GraphqlResovlerModule = any
 type GraphqlRouter<T> = any
-type GraphqlServerConfig = any
 type IGraphqlRouter = any
+
+export interface GraphqlServerConfig {
+    // automaticly generated, cant be rewritten
+    name: string // graphql config key name
+    pack: Packages // package name, automaticly generated
+    typeDefPath: string // output path for type definitions
+    clientPath: string // output path for client
+    serverPath: string // rewrite server path,
+
+    // options from graphql.json config file
+    isServer: boolean // start graphql server
+    isPublic: boolean // remove authentification from graphql server, will have public scheam
+    genClient: boolean // generate client queries
+    modules: string[] // module file paths 
+    documents?: string[] // document file paths, will be used to generate graphql client
+}
 
 export function getPackageConfigs() {
     const packages: {
@@ -515,7 +530,7 @@ export function getGraphqlRouterConfigs(cwd: string): GraphqlServerConfig[] {
     for(const [package_key, pack] of Object.entries(config) as any) {
         const conf = pack.graphql.ACTIVE
         for(const [server_key, server] of Object.entries(conf)) {
-            const srv_input: Partial<GraphqlServerConfig> = server as any            
+            const srv_input: Partial<GraphqlServerConfig> = server as GraphqlServerConfig
             const srv = {
                 name: server_key,
                 pack: package_key as Packages,
