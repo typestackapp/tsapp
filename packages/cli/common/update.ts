@@ -66,11 +66,7 @@ export async function update(options: UpdateOptions) {
                 log: []
             }
         
-            const update = await UpdateModel.findOneAndUpdate(
-                { version: update_input.version }, update_input, 
-                { upsert: true, new: true }
-            )
-        
+            const update = await UpdateModel.create(update_input)
             update.log.push({ type: "update", msg: "started" })
 
             const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/')

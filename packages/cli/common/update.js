@@ -83,7 +83,7 @@ function update(options) {
                     version: pack_version,
                     log: []
                 };
-                const update = yield UpdateModel.findOneAndUpdate({ version: update_input.version }, update_input, { upsert: true, new: true });
+                const update = yield UpdateModel.create(update_input);
                 update.log.push({ type: "update", msg: "started" });
                 const logFilePath = filePath.replace('.js', '.ts').split('/').slice(-2).join('/');
                 console.log(`Info,  ${logFilePath}`);
