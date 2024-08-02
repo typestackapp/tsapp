@@ -27,21 +27,14 @@ export type ZodEnvObject = {
 export class ENV<T extends ZodEnvObject> {
     private _zod: zod.ZodObject<T>;
     private _example?: zod.infer<zod.ZodObject<T>>;
-    private _dir: string;
     private _options: EnvOptions;
-    private _package: {
-        name?: string;
-        version?: string;
-        description?: string;
-    };
+    private _error: Error;
 
     constructor(shape: T, example?: zod.infer<zod.ZodObject<T>>, options?: Partial<EnvOptions>) {
         this._zod = zod.object(shape);
         this._example = example;
         this._options =  this.getDefaultOptions(options);
-
-        this._dir = this.getClassInstaceInfo(new Error()).dir;
-        this._package = this.getFilePackageJson(this._dir);
+        this._error = new Error()
     }
 
     public get example() {
@@ -67,8 +60,7 @@ export class ENV<T extends ZodEnvObject> {
     public export<N extends ZodEnvObject>(shape?: N, example?: Partial<zod.infer<zod.ZodObject<T>>> & zod.infer<zod.ZodObject<N>>, options?: Partial<EnvOptions>) {
         const _example = { ...this._example, ...example } as zod.infer<zod.ZodObject<T & N>>
         const env = new ENV({ ...this._zod.shape, ...shape }, _example, { ...this._options, ...options });
-        env._dir = this._dir;
-        env._package = this._package;
+        env._error = this._error;
         return env
     }
 
@@ -83,8 +75,10 @@ export class ENV<T extends ZodEnvObject> {
     }
     
     // finds .env file in package directory and returns parsed env vars
+    // do not use in next.js enviroment
     public getEnvVars(env_file_name: string): zod.infer<zod.ZodObject<ZodEnvObject>> {
-        return this.filter(prepareEnvVars(`${this._dir}/${env_file_name}`));
+        const dir = this.getClassInstaceInfo(this._error).dir;
+        return this.filter(prepareEnvVars(`${dir}/${env_file_name}`));
     }
 
     // filter env vars to only include the ones defined in the zod schema
@@ -107,7 +101,11 @@ export class ENV<T extends ZodEnvObject> {
         }
     }
 
-    private getFilePackageJson(dir: string) {
+    private getFilePackageJson(dir: string): {
+        name?: string;
+        version?: string;
+        description?: string;
+    }{
         // get package.json file path
         const packageJsonPath = path.join(dir, "package.json");
         // check if package.json file exists
@@ -141,11 +139,14 @@ export class ENV<T extends ZodEnvObject> {
         const locationMatch = callerLine.match(/\((.*):(\d+):(\d+)\)/);
         if (!locationMatch) throw new Error("Could not parse stack trace");
 
+        const dir = path.dirname(locationMatch[1]);
+
         return {
             dir: path.dirname(locationMatch[1]),
             file: locationMatch[1],
             line: locationMatch[2],
             column: locationMatch[3],
+            package: this.getFilePackageJson(dir)
         };
     }
 }

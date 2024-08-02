@@ -14,8 +14,7 @@ class ENV {
         this._zod = zod_1.default.object(shape);
         this._example = example;
         this._options = this.getDefaultOptions(options);
-        this._dir = this.getClassInstaceInfo(new Error()).dir;
-        this._package = this.getFilePackageJson(this._dir);
+        this._error = new Error();
     }
     get example() {
         return this._example;
@@ -35,8 +34,7 @@ class ENV {
     export(shape, example, options) {
         const _example = Object.assign(Object.assign({}, this._example), example);
         const env = new ENV(Object.assign(Object.assign({}, this._zod.shape), shape), _example, Object.assign(Object.assign({}, this._options), options));
-        env._dir = this._dir;
-        env._package = this._package;
+        env._error = this._error;
         return env;
     }
     // generate example .env file
@@ -49,8 +47,10 @@ class ENV {
         return Object.entries(vars).map(([key, value]) => `${key}=${value}`).join("\n");
     }
     // finds .env file in package directory and returns parsed env vars
+    // do not use in next.js enviroment
     getEnvVars(env_file_name) {
-        return this.filter((0, util_1.prepareEnvVars)(`${this._dir}/${env_file_name}`));
+        const dir = this.getClassInstaceInfo(this._error).dir;
+        return this.filter((0, util_1.prepareEnvVars)(`${dir}/${env_file_name}`));
     }
     // filter env vars to only include the ones defined in the zod schema
     filter(env_vars) {
@@ -95,11 +95,13 @@ class ENV {
         const locationMatch = callerLine.match(/\((.*):(\d+):(\d+)\)/);
         if (!locationMatch)
             throw new Error("Could not parse stack trace");
+        const dir = path_1.default.dirname(locationMatch[1]);
         return {
             dir: path_1.default.dirname(locationMatch[1]),
             file: locationMatch[1],
             line: locationMatch[2],
             column: locationMatch[3],
+            package: this.getFilePackageJson(dir)
         };
     }
 }
