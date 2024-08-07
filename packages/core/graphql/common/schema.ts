@@ -330,6 +330,7 @@ export default `#graphql
         Basic
         ApiKey
         Bearer
+        Cookie
     }
 
     enum PermissionType {

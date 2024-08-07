@@ -644,7 +644,8 @@ export interface ITimeZoneSearch extends ISearchScore {
 export type ITokenType =
   | 'ApiKey'
   | 'Basic'
-  | 'Bearer';
+  | 'Bearer'
+  | 'Cookie';
 
 export interface ITypeOptions {
   mongoose?: Maybe<Scalars['String']['output']>;

@@ -1,5 +1,7 @@
 import * as jose from 'jose'
 import mongoose from "mongoose"
+import cookie from 'cookie'
+import moment from 'moment'
 import { AccessTokenJWTPayload, AccessTokenPayloadVerified, BearerKeyOptions, addTimeDuration, compareApiKey, getToken } from "@typestackapp/core/models/user/util"
 import { decodeApiKey } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenOutput } from "@typestackapp/core/models/user/token/apikey"
@@ -11,7 +13,6 @@ import { tsapp } from "@typestackapp/core/env"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
 import { access_token_config_id } from "@typestackapp/core/models/update/main"
-import moment from 'moment'
 import { UserAccessInput, UserAccessLogDocument, UserAccessLogInput, UserAccessLogModel, UserAccessModel, UserDevice } from '@typestackapp/core/models/user/access'
 import { AccessValidator, secretCompare } from '@typestackapp/core/models/user/access/util'
 import { OauthAppModel } from '@typestackapp/core/models/user/app/oauth'
@@ -80,6 +81,7 @@ export type ValidUserToken =
 | UserToken<ApiKeyTokenOutput, "ApiKey">
 | UserToken<BearerTokenOutput, "Bearer">
 | UserToken<undefined, "Basic">
+| UserToken<BearerTokenOutput, "Cookie">
 
 export type CaptchaOptions = {
     enabled: boolean
@@ -297,7 +299,7 @@ export async function auth( req: AccessRequest, options: IAccessOptions ): Promi
         const validator = new AccessValidator(token.data.access)
         if(!validator.checkAccess(options))
             throw `Auth, user apikey has insuficient permission access to resource: ${getResourceInfo(options)}`
-    } else if(token_type == "Bearer") {
+    } else if(token_type == "Bearer" || token_type == "Cookie") {
         const app = await OauthAppModel.findOne({ "data.client_id": token.client_id })
         if(!app)
             throw `Auth, Bearer app:${token.client_id} not found`
@@ -374,18 +376,43 @@ export async function validateUserToken( req: Request, options?: IAccessOptions)
     }
 
     const auth_header = req?.headers?.authorization || authParamKeyName
-    if( !auth_header ) throw `Auth, Authorization header or parametre is not set`
+    let auth_type: ITokenType | undefined = undefined
+    let auth_token: string | undefined = undefined
 
-    let auth: string[] = []
-    for (const delimiter of [" ", "%20"]) {
-        auth = auth_header.split(delimiter)
-        if (auth.length === 2) break
+    if(auth_header) {
+        // try using auth header 
+        let auth: string[] = []
+        for (const delimiter of [" ", "%20"]) {
+            auth = auth_header.split(delimiter)
+            if (auth.length === 2) break
+        }
+        if( auth.length != 2 ) throw `Auth, Invalid authorization delemetre`
+        auth_token = auth[1]
+        auth_type = auth[0] as ITokenType
+    }else {
+        // try using cookie if auth header is not set
+        const cookies = cookie.parse(req.headers.cookie || '')
+        let cookie_token: string | undefined = undefined
+        let app_id: string | undefined = undefined
+        let is_at: boolean | undefined = undefined
+
+        for(const [cookie_name, cookie_value] of Object.entries(cookies)) {
+            app_id = cookie_name.split('_')[0]
+            is_at = cookie_name.split('_')[1] == 'at'
+            if(app_id && is_at) {
+                cookie_token = cookie_value
+                break
+            }
+        }
+
+        if(cookie_token) {
+            auth_type = "Cookie"
+            auth_token = cookie_token
+        }
     }
-    
-    if( auth.length != 2 ) throw `Auth, Invalid authorization delemetre`
 
-    const auth_type = auth[0] as ITokenType
-    const auth_token = auth[1]
+    if(auth_type == undefined) throw `Auth, auth type not found`
+    if(auth_token == undefined) throw `Auth, auth token not found`
     
     if(options) {
         if(!options?.auth?.tokens)
@@ -400,14 +427,17 @@ export async function validateUserToken( req: Request, options?: IAccessOptions)
     
     // check auth key validity
     switch (auth_type) {
+        case "Basic":
+            valid_user_key = await validateBasicKey(auth_token)
+        break
         case "ApiKey":
             valid_user_key = await validateApiKey(auth_token)
         break
         case "Bearer":
-            valid_user_key = await validateBearerKey(auth_token)
+            valid_user_key = await validateBearerKey(auth_token, {}, "Bearer")
         break
-        case "Basic":
-            valid_user_key = await validateBasicKey(auth_token)
+        case "Cookie":
+            valid_user_key = await validateBearerKey(auth_token, {}, "Cookie")
         break
         default:
             console.log(`
@@ -444,7 +474,7 @@ export const validateApiKey = async ( key: string ): Promise<ValidUserToken> => 
     return { user, token: token.toJSON(), token_type: "ApiKey" }
 }
 
-export const validateBearerKey = async ( key: string, options: BearerKeyOptions = {} ): Promise<ValidUserToken> => {
+export const validateBearerKey = async ( key: string, options: BearerKeyOptions = {}, token_type: "Bearer" | "Cookie" ): Promise<ValidUserToken> => {
     const [token_id, access_token] = getToken(key)
     const access_jwk = await JWKCache.get<AccessTokenJWKData>(access_token_config_id)
     const issuer = tsapp.env.TSAPP_DOMAIN_NAME
@@ -458,5 +488,5 @@ export const validateBearerKey = async ( key: string, options: BearerKeyOptions 
     
     const user = await UserModel.findOne({ _id: verified_access_token.payload.user_id })
     if(!user) throw "user not found"
-    return { user, token: {...verified_access_token.payload, _id: token_id}, token_type: "Bearer" }
+    return { user, token: {...verified_access_token.payload, _id: token_id}, token_type: token_type }
 }

@@ -27,7 +27,7 @@ describe('Test Bearer token', () => {
         await validateBearerKey(token.key.access.tk, {
             time: moment().subtract(0, 'seconds'), // token is used now, should be valid and not throw any error
             accessTokenExtendTime: "20s" // access token is valid for 20 seconds
-        })
+        }, "Bearer")
     })
 
     it('should use expired access token and fail', async () => {
@@ -39,7 +39,7 @@ describe('Test Bearer token', () => {
         const is_ok = await validateBearerKey(token.key.access.tk, {
             time: moment().subtract(0, 'seconds'), // token is used now, should be invalid and throw error
             accessTokenExtendTime: "10s"
-        })
+        }, "Bearer")
         .then(user => false)
         .catch(error => true)
 

@@ -681,7 +681,8 @@ export type TimeZoneSearch = SearchScore & {
 export enum TokenType {
   ApiKey = 'ApiKey',
   Basic = 'Basic',
-  Bearer = 'Bearer'
+  Bearer = 'Bearer',
+  Cookie = 'Cookie'
 }
 
 export type TypeOptions = {
