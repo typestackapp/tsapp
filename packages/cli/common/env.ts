@@ -29,12 +29,27 @@ export class ENV<T extends ZodEnvObject> {
     private _example?: zod.infer<zod.ZodObject<T>>;
     private _options: EnvOptions;
     private _error: Error;
+    private _root: boolean = true;
+    private _extended: boolean = false;
+    private _parent?: ENV<ZodEnvObject>;
 
     constructor(shape: T, example?: zod.infer<zod.ZodObject<T>>, options?: Partial<EnvOptions>) {
         this._zod = zod.object(shape);
         this._example = example;
         this._options =  this.getDefaultOptions(options);
         this._error = new Error()
+    }
+
+    public get parent() {
+        return this._parent;
+    }
+
+    public get root() {
+        return this._root;
+    }
+
+    public get extended() {
+        return this._extended;
     }
 
     public get example() {
@@ -61,6 +76,13 @@ export class ENV<T extends ZodEnvObject> {
         const _example = { ...this._example, ...example } as zod.infer<zod.ZodObject<T & N>>
         const env = new ENV({ ...this._zod.shape, ...shape }, _example, { ...this._options, ...options });
         env._error = this._error;
+        env._root = false;
+        env._extended = true;
+        // if shape is empty or undefined extended is false
+        if (Object.keys(shape || {}).length === 0) {
+            env._extended = false;
+        }
+        env._parent = this;
         return env
     }
 
@@ -90,6 +112,10 @@ export class ENV<T extends ZodEnvObject> {
             }
         }
         return vars;
+    }
+
+    public getPackage() {
+        return this.getFilePackageJson(this.getClassInstaceInfo(this._error).dir);
     }
 
     private getDefaultOptions(options?: Partial<EnvOptions>): EnvOptions {

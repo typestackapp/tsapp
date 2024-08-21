@@ -110,6 +110,7 @@ export const config = async (options: ConfigOptions) => {
     // ---------------- DOCKER / ENV --------------------
     const empty_docker_dirs: string[] = []
     const default_files = [] as string[]
+    let global_env_files: {[key: string]: string | undefined} = {}
 
     // get all default file paths
     for(const [pack_key, _config] of Object.entries(packages)) {
@@ -199,6 +200,25 @@ export const config = async (options: ConfigOptions) => {
                     console.error(`Error while loading env vars in packages/${_config.alias} error: ${error}`)
                 }
 
+                try { // create .global.env file
+                    const env_js = (await import(`${pack_folder}/env.js`)) as Module
+                    let global_file: string = ''
+                    for(const [env_key, env] of Object.entries(env_js)) {
+                        if(env_key == "default") continue
+                        if(!env.root && !env.extended) continue
+                        global_file += `# ${env_key} ${pack_key} ${env.extended? `extended ${env.parent.getPackage()?.name}`: ""} \n${env.toFile(env.filter(env_vars))}\n\n`
+                    }
+                    
+                    if(global_env_files[env_file_name]){
+                        global_env_files[env_file_name] += global_file
+                    } else {
+                        global_env_files[env_file_name] = global_file
+                    }
+                } catch (error) {
+                    console.error(`Error while creating global.env file in packages/${_config.alias} error: ${error}`)
+                }
+
+
                 try { // create default.env file
                     const env_js = (await import(`${pack_folder}/env.js`)) as Module
                     let default_file: string = ''
@@ -270,6 +290,10 @@ export const config = async (options: ConfigOptions) => {
         }
     }
 
+    // write global.env file
+    for(const [env_file_name, global_file] of Object.entries(global_env_files)) {
+        fs.writeFileSync(`${CWD}/docker-${env_file_name}/!global.env`, global_file)
+    }
 
     // -------------------- CONFIG --------------------
     // for each tsapp module in package.json create output config

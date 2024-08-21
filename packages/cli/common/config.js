@@ -42,7 +42,7 @@ const child_process_1 = __importDefault(require("child_process"));
 const crypto = __importStar(require("crypto"));
 const exec = child_process_1.default.execSync;
 const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     const CWD = options.cwd;
     const LINK = options.link;
     const core_dir = `${CWD}/packages/core`;
@@ -126,6 +126,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     // ---------------- DOCKER / ENV --------------------
     const empty_docker_dirs = [];
     const default_files = [];
+    let global_env_files = {};
     // get all default file paths
     for (const [pack_key, _config] of Object.entries(packages)) {
         const pack_folder = `${CWD}/packages/${_config.alias}`;
@@ -213,6 +214,26 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 catch (error) {
                     console.error(`Error while loading env vars in packages/${_config.alias} error: ${error}`);
                 }
+                try { // create .global.env file
+                    const env_js = (yield Promise.resolve(`${`${pack_folder}/env.js`}`).then(s => __importStar(require(s))));
+                    let global_file = '';
+                    for (const [env_key, env] of Object.entries(env_js)) {
+                        if (env_key == "default")
+                            continue;
+                        if (!env.root && !env.extended)
+                            continue;
+                        global_file += `# ${env_key} ${pack_key} ${env.extended ? `extended ${(_b = env.parent.getPackage()) === null || _b === void 0 ? void 0 : _b.name}` : ""} \n${env.toFile(env.filter(env_vars))}\n\n`;
+                    }
+                    if (global_env_files[env_file_name]) {
+                        global_env_files[env_file_name] += global_file;
+                    }
+                    else {
+                        global_env_files[env_file_name] = global_file;
+                    }
+                }
+                catch (error) {
+                    console.error(`Error while creating global.env file in packages/${_config.alias} error: ${error}`);
+                }
                 try { // create default.env file
                     const env_js = (yield Promise.resolve(`${`${pack_folder}/env.js`}`).then(s => __importStar(require(s))));
                     let default_file = '';
@@ -265,7 +286,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             env_vars["@DEFAULT_FILES"] = `[${default_files.join(', ')}]`;
             env_vars["@ENV_FILE"] = env_file;
             // foreach docker-compose file in package
-            const compose_files = (_b = fs_1.default.readdirSync(docker_folder)) === null || _b === void 0 ? void 0 : _b.filter(file => file.includes('.yml') && !file.includes('global.yml'));
+            const compose_files = (_c = fs_1.default.readdirSync(docker_folder)) === null || _c === void 0 ? void 0 : _c.filter(file => file.includes('.yml') && !file.includes('global.yml'));
             for (const cfile of compose_files) {
                 const input_file_path = `${docker_folder}/${cfile}`;
                 const docker_file_name = cfile.replace('.yml', '').replace('compose.', '');
@@ -275,7 +296,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 (0, util_1.prepareDockerFile)(docker_global_file, env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`);
             }
             // foreach docker file in package
-            const docker_files = (_c = fs_1.default.readdirSync(docker_folder)) === null || _c === void 0 ? void 0 : _c.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'));
+            const docker_files = (_d = fs_1.default.readdirSync(docker_folder)) === null || _d === void 0 ? void 0 : _d.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'));
             for (const dfile of docker_files) {
                 const input_file_path = `${docker_folder}/${dfile}`;
                 const compose_file_name = dfile.replace('Dockerfile.', '');
@@ -285,6 +306,10 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 (0, util_1.prepareDockerFile)("", env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`);
             }
         }
+    }
+    // write global.env file
+    for (const [env_file_name, global_file] of Object.entries(global_env_files)) {
+        fs_1.default.writeFileSync(`${CWD}/docker-${env_file_name}/!global.env`, global_file);
     }
     // -------------------- CONFIG --------------------
     // for each tsapp module in package.json create output config
@@ -484,7 +509,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     };
     const pack_config = JSON.parse(fs_1.default.readFileSync(pack_config_output, 'utf8'));
     for (const [pack_key, _config] of Object.entries(pack_config)) {
-        if (!((_d = _config.access) === null || _d === void 0 ? void 0 : _d.ACTIVE))
+        if (!((_e = _config.access) === null || _e === void 0 ? void 0 : _e.ACTIVE))
             continue;
         // loop trough each resource
         for (const [resource_key, _resource] of Object.entries(_config.access.ACTIVE)) {
@@ -591,7 +616,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     `;
     let graphql_services = "";
     for (const [pack_key, _config] of Object.entries(pack_config)) {
-        if (!((_e = _config === null || _config === void 0 ? void 0 : _config.graphql) === null || _e === void 0 ? void 0 : _e.ACTIVE)
+        if (!((_f = _config === null || _config === void 0 ? void 0 : _config.graphql) === null || _f === void 0 ? void 0 : _f.ACTIVE)
             || Object.keys(_config.graphql.ACTIVE).length === 0)
             continue;
         graphql_services = `${graphql_services}

@@ -11,10 +11,21 @@ const fs_1 = __importDefault(require("fs"));
 const util_1 = require("./util");
 class ENV {
     constructor(shape, example, options) {
+        this._root = true;
+        this._extended = false;
         this._zod = zod_1.default.object(shape);
         this._example = example;
         this._options = this.getDefaultOptions(options);
         this._error = new Error();
+    }
+    get parent() {
+        return this._parent;
+    }
+    get root() {
+        return this._root;
+    }
+    get extended() {
+        return this._extended;
     }
     get example() {
         return this._example;
@@ -35,6 +46,13 @@ class ENV {
         const _example = Object.assign(Object.assign({}, this._example), example);
         const env = new ENV(Object.assign(Object.assign({}, this._zod.shape), shape), _example, Object.assign(Object.assign({}, this._options), options));
         env._error = this._error;
+        env._root = false;
+        env._extended = true;
+        // if shape is empty or undefined extended is false
+        if (Object.keys(shape || {}).length === 0) {
+            env._extended = false;
+        }
+        env._parent = this;
         return env;
     }
     // generate example .env file
@@ -61,6 +79,9 @@ class ENV {
             }
         }
         return vars;
+    }
+    getPackage() {
+        return this.getFilePackageJson(this.getClassInstaceInfo(this._error).dir);
     }
     getDefaultOptions(options) {
         return Object.assign({ service: false, example: true, default: false }, options);
