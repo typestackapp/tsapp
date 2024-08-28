@@ -8,6 +8,19 @@ type GraphqlResovlerModule = any
 type GraphqlRouter<T> = any
 type IGraphqlRouter = any
 
+export type TSAppConfig = {
+    alias?: string | null
+    pack: string
+    resource: string
+    action: string
+    next: {
+        hash: string
+        import: string
+        title: string
+        icon?: string
+    }
+}
+
 export interface GraphqlServerConfig {
     // automaticly generated, cant be rewritten
     name: string // graphql config key name

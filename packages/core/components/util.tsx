@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { apps } from '@typestackapp/core/codegen/next/apps'
 import Link from 'next/link'
 import TSAppClient from '@typestackapp/core/models/user/app/oauth/client/tsapp'
-import { ValuesType } from 'utility-types'
 import { useQuery } from "@apollo/client"
 import { context } from '@typestackapp/core/components/global'
 import { AccessCheckOptions, AccessValidator } from '@typestackapp/core/models/user/access/util'
 import type { AuthOutput } from "@typestackapp/core/express/auth"
 import { gql } from '@typestackapp/core/codegen/system/client'
 import { Packages } from '@typestackapp/core'
+import { TSAppConfig } from '@typestackapp/cli/common/util'
 
 export { apps }
 
@@ -31,16 +31,8 @@ export type GridProps = {
   children: React.ReactNode
 }
 
-export type AdminApp = ValuesType<typeof apps>
-export type AdminAppData = AdminApp & { is_active: boolean }
-export type AdminAppResource = {
-  list: { [resource: string]: AdminAppData[] }
-  is_opened: boolean
-}
-
-export type AdminApps = {
-  [pack: string]: AdminAppResource
-}
+export type AdminApp = TSAppConfig
+export type AdminAppState = AdminApp & { is_active: boolean }
 
 export class ErrourBoundary extends React.Component<{ children: React.ReactNode }> {
   state = { hasError: false }
@@ -87,7 +79,7 @@ export const getAdminUserDataQuery = gql(`#graphql
   }
 `)
 
-export const getActiveApp = (params: AdminParams): AdminApp | undefined => {
+export const getActiveApp = (params: AdminParams) => {
   const state = getNavState(params)
   return apps.find((app) => {
     return (app.pack === state.pack || app.alias === state.alias) && app.resource === state.resource && app.action === state.action
@@ -147,28 +139,15 @@ export const getNavPath = (app: any, path: string): string => {
   return `${path}/${urlEncode(app.alias || app.pack)}/${urlEncode(app.resource)}/${urlEncode(app.action)}`
 }
 
-export function getAdminApps(apps: AdminApp[], active_app: AdminApp | undefined): AdminApps {
-  var adminApps: AdminApps = {}
-
+export function getAdminAppState(apps: AdminApp[], active_app: AdminApp | undefined): AdminAppState[] {
+  const adminApps: AdminAppState[] = []
   apps.forEach((app) => {
-    var resources: AdminAppResource = adminApps[app.next.group] || {
-      list: {},
-      is_opened: false
-    }
-
-    resources.list[app.resource] = resources.list[app.resource] || []
-
     const is_active_app = active_app != undefined && active_app.pack === app.pack && active_app.resource === app.resource
-    if(is_active_app) resources.is_opened = true
-
-    resources.list[app.resource]?.push({
+    adminApps.push({
       ...app,
       is_active: is_active_app
     })
-
-    adminApps[app.next.group] = resources
   })
-
   return adminApps
 }
 
@@ -218,6 +197,23 @@ export function UserNav({client, path}: {
   )
 }
 
+export function AppIcon({ app, path }: {
+  app: AdminAppState, 
+  path: string 
+}) {
+  return <Link href={getNavPath(app, path)} className='flex flex-col'>
+    {app.next?.icon && <img src={app.next.icon} className='max-h-14 object-contain'/>}
+    {!app.next?.icon && <svg viewBox="-20 0 190 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M38.155 140.475L48.988 62.1108L92.869 67.0568L111.437 91.0118L103.396 148.121L38.155 140.475ZM84.013 94.0018L88.827 71.8068L54.046 68.3068L44.192 135.457L98.335 142.084L104.877 96.8088L84.013 94.0018ZM59.771 123.595C59.394 123.099 56.05 120.299 55.421 119.433C64.32 109.522 86.05 109.645 92.085 122.757C91.08 123.128 86.59 125.072 85.71 125.567C83.192 118.25 68.445 115.942 59.771 123.595ZM76.503 96.4988L72.837 99.2588L67.322 92.6168L59.815 96.6468L56.786 91.5778L63.615 88.1508L59.089 82.6988L64.589 79.0188L68.979 85.4578L76.798 81.5328L79.154 86.2638L72.107 90.0468L76.503 96.4988Z" fill="#000000"></path>
+    </svg>
+    }
+    <div className='text-center mt-1'>
+      {app.next.title}
+    </div>
+    <div className='grow'></div>
+  </Link>
+}
+
 export function AdminAppList({ open, path, apps, app }: {
   apps: AdminApp[], // app list
   app: AdminApp | undefined, // active app
@@ -227,7 +223,7 @@ export function AdminAppList({ open, path, apps, app }: {
   const globalContext = React.useContext(context)
   const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
   const access = data?.getCurrentUser?.roles?.map( role => role.data.resource_access )
-  const [adminApps, setAdminApps] = React.useState<AdminApps | undefined>(globalContext?.apps?.state)
+  const [adminApps, setAdminApps] = React.useState<AdminAppState[] | undefined>(globalContext?.apps?.state)
 
   // watch app change
   React.useEffect(() => {
@@ -246,100 +242,34 @@ export function AdminAppList({ open, path, apps, app }: {
     })
 
     if(!globalContext?.apps?.state) {
-      const adminAppState = getAdminApps(_apps, app)
+      const adminAppState = getAdminAppState(_apps, app)
       globalContext.apps = {state: adminAppState, setState: setAdminApps}
       setAdminApps(adminAppState)
     }
 
-    if(!adminApps || !app || !adminApps[app.next.group]) return
-
-    const side_nav_active_app = adminApps[app.next.group].list[app.resource]
-    .find((side_nav_app) => side_nav_app.pack === app.pack && side_nav_app.resource === app.resource && side_nav_app.action === app.action)
-    
+    if(!adminApps || !app) return
+    const side_nav_active_app = adminApps.find((side_nav_app) => side_nav_app.pack === app.pack && side_nav_app.resource === app.resource && side_nav_app.action === app.action)
     if(!side_nav_active_app) return
 
     // set all apps to inactive
-    Object.entries(adminApps).forEach(([group, resources]) => {
-      Object.entries(resources.list).forEach(([resource, apps]) => {
-        apps.forEach((app) => {
-          app.is_active = false
-        })
-      })
-    })
+    for(const app of adminApps) {
+      app.is_active = false
+    }
 
     // set active app
     side_nav_active_app.is_active = true
 
-    setAdminApps({...adminApps})
+    setAdminApps([...adminApps])
   }, [app, data])
-
-  function getAppView(app: AdminAppData) {
-    return <div key={app.next.hash} className={app.is_active? 'bg-gray-300 border-b' : 'border-b hover:bg-gray-100'}>
-      <Link href={getNavPath(app, path)} >
-        <div className={app.next.list == 'grow'? 'px-3 py-2': 'px-3 py-2 ml-3'}>
-          {app.next.title}
-        </div>
-      </Link>
-    </div>
-  }
-
-  function getDefaultList(resources: AdminAppResource, pack: string) {
-    if(Object.keys(resources.list).length === 0) return <></>
-    return <>
-      <div className='border-b'>
-        <div className='px-3 py-2 hover:bg-gray-100' onClick={() => {
-            if(!adminApps) return
-            adminApps[pack].is_opened = !resources.is_opened
-            setAdminApps({...adminApps})
-          }}
-        >{pack}</div>
-      </div>
-
-      {resources.is_opened && <div>
-        {Object.entries(resources.list).map(([resource, apps]) => 
-          Object.entries(apps).map(([index, app]) => getAppView(app))
-        )}
-      </div>}
-    </>
-  }
-
-  function getGrowList(apps: AdminAppData[]) {
-    if(apps.length === 0) return <></>
-    return <>{apps.map((app) => getAppView(app))}</>
-  }
-
-  function getPackList(resources: AdminAppResource, pack: string) {
-    const grow_list: AdminAppData[] = []
-    const default_list: AdminAppResource = {
-      list: {},
-      is_opened: resources.is_opened
-    }
-
-    for(let [resource_key, apps] of Object.entries(resources.list)) {
-      for(let [index, app] of Object.entries(apps)) {
-        if(app.next.list === 'grow') {
-          grow_list.push(app)
-        }else if(app.next.list === 'default'){
-          default_list.list[resource_key] = default_list.list[resource_key] || []
-          default_list.list[resource_key].push(app)
-        }
-      }
-    }
-
-    return <div>
-      {getGrowList(grow_list)}
-      {getDefaultList(default_list, pack)}
-    </div>
-  }
 
   if(!adminApps || !data || !open || !access) return <></>
 
-  return <div className='flex flex-col border-r min-w-[150px]'>
-    {Object.entries(adminApps).map(([pack, resources]) => (
-      <div className='cursor-pointer' key={pack}>
-        {getPackList(resources, pack)}
-      </div>
-    ))}
+  return <div className='min-w-[150px] gap-3 place-content-center
+    max-md:flex max-md:flex-wrap 
+    md:grid md:grid-cols-4'>
+    {adminApps.map(app => (<div key={app.next.hash} className={app.is_active ? 'max-md:w-24 flex flex-col p-2 hover:bg-gray-200 cursor-pointer bg-gray-200': 'max-md:w-24 flex flex-col p-2 hover:bg-gray-200 cursor-pointer'}>
+      <AppIcon app={app} path={path}/>
+    </div>))}
   </div>
 }
 
@@ -393,7 +323,7 @@ export function Admin({ path, apps, app, children }: {
 }) { 
   const globalContext = React.useContext(context)
   const [isOpened, setIsOpened] = useState(true)
-  const [AdminApps, setAdminApps] = React.useState<AdminApps | undefined>(globalContext?.apps?.state)
+  const [AdminApps, setAdminApps] = React.useState<AdminAppState | undefined>(globalContext?.apps?.state)
   const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
   // const access = data?.getCurrentUser?.role?.data.resource_access
 
@@ -449,34 +379,36 @@ export function Admin({ path, apps, app, children }: {
 
   function getNavBar() {
     return <div className='
-      max-md:w-full max-md:h-12 max-md:flex-row max-md:h-12 max-md:min-h-12 max-md:max-h-12 max-md:gap-x-3 max-md:px-3 max-md:py-2
-      md:h-full md:flex-col md:w-12 md:min-w-12 md:max-w-12 md:gap-y-3 md:py-3 md:px-1
+      max-md:w-full max-md:h-12 max-md:flex-row max-md:h-12 max-md:min-h-12 max-md:max-h-12 max-md:px-3 max-md:py-2
+      md:h-full md:flex-col md:w-12 md:min-w-12 md:max-w-12 md:py-3 md:px-1
       flex items-center bg-gray-900 text-gray-200 
     '>
       {/* home */}
-      <Link href={path} className='hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
+      <Link href={path} className='md:my-2 max-md:mx-1 hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.4} stroke="currentColor" className="w-9 h-9 max-md:w-10 max-md:h-10">
           <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
         </svg>
       </Link>
-      
-      <div className='flex-grow'></div>
 
       {/* user */}
-      <div className='hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
+      <div className='md:my-2 max-md:mx-1 hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.4} stroke="currentColor" className="w-9 h-9 max-md:w-10 max-md:h-10">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>
       </div>
 
+      <div className='max-md:flex-grow'></div>
+
       {/* apps */}
       <div onClick={() => setIsOpened(!isOpened)} className='hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
-        <div className='hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.4} stroke="currentColor" className="w-9 h-9 max-md:w-10 max-md:h-10">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
+        <div className='md:my-2 max-md:mx-1 hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8 max-md:w-10 max-md:h-10">
+          <path xmlns="http://www.w3.org/2000/svg" d="M9.5 2h-6A1.502 1.502 0 0 0 2 3.5v6A1.502 1.502 0 0 0 3.5 11h6A1.502 1.502 0 0 0 11 9.5v-6A1.502 1.502 0 0 0 9.5 2zm.5 7.5a.501.501 0 0 1-.5.5h-6a.501.501 0 0 1-.5-.5v-6a.501.501 0 0 1 .5-.5h6a.501.501 0 0 1 .5.5zM20.5 2h-6A1.502 1.502 0 0 0 13 3.5v6a1.502 1.502 0 0 0 1.5 1.5h6A1.502 1.502 0 0 0 22 9.5v-6A1.502 1.502 0 0 0 20.5 2zm.5 7.5a.501.501 0 0 1-.5.5h-6a.501.501 0 0 1-.5-.5v-6a.501.501 0 0 1 .5-.5h6a.501.501 0 0 1 .5.5zM9.5 13h-6A1.502 1.502 0 0 0 2 14.5v6A1.502 1.502 0 0 0 3.5 22h6a1.502 1.502 0 0 0 1.5-1.5v-6A1.502 1.502 0 0 0 9.5 13zm.5 7.5a.501.501 0 0 1-.5.5h-6a.501.501 0 0 1-.5-.5v-6a.501.501 0 0 1 .5-.5h6a.501.501 0 0 1 .5.5zM20.5 13h-6a1.502 1.502 0 0 0-1.5 1.5v6a1.502 1.502 0 0 0 1.5 1.5h6a1.502 1.502 0 0 0 1.5-1.5v-6a1.502 1.502 0 0 0-1.5-1.5zm.5 7.5a.501.501 0 0 1-.5.5h-6a.501.501 0 0 1-.5-.5v-6a.501.501 0 0 1 .5-.5h6a.501.501 0 0 1 .5.5z"/>
+        </svg>
         </div>
       </div>
+
+      <div className='md:flex-grow'></div>
     </div>
   }
 

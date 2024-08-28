@@ -60,9 +60,7 @@
             "accountApp": {
                 "next": {
                     "import": "@typestackapp/core/components/user/account",
-                    "title": "Account",
-                    "group": "User",
-                    "list": "grow"
+                    "title": "Account"
                 }
             },
             "getCurrentUser": {

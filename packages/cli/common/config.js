@@ -525,8 +525,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                             hash: generateHash(pack_key + "_" + resource_key + "_" + action_key),
                             import: _action.next.import,
                             title: _action.next.title || action_key,
-                            group: _action.next.group || _config.alias || pack_key,
-                            list: _action.next.list || "default"
+                            icon: _action.next.icon
                         }
                     });
             }
@@ -561,8 +560,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                         loading: () => <p>loading...</p>
                     }),
                     title: "${app.next.title}",
-                    group: "${app.next.group}",
-                    list: "${app.next.list}"
+                    icon: ${app.next.icon ? `"${app.next.icon}"` : "undefined"}
                 }
             }
         `;

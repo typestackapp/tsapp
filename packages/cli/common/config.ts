@@ -2,7 +2,8 @@ import fs from 'fs'
 import { 
     copyConfigs, getConfigFile, mergeWithoutPublicRemoval, writeJsonTypeFile, 
     writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareDockerFile, 
-    mkDirRecursive, getPackageConfigs
+    mkDirRecursive, getPackageConfigs,
+    TSAppConfig
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
@@ -522,8 +523,7 @@ export const config = async (options: ConfigOptions) => {
                             hash: generateHash(pack_key+"_"+resource_key+"_"+action_key),
                             import: _action.next.import,
                             title: _action.next.title || action_key,
-                            group: _action.next.group || _config.alias || pack_key,
-                            list: _action.next.list || "default"
+                            icon: _action.next.icon
                         }
                     })
             }
@@ -563,8 +563,7 @@ export const config = async (options: ConfigOptions) => {
                         loading: () => <p>loading...</p>
                     }),
                     title: "${app.next.title}",
-                    group: "${app.next.group}",
-                    list: "${app.next.list}"
+                    icon: ${app.next.icon? `"${app.next.icon}"`: "undefined"}
                 }
             }
         `
@@ -645,18 +644,4 @@ export const config = async (options: ConfigOptions) => {
     }
 
     fs.writeFileSync(`${core_dir}/codegen/next/graphql.ts`, graphql_file.replace('{services}', graphql_services))
-}
-
-type TSAppConfig = {
-    alias: string | null | undefined
-    pack: string
-    resource: string
-    action: string
-    next: {
-        hash: string
-        import: string
-        title: string
-        group: string
-        list: "default" | "grow"
-    }
 }
