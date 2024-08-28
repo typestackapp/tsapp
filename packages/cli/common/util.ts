@@ -9,7 +9,7 @@ type GraphqlRouter<T> = any
 type IGraphqlRouter = any
 
 export type TSAppConfig = {
-    alias?: string | null
+    alias: string
     pack: string
     resource: string
     action: string

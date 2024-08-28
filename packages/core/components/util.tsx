@@ -8,7 +8,7 @@ import { AccessCheckOptions, AccessValidator } from '@typestackapp/core/models/u
 import type { AuthOutput } from "@typestackapp/core/express/auth"
 import { gql } from '@typestackapp/core/codegen/system/client'
 import { Packages } from '@typestackapp/core'
-import { TSAppConfig } from '@typestackapp/cli/common/util'
+import { ValuesType } from 'utility-types'
 
 export { apps }
 
@@ -31,8 +31,7 @@ export type GridProps = {
   children: React.ReactNode
 }
 
-export type AdminApp = TSAppConfig
-export type AdminAppState = AdminApp & { is_active: boolean }
+export type AdminApp = ValuesType<typeof apps> & { is_active?: boolean } // TSAppConfig
 
 export class ErrourBoundary extends React.Component<{ children: React.ReactNode }> {
   state = { hasError: false }
@@ -79,7 +78,7 @@ export const getAdminUserDataQuery = gql(`#graphql
   }
 `)
 
-export const getActiveApp = (params: AdminParams) => {
+export const getActiveApp = (params: AdminParams): ValuesType<typeof apps> | undefined => {
   const state = getNavState(params)
   return apps.find((app) => {
     return (app.pack === state.pack || app.alias === state.alias) && app.resource === state.resource && app.action === state.action
@@ -139,10 +138,10 @@ export const getNavPath = (app: any, path: string): string => {
   return `${path}/${urlEncode(app.alias || app.pack)}/${urlEncode(app.resource)}/${urlEncode(app.action)}`
 }
 
-export function getAdminAppState(apps: AdminApp[], active_app: AdminApp | undefined): AdminAppState[] {
-  const adminApps: AdminAppState[] = []
+export function getAdminAppState(apps: AdminApp[], active_app: AdminApp | undefined): AdminApp[] {
+  const adminApps: AdminApp[] = []
   apps.forEach((app) => {
-    const is_active_app = active_app != undefined && active_app.pack === app.pack && active_app.resource === app.resource
+    const is_active_app = active_app != undefined && active_app.pack === app.pack && active_app.resource === app.resource && active_app.action === app.action
     adminApps.push({
       ...app,
       is_active: is_active_app
@@ -198,7 +197,7 @@ export function UserNav({client, path}: {
 }
 
 export function AppIcon({ app, path }: {
-  app: AdminAppState, 
+  app: AdminApp, 
   path: string 
 }) {
   return <Link href={getNavPath(app, path)} className='flex flex-col'>
@@ -223,7 +222,7 @@ export function AdminAppList({ open, path, apps, app }: {
   const globalContext = React.useContext(context)
   const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
   const access = data?.getCurrentUser?.roles?.map( role => role.data.resource_access )
-  const [adminApps, setAdminApps] = React.useState<AdminAppState[] | undefined>(globalContext?.apps?.state)
+  const [adminApps, setAdminApps] = React.useState<AdminApp[] | undefined>(globalContext?.apps?.state)
 
   // watch app change
   React.useEffect(() => {
@@ -243,7 +242,7 @@ export function AdminAppList({ open, path, apps, app }: {
 
     if(!globalContext?.apps?.state) {
       const adminAppState = getAdminAppState(_apps, app)
-      globalContext.apps = {state: adminAppState, setState: setAdminApps}
+      globalContext.apps = {state: adminApps, setState: setAdminApps}
       setAdminApps(adminAppState)
     }
 
@@ -320,12 +319,9 @@ export function Admin({ path, apps, app, children }: {
   app: AdminApp | undefined, // active app
   path: string, // current base path
   children: React.ReactNode
-}) { 
-  const globalContext = React.useContext(context)
+}) {
   const [isOpened, setIsOpened] = useState(true)
-  const [AdminApps, setAdminApps] = React.useState<AdminAppState | undefined>(globalContext?.apps?.state)
   const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
-  // const access = data?.getCurrentUser?.role?.data.resource_access
 
   function getOverlay() {
     return <div className='fixed h-full w-full bg-gray-200 opacity-30 pointer-events-none'></div>

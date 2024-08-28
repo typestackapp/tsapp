@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, createContext} from 'react'
 import frontend from '@typestackapp/core/codegen/config/source/@typestackapp/core/frontend.public.json'
 import TSAppClient from '@typestackapp/core/models/user/app/oauth/client/tsapp'
 import type { ClientSession } from '@typestackapp/core/models/user/app/oauth/client'
-import type { AdminApps } from '@typestackapp/core/components/util'
+import type { AdminApp } from '@typestackapp/core/components/util'
 
 export type Session = {
     state: undefined | false | ClientSession,
@@ -11,8 +11,8 @@ export type Session = {
 }
 
 export type Apps = {
-    state: undefined | AdminApps,
-    setState: Dispatch<SetStateAction<undefined | AdminApps>>
+    state: undefined | AdminApp[],
+    setState: Dispatch<SetStateAction<undefined | AdminApp[]>>
 }
 
 export abstract class IGlobalContext {

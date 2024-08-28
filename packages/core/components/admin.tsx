@@ -1,7 +1,7 @@
 import React from 'react'
 import LoginComponent from '@typestackapp/core/components/user/access/login'
 import { context } from '@typestackapp/core/components/global'
-import { DisplayComponent, Admin, apps, getBasePath, AdminParams, getActiveApp, ErrourBoundary } from '@typestackapp/core/components/util'
+import { DisplayComponent, Admin, apps, getBasePath, AdminParams, getActiveApp, ErrourBoundary, AdminApp } from '@typestackapp/core/components/util'
 import { useParams, usePathname } from 'next/navigation'
 import { ApolloProvider } from "@apollo/client"
 
