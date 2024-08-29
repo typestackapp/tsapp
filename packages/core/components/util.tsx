@@ -264,9 +264,9 @@ export function AdminAppList({ open, path, apps, app }: {
   if(!adminApps || !data || !open || !access) return <></>
 
   return <div className='min-w-[150px] gap-3 place-content-center
-    max-md:flex max-md:flex-wrap 
+    max-md:flex max-md:flex-wrap max-md:gap-x-[3%]
     md:grid md:grid-cols-4'>
-    {adminApps.map(app => (<div key={app.next.hash} className={app.is_active ? 'max-md:w-24 flex flex-col p-2 hover:bg-gray-200 cursor-pointer bg-gray-200': 'max-md:w-24 flex flex-col p-2 hover:bg-gray-200 cursor-pointer'}>
+    {adminApps.map(app => (<div key={app.next.hash} className={app.is_active ? 'max-md:w-20 flex flex-col p-2 hover:bg-gray-200 cursor-pointer bg-gray-200': 'max-md:w-20 flex flex-col p-2 hover:bg-gray-200 cursor-pointer'}>
       <AppIcon app={app} path={path}/>
     </div>))}
   </div>
