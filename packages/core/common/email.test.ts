@@ -16,7 +16,7 @@ describe('Test email config', () => {
         await config.save()
         
         const emai_input: EmailInput = {
-            receivers: global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+            receivers: global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
             subject: "Test: test configs",
             html: "Email message content from test: should have usable email config",
             attachments: []

@@ -42,7 +42,7 @@ describe(`Test job type: ${discriminator}`, () => {
             "inputs": [
                 {
                     "external_id": "campaign-test-120",
-                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
                     "template_input": {
                         "UNSUBSCRIBE_HASH": "#000001",
                         "TASKS": [{"name": "test1"}, {"name": "test2"}]
@@ -50,7 +50,7 @@ describe(`Test job type: ${discriminator}`, () => {
                 },
                 {
                     "external_id": "campaign-test-121",
-                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
                     "template_input": {
                         "UNSUBSCRIBE_HASH": "#000002",
                         "TASKS": [{"name": "test3"}, {"name": "test4"}]
@@ -58,7 +58,7 @@ describe(`Test job type: ${discriminator}`, () => {
                 },
                 {
                     "external_id": "campaign-test-122",
-                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
                     "template_input": {
                         "UNSUBSCRIBE_HASH": "#000003",
                         "TASKS": [{"name": "test3"}, {"name": "test4"}]
@@ -66,7 +66,7 @@ describe(`Test job type: ${discriminator}`, () => {
                 },
                 {
                     "external_id": "campaign-test-123",
-                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
                     "template_input": {
                         "UNSUBSCRIBE_HASH": "#000004",
                         "TASKS": [{"name": "test3"}, {"name": "test4"}]
@@ -74,7 +74,7 @@ describe(`Test job type: ${discriminator}`, () => {
                 },
                 {
                     "external_id": "campaign-test-124",
-                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
                     "template_input": {
                         "UNSUBSCRIBE_HASH": "#000003",
                         "TASKS": [{"name": "test3"}, {"name": "test4"}]
@@ -82,7 +82,7 @@ describe(`Test job type: ${discriminator}`, () => {
                 },
                 {
                     "external_id": "campaign-test-125",
-                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL,
+                    "email": global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL,
                     "template_input": {
                         "UNSUBSCRIBE_HASH": "#000004",
                         "TASKS": [{"name": "test3"}, {"name": "test4"}]

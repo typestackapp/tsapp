@@ -32,7 +32,7 @@ const emailRemainderSchema = new Schema<EmailRemainderDocument, Model<EmailRemai
     }
 })
 
-emailRemainderSchema.methods.callback = async function(){
+emailRemainderSchema.methods.onTick = async function() {
     const email_config = await EmailConfigModel.findById(this.params.email_config_id)
     if (!email_config) throw new Error(`EmailConfig not found with id: ${this.params.email_config_id}`)
     const message = await new Email(this.params.email).send(email_config)

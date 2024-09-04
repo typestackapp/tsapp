@@ -66,7 +66,7 @@ export class Email {
             const name = this.from?.name || email_config.data.from.name
             const from = { address, name }
 
-            if(global.tsapp["@typestackapp/core"].config.system.DEV_SAVE_MESSAGES_TO_FILE === false) {
+            if(!global.tsapp["@typestackapp/core"].config.system.DEV_SAVE_MESSAGES_TO_FILE) {
                 _envelope = await nodemailer
                 .createTransport( email_config.data.auth )
                 .sendMail({ ...this,  from })
