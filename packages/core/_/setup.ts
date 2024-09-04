@@ -24,7 +24,7 @@ export async function setup() {
     await ConnectionList.initilize()
 
     // remove logs at the begining of all tests, setup() runs before each test file!
-    if (global.tsapp["@typestackapp/core"].config.system.DEV_CLEAN_LOGS) {
+    if (global.tsapp["@typestackapp/core"].config.system.DEV_CLEAN_MESSAGES_LOGS) {
         fs.emptyDirSync(`${process.cwd()}/logs/email`)
         fs.emptyDirSync(`/tsapp/logs/email`)
     }
