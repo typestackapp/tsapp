@@ -147,9 +147,7 @@ export class ExpressRouter {
 
     // foreach path replace params [param1], [param2] with :param1, :param2
     getPaths(paths: string[]) {
-        return paths.map(path => {
-            return path.replace(/\[(.*?)\]/g, ":$1")
-        })
+        return paths.map(path => path.replace(/\[(.*?)\]/g, ":$1").replace(/_/g, "/"))
     }
 
     registerRoters(router: Router): IExpressRouter[] {
