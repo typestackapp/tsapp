@@ -47,8 +47,8 @@ export class Email {
     public attachments: Attachment[] = []
     
     constructor( input: EmailInput, options?: EmailOptions ) {
-        const send_all_to_dev = global.tsapp["@typestackapp/core"].config.system.DEV_SEND_MESSAGES_TO_DEV
-        const dev_emails = global.tsapp["@typestackapp/core"].config.system.DEV_SEND_EMAIL
+        const send_all_to_dev = global.tsapp["@typestackapp/core"].config.system.DEV_REWRITE_MESSAGE_RECEIVER
+        const dev_emails = global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL
         this.options = options
         this.from = input.from
         this.to = (send_all_to_dev)? dev_emails: input.receivers
@@ -66,7 +66,7 @@ export class Email {
             const name = this.from?.name || email_config.data.from.name
             const from = { address, name }
 
-            if(global.tsapp["@typestackapp/core"].config.system.SEND_EMAILS) {
+            if(global.tsapp["@typestackapp/core"].config.system.DEV_SAVE_MESSAGES_TO_FILE === false) {
                 _envelope = await nodemailer
                 .createTransport( email_config.data.auth )
                 .sendMail({ ...this,  from })
