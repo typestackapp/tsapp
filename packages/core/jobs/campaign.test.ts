@@ -1,8 +1,8 @@
 import { expect } from "chai"
-import { CampaignDocument, CampaignInput, CampaignModel, JobParams, producer, discriminator } from "./campaign"
+import { CampaignDocument, CampaignInput, CampaignModel, JobParams, producer, discriminator } from "@typestackapp/core/jobs/campaign"
 import { sleep } from "@typestackapp/core/common/util"
 import { Types } from "mongoose"
-import { JobActionModel } from "."
+import { JobActionModel } from "@typestackapp/core/models/job"
 
 jest.setTimeout(20000)
 

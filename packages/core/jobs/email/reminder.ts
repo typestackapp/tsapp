@@ -1,5 +1,5 @@
 import { Model, Schema, Types } from "mongoose"
-import { JobDocument, JobInput, JobModel } from ".."
+import { JobDocument, JobInput, JobModel } from "@typestackapp/core/models/job"
 import { Email, EmailInput } from "@typestackapp/core/common/email"
 import { EmailConfigModel } from "@typestackapp/core/models/config/email"
 

@@ -1,4 +1,4 @@
-import { producer, JobParams, CampaignInput, CampaignModel } from "@typestackapp/core/models/job/campaign"
+import { producer, JobParams, CampaignInput, CampaignModel } from "@typestackapp/core/jobs/campaign"
 import { ExpressRouter } from "@typestackapp/core"
 import { Types } from "mongoose"
 const { config } = global.tsapp["@typestackapp/core"]

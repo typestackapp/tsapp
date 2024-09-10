@@ -5,7 +5,7 @@ import { EmailConfigInput, EmailConfigModel } from "@typestackapp/core/models/co
 import { ChannelConfigInput, ChannelConfigModel } from "@typestackapp/core/models/config/channel"
 import { encodeApiKey, hashApiKey, newApiKeySecret } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenInput, ApiKeyTokenModel } from "@typestackapp/core/models/user/token/apikey"
-import { system_admin_id, all_access_inputs } from "@typestackapp/core/models/update/main"
+import { system_admin_id, all_access_inputs } from "@typestackapp/core/updates/main"
 import { UserModel } from "@typestackapp/core/models/user"
 import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
 import { tsapp } from "@typestackapp/core/env"

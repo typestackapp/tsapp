@@ -3,7 +3,7 @@ import { randomSecret, secretCompare, secretHash } from "@typestackapp/core/mode
 import { UserDocument, UserModel } from "@typestackapp/core/models/user"
 import { BearerTokenModel, BearerTokenInput, BearerTokenDocument } from "@typestackapp/core/models/user/token/bearer"
 import { ApiKeyTokenDocument } from "@typestackapp/core/models/user/token/apikey"
-import { access_token_config_id, refresh_token_config_id } from "@typestackapp/core/models/update/main"
+import { access_token_config_id, refresh_token_config_id } from "@typestackapp/core/updates/main"
 import { AccessTokenJWKData, RefreshTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
 import * as jose from 'jose'
 import moment, { unitOfTime } from "moment"

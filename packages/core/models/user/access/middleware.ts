@@ -12,7 +12,7 @@ import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, 
 import { tsapp } from "@typestackapp/core/env"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
-import { access_token_config_id } from "@typestackapp/core/models/update/main"
+import { access_token_config_id } from "@typestackapp/core/updates/main"
 import { UserAccessInput, UserAccessLogDocument, UserAccessLogInput, UserAccessLogModel, UserAccessModel, UserDevice } from '@typestackapp/core/models/user/access'
 import { AccessValidator, secretCompare } from '@typestackapp/core/models/user/access/util'
 import { OauthAppModel } from '@typestackapp/core/models/user/app/oauth'

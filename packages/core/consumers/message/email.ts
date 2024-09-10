@@ -1,8 +1,6 @@
 import { Channel, Message } from "amqplib/callback_api"
 import { ConsumerOnMessage, OnMessage, parseData } from "@typestackapp/core/common/rabbitmq/consumer"
 import { EmailConfigModel } from "@typestackapp/core/models/config/email"
-import { ConsumerInput } from "@typestackapp/core/models/config/consumer"
-import { ChannelConfigDocument } from "@typestackapp/core/models/config/channel"
 import { Email, EmailInput, EmailOptions } from "@typestackapp/core/common/email"
 import { JobActionModel } from "@typestackapp/core/models/job"
 import { Types } from "mongoose"
@@ -14,7 +12,7 @@ export type EmailConsumerInput = {
 
 export const type = "EmailMessageConsumer"
 
-export const onMessage: OnMessage = async ( channel: Channel, channel_config: ChannelConfigDocument, consumer: ConsumerInput ): Promise<ConsumerOnMessage> => {
+export const onMessage: OnMessage = async ( channel, channel_config, consumer ) => {
     const email = await EmailConfigModel.findOne({"_id": new Types.ObjectId(consumer.options?.consumerTag)})
     if(!email) throw `Error, consumers onMessage email config does not exist _id: ${channel_config._id}`
     return ( msg: Message | null ) => {

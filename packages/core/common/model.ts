@@ -16,7 +16,8 @@ export class ModelLoader {
         if (ModelLoader.loadedModels[pack]) return;
 
         ModelLoader.loadedModels[pack] = true;
-        const path = `${process.cwd()}/node_modules/${pack}/models/`;
+        const model_path = `${process.cwd()}/node_modules/${pack}/models/`;
+        const job_path = `${process.cwd()}/node_modules/${pack}/jobs/`;
 
         const loadAllModels = async (path: string) => {
             const files = fs.readdirSync(path);
@@ -41,9 +42,8 @@ export class ModelLoader {
         }
 
         // skipt if folder does not exist
-        if( !fs.existsSync(path) ) return;
-
-        loadAllModels(path);
+        if( fs.existsSync(model_path) ) await loadAllModels(model_path);
+        if( fs.existsSync(model_path) ) await loadAllModels(job_path);
     }
 }
 

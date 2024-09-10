@@ -83,39 +83,39 @@
             "searchConfigs": {
                 "info": [ "Allows user to search for configs with Read permission" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
-                "type": { "mongoose": "@typestackapp/core/models/config" }
+                "model": { "mongoose": "@typestackapp/core/models/config" }
             },
             "getConfig": {
                 "info": [ "Allows user to get config with Read permission by providing config id" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
-                "type": { "mongoose": "@typestackapp/core/models/config" }
+                "model": { "mongoose": "@typestackapp/core/models/config" }
             }
         },
         "Job": {
             "searchJobs": {
                 "info": [ "Allows user to search for jobs with Read permission" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
-                "type": { "mongoose": "@typestackapp/core/models/job" }
+                "model": { "mongoose": "@typestackapp/core/models/job" }
             },
             "getJob": {
                 "info": [ "Allows user to read job with Read permission by providing job id" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
-                "type": { "mongoose": "@typestackapp/core/models/job" }
+                "model": { "mongoose": "@typestackapp/core/models/job" }
             },
             "createJob":{
                 "info": [ "Allows user to create new job with Write permission" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Write" },
-                "type": { "mongoose": "@typestackapp/core/models/job" }
+                "model": { "mongoose": "@typestackapp/core/models/job" }
             },
             "updateJob": {
                 "info": [ "Allows user to update job with Update permission" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Update" },
-                "type": { "mongoose": "@typestackapp/core/models/job" }
+                "model": { "mongoose": "@typestackapp/core/models/job" }
             },
             "deleteJob": {
                 "info": [ "Allows user to delete job with Delete permission" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Delete" },
-                "type": { "mongoose": "@typestackapp/core/models/job" }
+                "model": { "mongoose": "@typestackapp/core/models/job" }
             }
         },
         "MessagingCampaign": {

@@ -35,7 +35,7 @@ export async function update(options: UpdateOptions) {
     console.log(`Info, updating packages:`)
 
     for (const [pack_key, pack] of Object.entries(getPackageConfigs())) {
-        const update_path = `${options.cwd}/node_modules/${pack_key}/models/update`
+        const update_path = `${options.cwd}/node_modules/${pack_key}/updates`
         const pack_version = pack.version
         console.log(`Info, ${pack_key}:${pack_version}`)
 

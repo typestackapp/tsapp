@@ -11,8 +11,8 @@
     "test:setup": "jest ./_/setup.test.js --env=node --bail=1 --setupFilesAfterEnv ./_/env.js",
     "test:service": "jest ./common/service/service.test.js --env=node --bail=1",
     "test:access": "jest \"/models/user/access.*\\.test\\.js\" --env=node --bail=1 --setupFilesAfterEnv ./_/env.js",
-    "test:job-template": "jest \"/models/job/template.*\\.test\\.js\" --env=node --bail=1 --setupFilesAfterEnv ./_/env.js",
-    "test:job-campaign": "jest \"/models/job/campaign.*\\.test\\.js\" --env=node --bail=1 --setupFilesAfterEnv ./_/env.js"
+    "test:job-template": "jest \"/jobs/template.*\\.test\\.js\" --env=node --bail=1 --setupFilesAfterEnv ./_/env.js",
+    "test:job-campaign": "jest \"/jobs/campaign.*\\.test\\.js\" --env=node --bail=1 --setupFilesAfterEnv ./_/env.js"
   },
   "repository": {
     "type": "git",

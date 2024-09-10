@@ -1,7 +1,7 @@
 import { expect } from "chai"
-import { TemplateJobDocument, TemplateJobInput, TemplateJobModel, discriminator } from "./template"
+import { TemplateJobDocument, TemplateJobInput, TemplateJobModel, discriminator } from "@typestackapp/core/jobs/template"
 import { CronJobDoc } from "@typestackapp/core/common/job"
-import { JobActionModel } from "."
+import { JobActionModel } from "@typestackapp/core/models/job"
 import { LogModel } from "@typestackapp/core/models/log"
 import { Types } from "mongoose"
 

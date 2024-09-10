@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { Email, EmailInput, EmailOptions } from '../../common/email'
+import { Email, EmailInput, EmailOptions } from '../common/email'
 import { Model, Schema } from "mongoose"
 import { JobDocument, JobInput, JobModel, JobStepInput } from "@typestackapp/core/models/job"
 import { InteractionType, Template } from "@typestackapp/core/common/template"

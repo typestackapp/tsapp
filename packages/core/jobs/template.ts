@@ -1,5 +1,5 @@
 import { Model, Schema } from "mongoose"
-import { JobDocument, JobInput, JobModel, JobStepInput } from "."
+import { JobDocument, JobInput, JobModel, JobStepInput } from "@typestackapp/core/models/job"
 
 export const pack = "@typestackapp/core"
 export const type = "TemplateJob"
