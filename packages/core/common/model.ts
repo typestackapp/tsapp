@@ -41,9 +41,9 @@ export class ModelLoader {
             }
         }
 
-        // skipt if folder does not exist
+        // load models if exists
         if( fs.existsSync(model_path) ) await loadAllModels(model_path);
-        if( fs.existsSync(model_path) ) await loadAllModels(job_path);
+        if( fs.existsSync(job_path) ) await loadAllModels(job_path);
     }
 }
 
