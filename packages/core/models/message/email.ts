@@ -1,7 +1,7 @@
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 import { Schema, Types } from "mongoose"
-import { MessageModel, MessageInput, MessageDocument } from "."
-import { EmailOptions } from '../../common/email'
+import { MessageModel, MessageInput, MessageDocument } from "@typestackapp/core/models/message"
+import { EmailOptions } from '@typestackapp/core/common/email'
 
 export const pack = "@typestackapp/core"
 export const type = "EmailMessage"
@@ -17,10 +17,10 @@ export interface IEmailMessage {
 }
 
 export interface EmailMessageInput extends MessageInput<IEmailMessage> {
-    _id?: Types.ObjectId
+    _id: Types.ObjectId
 }
 
-export interface EmailMessageDocument extends MessageDocument<EmailMessageInput> {
+export interface EmailMessageDocument extends MessageDocument<IEmailMessage>, EmailMessageInput {
     pack: typeof pack
     type: typeof type
 }
