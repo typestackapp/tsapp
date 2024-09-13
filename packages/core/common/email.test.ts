@@ -7,7 +7,6 @@ jest.setTimeout(10000) // extend timeout to 10 seconds
 describe('Test email config', () => {
 
     it('should have usable email config', async () => {
-        // check if system.json has DEV option to save localy instead of sending
         // sending via unvalid email config will thrown: "Exceeded timeout of 5000 ms for a test.
         const config = await EmailConfigModel.findOne({_id: global.core_tsapp_test.email_config._id})
         if(!config) throw "Config not found!"

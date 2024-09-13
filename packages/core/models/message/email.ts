@@ -16,7 +16,9 @@ export interface IEmailMessage {
     options?: EmailOptions
 }
 
-export interface EmailMessageInput extends MessageInput<IEmailMessage> {}
+export interface EmailMessageInput extends MessageInput<IEmailMessage> {
+    _id?: Types.ObjectId
+}
 
 export interface EmailMessageDocument extends MessageDocument<EmailMessageInput> {
     pack: typeof pack

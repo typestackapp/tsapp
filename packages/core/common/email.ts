@@ -2,15 +2,14 @@ import { Attachment as MailAttachment, Address } from "nodemailer/lib/mailer"
 import SMTPTransport from "nodemailer/lib/smtp-transport"
 import nodemailer from "nodemailer"
 import { Channel } from "amqplib/callback_api"
-import { ObjectId } from "mongodb"
 import { Types } from "mongoose"
 import moment from "moment"
 import fs from "fs-extra"
-import { EmailConfigDocument } from "../models/config/email"
-import { EmailMessageDocument, EmailMessageModel, EmailMessageInput } from "../models/message/email"
-import { EmailConsumerInput } from "../consumers/message/email"
-import { ContactInput, updateContact} from "../models/contact"
-import { ChannelConfigDocument} from "../models/config/channel"
+import { EmailConfigDocument } from "@typestackapp/core/models/config/email"
+import { EmailMessageDocument, EmailMessageModel, EmailMessageInput } from "@typestackapp/core/models/message/email"
+import { EmailConsumerInput } from "@typestackapp/core/consumers/message/email"
+import { ContactInput, updateContact} from "@typestackapp/core/models/contact"
+import { ChannelConfigDocument} from "@typestackapp/core/models/config/channel"
 
 export interface Attachment extends MailAttachment {}
 
@@ -26,6 +25,7 @@ export interface EmailOptions {
 }
 
 export interface EmailInput {
+    _id?: Types.ObjectId,
     receivers: string[],
     subject: string,
     html: string,
@@ -39,6 +39,7 @@ export interface EmailAddress {
 }
 
 export class Email {
+    readonly id: Types.ObjectId
     readonly from?: EmailAddress
     readonly to: string[]
     readonly subject: string
@@ -55,6 +56,7 @@ export class Email {
         this.subject = input.subject
         this.html = input.html
         this.attachments = input.attachments
+        this.id = input._id || new Types.ObjectId()
     }
 
     public async send(email_config: EmailConfigDocument): Promise<EmailMessageDocument> {
@@ -89,6 +91,7 @@ export class Email {
         }
 
         var msg_input: EmailMessageInput = {
+            _id: this.id,
             data: {
                 email: this.to,
                 res: _envelope,
@@ -113,7 +116,7 @@ export class Email {
 
     getMockEmail(from: EmailAddress): SMTPTransport.SentMessageInfo {
         // return mock email response
-        const _id = new ObjectId().toString()
+        const _id = this.id.toString()
         const _time = moment().format("HHmmss")
         const _path = `${process.cwd()}/logs/email/`
         const _name = `${_path}${_time}-${_id}`
@@ -142,20 +145,17 @@ export class Email {
         return _envelope
     }
 
-    getInput(): EmailInput {
-        return {
-            receivers: this.to,
-            subject: this.subject,
-            html: this.html,
-            attachments: this.attachments,
-            from: this.from,
-        }
-    }
-
     getConsumerInput(): EmailConsumerInput {
         return {
-            input: this.getInput(),
-            options: this.options
+            options: this.options,
+            input: {
+                _id: this.id.toString(),
+                receivers: this.to,
+                subject: this.subject,
+                html: this.html,
+                attachments: this.attachments,
+                from: this.from,
+            }
         }
     }
 

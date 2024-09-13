@@ -1,6 +1,6 @@
 import { Packages } from "@typestackapp/core";
 import { MongooseDocument } from "@typestackapp/core/models/util";
-import { Schema } from 'mongoose'
+import { Schema, Types } from 'mongoose'
 
 export interface MessageInput<TData> {
     data: TData

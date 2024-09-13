@@ -1,12 +1,12 @@
-import { Channel, Message } from "amqplib/callback_api"
-import { ConsumerOnMessage, OnMessage, parseData } from "@typestackapp/core/common/rabbitmq/consumer"
+import { Message } from "amqplib/callback_api"
+import { OnMessage, parseData } from "@typestackapp/core/common/rabbitmq/consumer"
 import { EmailConfigModel } from "@typestackapp/core/models/config/email"
 import { Email, EmailInput, EmailOptions } from "@typestackapp/core/common/email"
 import { JobActionModel } from "@typestackapp/core/models/job"
 import { Types } from "mongoose"
 
 export type EmailConsumerInput = {
-    input: EmailInput
+    input: Omit<EmailInput, '_id'> & { _id?: string }
     options?: EmailOptions
 }
 
@@ -24,9 +24,14 @@ export const onMessage: OnMessage = async ( channel, channel_config, consumer ) 
             console.log(msg)
             return channel.nack( msg )
         }
+
+        const email_input = {
+            ..._data.input,
+            _id: new Types.ObjectId(_data.input._id)
+        }
         
         // send email
-        new Email(_data.input, _data.options)
+        new Email(email_input, _data.options)
         .send(email)
         .then(async (doc) => {
 
@@ -40,7 +45,6 @@ export const onMessage: OnMessage = async ( channel, channel_config, consumer ) 
             step.status = "Executed"
             action.markModified("steps")
             await action?.save()
-
         })
         .catch((err) => {
             console.error(err)
