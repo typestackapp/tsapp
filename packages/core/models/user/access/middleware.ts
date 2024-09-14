@@ -229,8 +229,17 @@ export function getResourceInfo( options: IAccessOptions | undefined ): string {
 async function log( req: AccessRequest, options: IAccessOptions ): Promise<void> {
     if(options.log?.enabled == false) return
 
+    const ipJoin = (...ip: (string[] | string | undefined)[]): string | undefined => {
+        for(const i of ip) {
+            if(i && i != '::1' && i != 'undefined') {
+                // replace all "::ffff:"
+                return i.toString().replace(/^.*:/, '')
+            }
+        }
+    }
+    
     const device: UserDevice = {
-        ip_address: `${req.headers['x-forwarded-for']}` || req.ip || "",
+        ip_address: ipJoin(req.headers['x-forwarded-for'], req.ip),
         agent: req.headers['user-agent']
     }
 
