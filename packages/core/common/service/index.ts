@@ -145,9 +145,14 @@ export class ExpressRouter {
         return this.routers
     }
 
-    // foreach path replace params [param1], [param2] with :param1, :param2
-    getPaths(paths: string[]) {
-        return paths.map(path => path.replace(/\[(.*?)\]/g, ":$1").replace(/_/g, "/"))
+    getPaths(paths: string[]): string[] {
+        return paths.map(path => {
+            // Replace underscores that are not inside square brackets
+            let updatedPath = path.replace(/_+(?![^\[]*\])/g, '/');
+            
+            // Replace [param] with :param
+            return updatedPath.replace(/\[(.*?)\]/g, ":$1");
+        });
     }
 
     registerRoters(router: Router): IExpressRouter[] {
