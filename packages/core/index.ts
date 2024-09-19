@@ -1,7 +1,3 @@
-import type { UserDocument } from '@typestackapp/core/models/user'
-import type { EmailConfigDocument } from '@typestackapp/core/models/config/email'
-import type { ChannelConfigDocument } from '@typestackapp/core/models/config/channel'
-import type { TokenDocument } from '@typestackapp/core/models/user/token'
 import type { Connections as DBConnections } from '@typestackapp/core/common/db'
 import type { Connections as RMQConnections } from '@typestackapp/core/common/rabbitmq/connection'
 import type { JobList } from '@typestackapp/core/common/job'
@@ -20,16 +16,6 @@ export { config }
 export type { Config }
 export const packages = getPackageConfigs() as {[key in Packages]: ReturnType<typeof getPackageConfigs>[string]}
 export type Packages = keyof typeof tsapp_config.packages
-
-declare global {
-    var core_tsapp_test: {
-        root_user: UserDocument
-        email_config: EmailConfigDocument
-        email_channel_config: ChannelConfigDocument
-        api_key: TokenDocument
-        jobs: JobList
-    }
-}
 
 export class TSA {
     private static _db: DBConnections

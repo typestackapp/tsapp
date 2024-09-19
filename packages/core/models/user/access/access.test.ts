@@ -12,9 +12,10 @@ import { AccessValidator, AccessCheckOptions } from "@typestackapp/core/models/u
 var token: Awaited<ReturnType<typeof newRefreshToken>>
 const client_id = default_user_app_client_id
 
-import { api_key_base64, setup } from "@typestackapp/core/common/test/util"
+import { api_key_base64, setup, Setup } from "@typestackapp/core/common/test/util"
+var core_tsapp_test: Setup = {} as any
 beforeAll(async () => {
-    await setup()
+    core_tsapp_test = await setup()
 })
 
 describe('Test Bearer token', () => {
@@ -23,7 +24,7 @@ describe('Test Bearer token', () => {
     })
 
     it('should use valid access token and suceed', async () => {
-        token = await newRefreshToken(global.core_tsapp_test.root_user, client_id, "refresh_token", {
+        token = await newRefreshToken(core_tsapp_test.root_user, client_id, "refresh_token", {
             time: moment().subtract(10, 'seconds'), // token was created 10 seconds ago
             accessTokenExtendTime: "20s" // access token is valid for 20 seconds
         })
@@ -35,7 +36,7 @@ describe('Test Bearer token', () => {
     })
 
     it('should use expired access token and fail', async () => {
-        token = await newRefreshToken(global.core_tsapp_test.root_user, client_id, "refresh_token", {
+        token = await newRefreshToken(core_tsapp_test.root_user, client_id, "refresh_token", {
             time: moment().subtract(20, 'seconds'), // token was created 20 seconds ago
             accessTokenExtendTime: "10s" // access token is valid for 10 seconds
         })
@@ -98,7 +99,7 @@ describe('Test ApiKey token', () => {
     })
 
     it('should have global apikey', async () => {
-        expect(global.core_tsapp_test.api_key).to.exist
+        expect(core_tsapp_test.api_key).to.exist
     })
 
     it('should throw error while getting non existing apikey', async () => {

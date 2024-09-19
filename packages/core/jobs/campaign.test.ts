@@ -7,9 +7,10 @@ import { TSA } from "@typestackapp/core"
 
 jest.setTimeout(20000)
 
-import { setup } from "@typestackapp/core/common/test/util"
+import { setup, Setup } from "@typestackapp/core/common/test/util"
+var core_tsapp_test: Setup = {} as any
 beforeAll(async () => {
-    await setup()
+    core_tsapp_test = await setup()
 })
 
 describe(`Test job type: ${discriminator}`, () => {
@@ -103,8 +104,8 @@ describe(`Test job type: ${discriminator}`, () => {
             description: "Test campaign job",
             data: undefined,
             params: job_params,
-            created_by: global.core_tsapp_test.root_user._id,
-            updated_by: global.core_tsapp_test.root_user._id,
+            created_by: core_tsapp_test.root_user._id,
+            updated_by: core_tsapp_test.root_user._id,
             log: { enabled: false, max: 0 },
         }
 

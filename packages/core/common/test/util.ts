@@ -1,3 +1,8 @@
+import type { UserDocument } from '@typestackapp/core/models/user'
+import type { EmailConfigDocument } from '@typestackapp/core/models/config/email'
+import type { ChannelConfigDocument } from '@typestackapp/core/models/config/channel'
+import type { TokenDocument } from '@typestackapp/core/models/user/token'
+
 import { Types } from "mongoose"
 import { JobList } from "@typestackapp/core/common/job"
 import { EmailConfigInput, EmailConfigModel } from "@typestackapp/core/models/config/email"
@@ -13,18 +18,26 @@ export const email_channel_config_id = new Types.ObjectId("63453a61fe9cd72c40188
 export const api_key_secret = newApiKeySecret(5)
 export const api_key_base64 = encodeApiKey(api_key_id, api_key_secret)
 
+export type Setup = {
+    root_user: UserDocument
+    email_config: EmailConfigDocument
+    email_channel_config: ChannelConfigDocument
+    api_key: TokenDocument
+    jobs: JobList
+}
+
 export async function setup() {
-    global.core_tsapp_test = {} as any
+    const core_tsapp_test = {} as Setup
 
     // upsert root user
     const _user = await UserModel.findOne({ _id: system_admin_id })
     if(!_user) throw "Root user not found"
-    global.core_tsapp_test.root_user = _user
+    core_tsapp_test.root_user = _user
 
     const email_input: EmailConfigInput = {
         "log": {enabled: false},
-        "created_by": global.core_tsapp_test.root_user._id,
-        "updated_by": global.core_tsapp_test.root_user._id,
+        "created_by": core_tsapp_test.root_user._id,
+        "updated_by": core_tsapp_test.root_user._id,
         "title": "Email description - this email is created while running tests.",
         "data": {
             "from": {
@@ -43,7 +56,7 @@ export async function setup() {
         }
     }
 
-    global.core_tsapp_test.email_config = await EmailConfigModel.findOneAndUpdate(
+    core_tsapp_test.email_config = await EmailConfigModel.findOneAndUpdate(
         { _id: email_config_id },
         { _id: email_config_id, ...email_input },
         { upsert: true, new: true }
@@ -51,8 +64,8 @@ export async function setup() {
 
     const channel_data: ChannelConfigInput = {
         "log": {enabled: false},
-        "created_by": global.core_tsapp_test.root_user._id,
-        "updated_by": global.core_tsapp_test.root_user._id,
+        "created_by": core_tsapp_test.root_user._id,
+        "updated_by": core_tsapp_test.root_user._id,
         "title": "Channel description - this channel config is created while running tests.",
         "data": {
             "services": ["tsapp"],
@@ -86,14 +99,14 @@ export async function setup() {
         }
     }
 
-    global.core_tsapp_test.email_channel_config = await ChannelConfigModel.findOneAndUpdate(
+    core_tsapp_test.email_channel_config = await ChannelConfigModel.findOneAndUpdate(
         { _id: email_channel_config_id },
         { _id: email_channel_config_id, ...channel_data },
         { upsert: true, new: true }
     )
 
     const api_key_data: ApiKeyTokenInput = {
-        user_id: global.core_tsapp_test.root_user._id,
+        user_id: core_tsapp_test.root_user._id,
         status: "active",
         data: {
             key: hashApiKey(api_key_secret),
@@ -102,12 +115,14 @@ export async function setup() {
         }
     }
 
-    global.core_tsapp_test.api_key = await ApiKeyTokenModel.findOneAndUpdate(
+    core_tsapp_test.api_key = await ApiKeyTokenModel.findOneAndUpdate(
         { _id: api_key_id },
         { _id: api_key_id, ...api_key_data },
         { upsert: true, new: true } 
     )
 
     // adds all active jobs
-    global.core_tsapp_test.jobs = await JobList.getInstance()
+    core_tsapp_test.jobs = await JobList.getInstance()
+
+    return core_tsapp_test
 }

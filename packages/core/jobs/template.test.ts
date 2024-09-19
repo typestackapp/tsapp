@@ -5,9 +5,10 @@ import { JobActionModel } from "@typestackapp/core/models/job"
 import { LogModel } from "@typestackapp/core/models/log"
 import { Types } from "mongoose"
 
-import { setup } from "@typestackapp/core/common/test/util"
+import { setup, Setup } from "@typestackapp/core/common/test/util"
+var core_tsapp_test: Setup = {} as any
 beforeAll(async () => {
-    await setup()
+    core_tsapp_test = await setup()
 })
 
 describe(`Test job type ${discriminator}`, () => {
@@ -31,8 +32,8 @@ describe(`Test job type ${discriminator}`, () => {
                 },
                 template: "Hi {{name}}, this is a test email."
             },
-            created_by: global.core_tsapp_test.root_user._id,
-            updated_by: global.core_tsapp_test.root_user._id,
+            created_by: core_tsapp_test.root_user._id,
+            updated_by: core_tsapp_test.root_user._id,
         } satisfies TemplateJobInput
     })
 
@@ -52,7 +53,7 @@ describe(`Test job type ${discriminator}`, () => {
     it('should add job to job list', async () => {
         const test_job = await TemplateJobModel.findOne({_id: job_id})
         if(!test_job) throw "Job not found"
-        job = await global.core_tsapp_test.jobs.add(test_job)
+        job = await core_tsapp_test.jobs.add(test_job)
     })
 
     it('should execute job callback', async () => {
