@@ -1,5 +1,5 @@
 import { Schema, Document, Model, Types, FilterQuery } from "mongoose"
-import type { ILogOptionsDocument, ILogOptionsInput } from "@typestackapp/core"
+import { TSA, type ILogOptionsDocument, type ILogOptionsInput } from "@typestackapp/core"
 import type { MongooseDocument } from "@typestackapp/core/models/util"
 
 /**
@@ -69,4 +69,4 @@ logOptionsSchema.methods.add = async function(doc) {
     return null
 }
 
-export const LogModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<LogDocument, Model<LogDocument>>('logs', logSchema)
+export const LogModel = TSA.db["@typestackapp/core"].mongoose.core.model<LogDocument, Model<LogDocument>>('logs', logSchema)

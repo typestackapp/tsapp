@@ -1,4 +1,4 @@
-import { Packages } from "@typestackapp/core";
+import { Packages, TSA } from "@typestackapp/core";
 import mongoose, { ObjectId, Schema, Types } from "mongoose"
 
 export interface UserInfoInput<TData> {
@@ -16,4 +16,4 @@ export const userInfoSchema = new Schema<UserInfoDocument<any>>({
     data: { type: Schema.Types.Mixed, index: true }
 }, { timestamps: true, discriminatorKey: 'pack' })
 
-export const UserInfoModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<UserInfoDocument<any>>("user_info", userInfoSchema)
+export const UserInfoModel = TSA.db["@typestackapp/core"].mongoose.core.model<UserInfoDocument<any>>("user_info", userInfoSchema)

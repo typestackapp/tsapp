@@ -6,7 +6,7 @@ import { AccessTokenJWTPayload, AccessTokenPayloadVerified, BearerKeyOptions, ad
 import { decodeApiKey } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenOutput } from "@typestackapp/core/models/user/token/apikey"
 import { UserDocument, UserModel } from '@typestackapp/core/models/user'
-import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod, IServerAccess, IAccessOptions, Packages } from '@typestackapp/core'
+import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod, IServerAccess, IAccessOptions, Packages, TSA } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
 import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '@typestackapp/core/common/service'
 import { tsapp } from "@typestackapp/core/env"
@@ -340,7 +340,7 @@ async function captcha(req: AccessRequest, options: IAccessOptions): Promise<Cap
         const type = options.captcha.type
         const pack = options.captcha.pack
         const token = req.headers['x-captcha-token']
-        const captcha_options = global.tsapp[pack].config.captcha.ACTIVE
+        const captcha_options = TSA.config[pack].captcha.ACTIVE
         const captcha_config = Object.values<CaptchaOptions>(captcha_options).find((c) => c.type == type)
 
         if(captcha_config == undefined) throw `Captcha, is undefined, please define captcha config for resource ${getResourceInfo(options)}`

@@ -1,9 +1,9 @@
-import { IResolvers } from "@typestackapp/core"
+import { IResolvers, TSA } from "@typestackapp/core"
 import { GraphqlRouter, StreamListener } from "@typestackapp/core/common/service"
 import * as j from "@typestackapp/core/models/job"
 import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
-const { config } = global.tsapp["@typestackapp/core"]
 
+const config = TSA.config["@typestackapp/core"]
 export const router = new GraphqlRouter<IResolvers<AccessRequest>>()
 
 const job_stream = j.JobModel.watch<j.JobDocument<any>>([])

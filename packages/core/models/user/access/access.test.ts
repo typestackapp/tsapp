@@ -1,9 +1,8 @@
 import { expect } from "chai"
 import moment from "moment"
 import { DeepPartial } from "utility-types"
-import { api_key_base64, api_key_secret } from "@typestackapp/core/_/setup"
 import { Types } from "mongoose"
-import { newRefreshToken, newAccessToken, BearerToken } from "@typestackapp/core/models/user/util"
+import { newRefreshToken, newAccessToken } from "@typestackapp/core/models/user/util"
 import { BearerTokenModel } from "@typestackapp/core/models/user/token/bearer"
 import { default_user_app_client_id } from "@typestackapp/core/updates/main"
 import { AccessInput, AccessOptions, UserAccessLogModel, UserAccessLogInput } from "@typestackapp/core/models/user/access"
@@ -12,6 +11,11 @@ import { AccessValidator, AccessCheckOptions } from "@typestackapp/core/models/u
 
 var token: Awaited<ReturnType<typeof newRefreshToken>>
 const client_id = default_user_app_client_id
+
+import { api_key_base64, setup } from "@typestackapp/core/common/test/util"
+beforeAll(async () => {
+    await setup()
+})
 
 describe('Test Bearer token', () => {
     beforeAll(async () => {

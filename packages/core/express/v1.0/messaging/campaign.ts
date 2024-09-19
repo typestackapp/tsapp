@@ -1,7 +1,7 @@
 import { producer, JobParams, CampaignInput, CampaignModel } from "@typestackapp/core/jobs/campaign"
-import { ExpressRouter } from "@typestackapp/core"
+import { ExpressRouter, TSA } from "@typestackapp/core"
 import { Types } from "mongoose"
-const { config } = global.tsapp["@typestackapp/core"]
+const config = TSA.config["@typestackapp/core"]
 export const router = new ExpressRouter()
 
 router.post(

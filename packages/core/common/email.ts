@@ -10,6 +10,7 @@ import { EmailMessageDocument, EmailMessageModel, EmailMessageInput } from "@typ
 import { EmailConsumerInput } from "@typestackapp/core/consumers/message/email"
 import { ContactInput, updateContact} from "@typestackapp/core/models/contact"
 import { ChannelConfigDocument} from "@typestackapp/core/models/config/channel"
+import { TSA } from "@typestackapp/core"
 
 export interface Attachment extends MailAttachment {}
 
@@ -48,8 +49,8 @@ export class Email {
     public attachments: Attachment[] = []
     
     constructor( input: EmailInput, options?: EmailOptions ) {
-        const send_all_to_dev = global.tsapp["@typestackapp/core"].config.system.DEV_REWRITE_MESSAGE_RECEIVER
-        const dev_emails = global.tsapp["@typestackapp/core"].config.system.DEV_EMAIL
+        const send_all_to_dev = TSA.config["@typestackapp/core"].system.DEV_REWRITE_MESSAGE_RECEIVER
+        const dev_emails = TSA.config["@typestackapp/core"].system.DEV_EMAIL
         this.options = options
         this.from = input.from
         this.to = (send_all_to_dev)? dev_emails: input.receivers
@@ -68,7 +69,7 @@ export class Email {
             const name = this.from?.name || email_config.data.from.name
             const from = { address, name }
 
-            if(!global.tsapp["@typestackapp/core"].config.system.DEV_SAVE_MESSAGES_TO_FILE) {
+            if(!TSA.config["@typestackapp/core"].system.DEV_SAVE_MESSAGES_TO_FILE) {
                 _envelope = await nodemailer
                 .createTransport( email_config.data.auth )
                 .sendMail({ ...this,  from })
@@ -164,7 +165,7 @@ export class Email {
         const email_consumer_data = this.getConsumerInput()
         const case_buf = Buffer.from( JSON.stringify( email_consumer_data ) )
         const queue_id = channel_config._id.toString()
-        const channel: Channel = global.tsapp["@typestackapp/core"].rmq.core.getChannel()
+        const channel: Channel = TSA.rmq["@typestackapp/core"].core.getChannel()
         return channel.sendToQueue( queue_id, case_buf, channel_config.data.options?.publish )
     }
 }

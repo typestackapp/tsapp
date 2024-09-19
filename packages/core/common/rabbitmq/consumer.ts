@@ -1,9 +1,9 @@
 import { Connection as RabbitmqConnection, Channel, Message, Replies } from "amqplib/callback_api"
 import { Types } from "mongoose"
-import { ConsumerInput } from "../../models/config/consumer"
-import { ChannelConfigDocument, ChannelConfigModel } from "../../models/config/channel"
-import { Connection } from "./connection"
-import { config, rcs } from "@typestackapp/core"
+import { ConsumerInput } from "@typestackapp/core/models/config/consumer"
+import { ChannelConfigDocument, ChannelConfigModel } from "@typestackapp/core/models/config/channel"
+import { Connection } from "@typestackapp/core/common/rabbitmq/connection"
+import { TSA } from "@typestackapp/core"
 
 export type ConsumerOnMessage = ( msg: Message | null ) => void
 
@@ -28,7 +28,7 @@ export class ConsumerList {
 
     public async initilize(conn: RabbitmqConnection) {
         // foreach config.consumer_services
-        for await(const service of rcs) {
+        for await(const service of TSA.rcs) {
             await this.initilizeConsumers(conn, service)
         }
     }

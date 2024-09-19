@@ -1,6 +1,6 @@
 
 import { Document, Model, Schema, Types } from "mongoose"
-import { IJobInput, IJobDocument } from "@typestackapp/core"
+import { IJobInput, IJobDocument, TSA } from "@typestackapp/core"
 import { IJobActionInput, IJobStepInput } from "@typestackapp/core"
 import { LogOptionsDocument, logOptionsSchema } from "@typestackapp/core/models/log"
 import { MongooseDocument } from "@typestackapp/core/models/util"
@@ -95,5 +95,5 @@ jobSchema.pre('deleteOne', async function(next) {
     next()
 })
 
-export const JobModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model("jobs", jobSchema)
-export const JobActionModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model("job_actions", jobActionSchema)
+export const JobModel = TSA.db["@typestackapp/core"].mongoose.core.model("jobs", jobSchema)
+export const JobActionModel = TSA.db["@typestackapp/core"].mongoose.core.model("job_actions", jobActionSchema)

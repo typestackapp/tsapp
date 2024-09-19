@@ -37,21 +37,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.update = void 0;
 const fs_1 = __importDefault(require("fs"));
+const core_1 = require("@typestackapp/core");
 const util_1 = require("./util");
 function update(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const core = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core")));
-        console.log(`Info, connecting to databases`);
-        const db = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core/common/db")));
-        yield db.default.getInstance();
-        console.log(`Info, loading all models`);
-        const model_loader = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core/common/model")));
-        yield model_loader.ModelLoader.loadAllModels();
-        console.log(`Info, connecting to rabbitmq`);
-        const rabbitmq = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core/common/rabbitmq/connection")));
-        yield rabbitmq.ConnectionList.initilize();
+        yield core_1.TSA.init();
         const { UpdateModel } = yield Promise.resolve().then(() => __importStar(require("@typestackapp/core/models/update")));
-        const session = yield global.tsapp["@typestackapp/core"].db.mongoose.core.startSession();
+        const session = yield core_1.TSA.db["@typestackapp/core"].mongoose.core.startSession();
         session.startTransaction();
         // sleep for 2 second, fixes Update error: MongoServerError: Unable to acquire IX lock on
         yield (0, util_1.sleep)(2);

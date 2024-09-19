@@ -2,6 +2,11 @@ import { expect } from "chai"
 import { secretCompare } from "@typestackapp/core/models/user/access/util"
 import { tsapp } from "@typestackapp/core/env"
 
+import { setup } from "@typestackapp/core/common/test/util"
+beforeAll(async () => {
+    await setup()
+})
+
 describe('Test users', () => {
     
     it('should check if password can be validated', async () => {

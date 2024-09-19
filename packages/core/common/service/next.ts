@@ -1,16 +1,8 @@
 import { tsapp } from "@typestackapp/core/env"
-import DB from "@typestackapp/core/common/db"
-DB.getInstance()
-
-import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
+import { TSA } from "@typestackapp/core"
 import express from "express"
 import next from "next"
 import { NextServerOptions } from "next/dist/server/next"
-
-async function initilize() {
-    await DB.getInstance()
-    await ConnectionList.initilize()
-}
 
 const nextBuild = async (dir: string) => {
     return new Promise(async (resolve, reject) => {
@@ -35,7 +27,7 @@ const nextBuild = async (dir: string) => {
     })
 }
 
-initilize()
+TSA.init()
 .then(async () => {
     const server = express()
     const port = 80

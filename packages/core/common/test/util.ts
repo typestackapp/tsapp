@@ -1,4 +1,3 @@
-import fs from "fs-extra"
 import { Types } from "mongoose"
 import { JobList } from "@typestackapp/core/common/job"
 import { EmailConfigInput, EmailConfigModel } from "@typestackapp/core/models/config/email"
@@ -7,8 +6,6 @@ import { encodeApiKey, hashApiKey, newApiKeySecret } from "@typestackapp/core/mo
 import { ApiKeyTokenInput, ApiKeyTokenModel } from "@typestackapp/core/models/user/token/apikey"
 import { system_admin_id, all_access_inputs } from "@typestackapp/core/updates/main"
 import { UserModel } from "@typestackapp/core/models/user"
-import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
-import { tsapp } from "@typestackapp/core/env"
 
 export const api_key_id = new Types.ObjectId()
 export const email_config_id = new Types.ObjectId("62091b669343af312f5f1eee")
@@ -17,17 +14,7 @@ export const api_key_secret = newApiKeySecret(5)
 export const api_key_base64 = encodeApiKey(api_key_id, api_key_secret)
 
 export async function setup() {
-    if (tsapp.env.TSAPP_ENV_TYPE == "prod")
-        throw "Can't run tests in production enviroment"
-
-    // initilize rabbitmq connections
-    await ConnectionList.initilize()
-
-    // remove logs at the begining of all tests, setup() runs before each test file!
-    if (global.tsapp["@typestackapp/core"].config.system.DEV_CLEAN_MESSAGES_LOGS) {
-        fs.emptyDirSync(`${process.cwd()}/logs/email`)
-        fs.emptyDirSync(`/tsapp/logs/email`)
-    }
+    global.core_tsapp_test = {} as any
 
     // upsert root user
     const _user = await UserModel.findOne({ _id: system_admin_id })
@@ -123,6 +110,4 @@ export async function setup() {
 
     // adds all active jobs
     global.core_tsapp_test.jobs = await JobList.getInstance()
-
-
 }

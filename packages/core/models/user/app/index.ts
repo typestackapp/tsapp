@@ -1,3 +1,4 @@
+import { TSA } from "@typestackapp/core"
 import mongoose, { Model, Schema, Document, Types } from "mongoose"
 
 export type AppAction = 
@@ -38,4 +39,4 @@ appSchema.index(
     { name: "app_search_index" }
 )
 
-export const AppModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<AppDocument>('user_apps', appSchema)
+export const AppModel = TSA.db["@typestackapp/core"].mongoose.core.model<AppDocument>('user_apps', appSchema)

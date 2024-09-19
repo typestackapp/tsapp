@@ -1,4 +1,4 @@
-import { Packages } from "@typestackapp/core";
+import { Packages, TSA } from "@typestackapp/core";
 import { MongooseDocument } from "@typestackapp/core/models/util";
 import { Schema, Types } from 'mongoose'
 
@@ -17,4 +17,4 @@ const messageSchema = new Schema<MessageDocument<any>>({
     data: { type:Schema.Types.Mixed, index:true },
 },{ timestamps: true })
 
-export const MessageModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<MessageDocument<any>>("messages", messageSchema)
+export const MessageModel = TSA.db["@typestackapp/core"].mongoose.core.model<MessageDocument<any>>("messages", messageSchema)

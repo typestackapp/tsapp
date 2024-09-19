@@ -1,16 +1,14 @@
 import { ConfigModel } from "@typestackapp/core/models/config"
 import { PipelineStage } from "mongoose"
-import { GraphqlRouter, IResolvers } from "@typestackapp/core"
+import { GraphqlRouter, IResolvers, TSA } from "@typestackapp/core"
 import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
-const { config } = global.tsapp["@typestackapp/core"]
 
+const config = TSA.config["@typestackapp/core"]
 export const router = new GraphqlRouter<IResolvers<AccessRequest>>()
 
 router.resolvers.Query.searchConfigs = {
     access: config.access.ACTIVE.Config.searchConfigs,
     resolve: async (parent, args, context, info) => {
-        // TODO check acces to config
-
         const text = args.search.text
         const limit = args?.search?.limit || 10
         const offset = args?.search?.offset || 0
@@ -42,7 +40,6 @@ router.resolvers.Query.searchConfigs = {
 router.resolvers.Query.getConfig = {
     access: config.access.ACTIVE.Config.getConfig,
     resolve: async (parent, args, context, info) => {
-        // TODO check acces to config
         return await ConfigModel.findById(args.id)
     }
 }

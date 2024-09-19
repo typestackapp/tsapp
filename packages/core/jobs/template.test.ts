@@ -5,6 +5,11 @@ import { JobActionModel } from "@typestackapp/core/models/job"
 import { LogModel } from "@typestackapp/core/models/log"
 import { Types } from "mongoose"
 
+import { setup } from "@typestackapp/core/common/test/util"
+beforeAll(async () => {
+    await setup()
+})
+
 describe(`Test job type ${discriminator}`, () => {
     const job_id = "63281deb77824ea0ca9190fb"
     let job_input: TemplateJobInput

@@ -16,8 +16,9 @@ import { CallbackOptions, ClientSession } from '@typestackapp/core/models/user/a
 import { UserModel } from '@typestackapp/core/models/user'
 import { RoleConfigModel } from '@typestackapp/core/models/config/role'
 import { tsapp } from "@typestackapp/core/env"
+import { TSA } from "@typestackapp/core"
 
-const {config} = global.tsapp["@typestackapp/core"]
+const config = TSA.config["@typestackapp/core"]
 export const router = new ExpressRouter()
 const t = initTRPC.context<Context>().create()
 const createContext = ({req, res}: trpcExpress.CreateExpressContextOptions) => ({req,res})

@@ -1,5 +1,6 @@
-import { ExpressRouter } from "@typestackapp/core"
-const { config } = global.tsapp["@typestackapp/core"]
+import { ExpressRouter, TSA } from "@typestackapp/core"
+
+const config = TSA.config["@typestackapp/core"]
 export const router = new ExpressRouter()
 
 router.get(

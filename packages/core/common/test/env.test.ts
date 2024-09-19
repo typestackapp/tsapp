@@ -1,12 +1,13 @@
 import { expect } from "chai"
+import { TSA } from "@typestackapp/core"
 
 describe('Test global variabless', () => {
     it('should have global config', () => {
-        expect(global.tsapp["@typestackapp/core"].config).to.exist
+        expect(TSA.config["@typestackapp/core"]).to.exist
     })
 
     it('should have global db', async () => {
-        expect(global.tsapp["@typestackapp/core"].db.mongoose.core).to.exist
+        expect(TSA.db["@typestackapp/core"].mongoose.core).to.exist
     })
 
     it('should have global jobs', () => {

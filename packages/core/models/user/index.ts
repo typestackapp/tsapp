@@ -1,5 +1,5 @@
 import { Types, Schema, Document, Model } from "mongoose"
-import { IUserInput, IUserDocument as IUserDocument } from "@typestackapp/core"
+import { IUserInput, IUserDocument as IUserDocument, TSA } from "@typestackapp/core"
 import { accessSchema, AccessDocument } from '@typestackapp/core/models/user/access'
 import { RoleConfigDocument, RoleConfigModel } from "@typestackapp/core/models/config/role"
 import { checkRolesAccessToGraphqlService } from "@typestackapp/core/models/user/access/util"
@@ -26,4 +26,4 @@ userSchema.methods.haveAccessToGraphqlService = async function(options: GraphqlS
     return { user, roles: roleConfigs }
 }
 
-export const UserModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model('users', userSchema, "users")
+export const UserModel = TSA.db["@typestackapp/core"].mongoose.core.model('users', userSchema, "users")

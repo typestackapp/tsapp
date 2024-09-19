@@ -1,5 +1,5 @@
 import { Schema, Document } from 'mongoose'
-import type { IConfigInput, IConfigDocument, IConfigBase  } from '@typestackapp/core'
+import { type IConfigInput, type IConfigDocument, type IConfigBase, TSA  } from '@typestackapp/core'
 import { LogOptionsDocument, logOptionsSchema } from '@typestackapp/core/models/log'
 import { MongooseDocument } from "@typestackapp/core/models/util"
 
@@ -34,4 +34,4 @@ configSchema.index(
     { name: "config_search_index" }
 )
 
-export const ConfigModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<ConfigDocument>("configs", configSchema)
+export const ConfigModel = TSA.db["@typestackapp/core"].mongoose.core.model<ConfigDocument>("configs", configSchema)

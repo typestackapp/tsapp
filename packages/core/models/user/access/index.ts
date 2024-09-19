@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose"
-import { IAccessInput, ITokenType } from '@typestackapp/core'
+import { IAccessInput, ITokenType, TSA } from '@typestackapp/core'
 import { IAccessDocument, IServerAccess, IAccessOptions } from '@typestackapp/core'
 import { Request, Response, NextFunction } from "express"
 import { Packages } from "@typestackapp/core"
@@ -108,5 +108,5 @@ userAccessLogSchema.methods.addInfo = async function(type: string, msg?: string)
 }
 
 export const AccessModel = mongoose.model('access', accessSchema)
-export const UserAccessModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model('user_access', userAccessSchema, 'user_access')
-export const UserAccessLogModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model('user_access_logs', userAccessLogSchema)
+export const UserAccessModel = TSA.db["@typestackapp/core"].mongoose.core.model('user_access', userAccessSchema, 'user_access')
+export const UserAccessLogModel = TSA.db["@typestackapp/core"].mongoose.core.model('user_access_logs', userAccessLogSchema)

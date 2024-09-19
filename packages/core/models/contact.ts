@@ -1,3 +1,4 @@
+import { TSA } from "@typestackapp/core"
 import mongoose, { Schema, Document, Types } from "mongoose"
 
 export type ContactType = "Email" | "Phone" | "Address"
@@ -19,7 +20,7 @@ const contactSchema = new Schema<ContactDocument>({
     type: { type: String, required: true, index: true },
 },{ timestamps:true })
 
-export const ContactModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<ContactDocument>('contacts', contactSchema)
+export const ContactModel = TSA.db["@typestackapp/core"].mongoose.core.model<ContactDocument>('contacts', contactSchema)
 
 export async function updateContact(contact_input: ContactInput): Promise<ContactDocument> {
     // find contact by user info value

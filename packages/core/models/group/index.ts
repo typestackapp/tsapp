@@ -1,4 +1,4 @@
-import { Packages } from "@typestackapp/core"
+import { Packages, TSA } from "@typestackapp/core"
 import mongoose, { ObjectId, Schema, Types } from "mongoose"
 
 export interface GroupInput<TData> {
@@ -16,4 +16,4 @@ export const groupSchema = new Schema<GroupDocument<any>>({
     data: { type: Schema.Types.Mixed, index: true }
 }, { timestamps: true, discriminatorKey: 'pack' })
 
-export const GroupModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<GroupDocument<any>>("groups", groupSchema)
+export const GroupModel = TSA.db["@typestackapp/core"].mongoose.core.model<GroupDocument<any>>("groups", groupSchema)

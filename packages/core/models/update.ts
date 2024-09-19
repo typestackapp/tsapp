@@ -1,4 +1,4 @@
-import { Packages } from "@typestackapp/core"
+import { Packages, TSA } from "@typestackapp/core"
 import { Types, Schema, Document, ClientSession } from "mongoose"
 
 // export const transaction = async (session: ClientSession, update: UpdateDocument) => {
@@ -28,4 +28,4 @@ export const updateSchema = new Schema<UpdateDocument>({
     log: { type: [updateLogSchema], required: true, unique: false, index: true }
 },{ timestamps:true })
 
-export const UpdateModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<UpdateDocument>('updates', updateSchema)
+export const UpdateModel = TSA.db["@typestackapp/core"].mongoose.core.model<UpdateDocument>('updates', updateSchema)

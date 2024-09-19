@@ -1,11 +1,11 @@
-import { GraphqlRouter } from "@typestackapp/core"
+import { GraphqlRouter, TSA } from "@typestackapp/core"
 import { UserModel } from "@typestackapp/core/models/user"
 import { getCurrentUser, getUser } from "./schema"
 import { IResolvers } from "@typestackapp/core"
 import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
 import { RoleConfigModel } from "@typestackapp/core/models/config/role"
-const { config } = global.tsapp["@typestackapp/core"]
 
+const config = TSA.config["@typestackapp/core"]
 export const router = new GraphqlRouter<IResolvers<AccessRequest>>({
     keys: ["UserOutput"],
 })

@@ -1,18 +1,9 @@
-import { packages, Packages, ExpressRouter } from "@typestackapp/core"
+import { TSA, packages, Packages, ExpressRouter } from "@typestackapp/core"
 import { tsapp } from "@typestackapp/core/env"
-import DB from "@typestackapp/core/common/db"
-DB.getInstance()
-
 import express from "express"
-import { ConnectionList } from "@typestackapp/core/common/rabbitmq/connection"
-import { middleware, upsertRouterDocs } from "@typestackapp/core/models/user/access/middleware"
 
-async function initilize() {
-    await DB.getInstance()
-    await ConnectionList.initilize()
-}
-
-initilize().then(async () => {
+TSA.init().then(async () => {
+    const { middleware, upsertRouterDocs } = require("@typestackapp/core/models/user/access/middleware")
     const app = express()
     app.use(express.json({ limit: "100mb" }))
     app.use(express.urlencoded({ extended: true , limit: "100mb" }))

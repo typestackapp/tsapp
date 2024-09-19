@@ -1,4 +1,4 @@
-import { Packages } from "@typestackapp/core"
+import { Packages, TSA } from "@typestackapp/core"
 import { Serialize } from "@trpc/server/shared"
 import { Model, Schema, Types, Document } from "mongoose"
 
@@ -43,4 +43,4 @@ export const tokenSchema = new Schema<TokenDocument, Model<TokenDocument>, Token
     data: { type: Schema.Types.Mixed, index: true, required: false },
 }, { timestamps: true })
 
-export const TokenModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model('user_tokens', tokenSchema, 'user_tokens')
+export const TokenModel = TSA.db["@typestackapp/core"].mongoose.core.model('user_tokens', tokenSchema, 'user_tokens')

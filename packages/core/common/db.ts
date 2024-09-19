@@ -21,7 +21,7 @@ export interface ConnectionOptions {
     disabled: boolean, // skips connection if enabled
 }
 
-type Connections = {
+export type Connections = {
     [Package in Packages]: {
         [ DbKey in keyof Config[Package]["db"]["ACTIVE"] ]: {
             [ ConKey in keyof Config[Package]["db"]["ACTIVE"][DbKey] ]: DbKey extends keyof ConnectionType ? ConnectionType[DbKey] : any
@@ -33,49 +33,32 @@ export type DbConnection<TPackage extends Packages> = Connections[TPackage]
 
 
 export default class DB {
-    private static promise: Promise<boolean>
+    private static promise: Promise<Connections>
 
-    public static getInstance(): Promise<boolean> {
+    public static getInstance(): Promise<Connections> {
         if(DB.promise) return DB.promise
 
         const connections: Promise<boolean>[] = []
+        const _conns: any = {}
 
         // connect to configured databases
-        for(const [pack_key, pack] of Object.entries(config)){
+        for(const [pack_key, pack] of Object.entries(config)) {
             for (const [conn_key, conn] of Object.entries(pack.db.ACTIVE)) {
                 for (const [config_key, config] of Object.entries<any>(conn)) {
-
-                    const global_pack = global.tsapp as any
-                    global_pack[pack_key]["db"] = global_pack[pack_key]["db"] || {} as any
-                    global_pack[pack_key]["db"][conn_key] = global_pack[pack_key]["db"][conn_key] || {} as any
+                    _conns[pack_key] = _conns[pack_key] || {}
+                    _conns[pack_key][conn_key] = _conns[pack_key][conn_key] || {}
+                    _conns[pack_key][conn_key][config_key] = _conns[pack_key][conn_key][config_key] || {}
 
                     if( config?.options?.disabled ) { // skip connection if disabled
                         // console.log(`WARNING, skipping connection for DB ${pack_key}.${conn_key}.${config_key}.options == true`)
                         continue
                     }
-                    
-                    if( global_pack[pack_key]["db"][conn_key][config_key] ) // check if global connection is already set
-                        throw `Error, skipping connection for DB ${pack_key}.${conn_key}.${config_key} as it is already set`
                         
                     let _connection = DB.connect(conn_key, config.conn)
-    
-                    if( !(_connection instanceof Promise) ) {
-                        global_pack[pack_key]["db"][conn_key][config_key] = _connection
-                        continue
-                    }
-
-                    // _connection.then((conn: any) => {
-                    //     console.log(`DB, connected to ${pack_key}.${conn_key}.${config_key}`)
-                    // })
-                    // .catch((err: any) => {
-                    //     console.log(`DB, failed to connect to ${pack_key}.${conn_key}.${config_key}`)
-                    //     console.log(err)
-                    // })
-    
+                    
                     // if connection is a promise, wait for it to resolve
                     let _promise = new Promise<boolean>(async (resolve) => {
-                        // console.log(`DB, connected to ${conn_type}.${conn_config}`)
-                        global_pack[pack_key]["db"][conn_key][config_key] = await _connection
+                        _conns[pack_key][conn_key][config_key] = await _connection
                         resolve(true)
                     })
     
@@ -83,10 +66,10 @@ export default class DB {
                 }
             }
         }
-
-        return DB.promise = new Promise<boolean>(async (resolve, reject) => {
+        
+        return DB.promise = new Promise<Connections>(async (resolve, reject) => {
             await Promise.all(connections)
-            resolve(true)
+            resolve(_conns as Connections)
         })
     }
 

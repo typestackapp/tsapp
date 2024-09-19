@@ -1,3 +1,4 @@
+import { TSA } from "@typestackapp/core"
 import mongoose, { ObjectId, Schema, Types } from "mongoose"
 
 export interface FileInput {
@@ -29,4 +30,4 @@ export const fileSchema = new Schema<FileDocument>({
   metadata: { type: Schema.Types.Mixed, index: true }
 }, { timestamps: true })
 
-export const FileModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<FileDocument>("files", fileSchema)
+export const FileModel = TSA.db["@typestackapp/core"].mongoose.core.model<FileDocument>("files", fileSchema)

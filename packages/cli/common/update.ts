@@ -1,4 +1,5 @@
 import fs from "fs"
+import { TSA } from "@typestackapp/core"
 import type { Transaction, UpdateInput, UpdateDocument } from "@typestackapp/core/models/update"
 import { getPackageConfigs, sleep } from "./util"
 
@@ -7,23 +8,10 @@ export type UpdateOptions = {
 }
 
 export async function update(options: UpdateOptions) {
-    const core = await import("@typestackapp/core")
-
-    console.log(`Info, connecting to databases`)
-    const db = await import("@typestackapp/core/common/db")
-    await db.default.getInstance()
-
-    console.log(`Info, loading all models`)
-    const model_loader = await import("@typestackapp/core/common/model")
-    await model_loader.ModelLoader.loadAllModels()
-
-    console.log(`Info, connecting to rabbitmq`)
-    const rabbitmq = await import("@typestackapp/core/common/rabbitmq/connection")
-    await rabbitmq.ConnectionList.initilize()
+    await TSA.init()
 
     const { UpdateModel } = await import("@typestackapp/core/models/update")
-
-    const session = await global.tsapp["@typestackapp/core"].db.mongoose.core.startSession()
+    const session = await TSA.db["@typestackapp/core"].mongoose.core.startSession()
     session.startTransaction()
     
     // sleep for 2 second, fixes Update error: MongoServerError: Unable to acquire IX lock on

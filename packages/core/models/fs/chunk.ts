@@ -1,3 +1,4 @@
+import { TSA } from "@typestackapp/core"
 import mongoose, { ObjectId, Schema, Types } from "mongoose"
 
 export interface ChunkInput {
@@ -21,4 +22,4 @@ export const chunkSchema = new Schema<ChunkDocument>({
   data: { type: Buffer, index: true }
 }, { timestamps: true })
 
-export const ChunkModel = global.tsapp["@typestackapp/core"].db.mongoose.core.model<ChunkDocument>("chunks", chunkSchema)
+export const ChunkModel = TSA.db["@typestackapp/core"].mongoose.core.model<ChunkDocument>("chunks", chunkSchema)

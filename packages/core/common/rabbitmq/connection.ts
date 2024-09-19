@@ -1,7 +1,7 @@
 import amqp, { Connection as RabbitmqConnection, Channel, Message, Options, Replies } from "amqplib/callback_api"
-import { Packages, Config } from "@typestackapp/core"
-import { ChannelOptions } from "../../models/config/channel"
-import { ConsumerList } from "./consumer"
+import { Packages, Config, config } from "@typestackapp/core"
+import { ChannelOptions } from "@typestackapp/core/models/config/channel"
+import { ConsumerList } from "@typestackapp/core/common/rabbitmq/consumer"
 import { sleep } from "@typestackapp/cli/common/util"
 
 export type Connections = {
@@ -18,6 +18,7 @@ export type ConnectionOptions = {
     psw: string
     retry_time: number
     channel?: ChannelOptions
+    start_consumers?: boolean
 }
 
 export class ConnectionList {
@@ -32,19 +33,15 @@ export class ConnectionList {
         return ConnectionList.connections
     }
 
-    static async initilize(): Promise<Connections> {
+    static async initilize(start_consumers: boolean = false): Promise<Connections> {
         if(ConnectionList.connections) return ConnectionList.connections
 
         let temp_connections: any = {}
 
-        for(const [package_key, pack] of Object.entries(global.tsapp)) {
-            for await(const [connection_key, options] of Object.entries(pack.config.rabbitmq.ACTIVE)) {
+        for(const [package_key, pack] of Object.entries(config)) {
+            for await(const [connection_key, options] of Object.entries(pack.rabbitmq.ACTIVE)) {
                 if(!temp_connections[package_key]) temp_connections[package_key] = {}
-                const new_conn = await Connection.getInstance(options)
-                
-                const global_pack = global.tsapp as any
-                global_pack[package_key].rmq = global_pack[package_key].rmq || {} as any
-                global_pack[package_key].rmq[connection_key] = new_conn
+                const new_conn = await Connection.getInstance({...options, start_consumers})
                 temp_connections[package_key][connection_key] = new_conn
             }
         }
@@ -54,7 +51,6 @@ export class ConnectionList {
 }
 
 export class Connection {
-    static start_consumers: boolean = false
     private options: ConnectionOptions
     conn: RabbitmqConnection
     channel: Channel
@@ -77,7 +73,7 @@ export class Connection {
         const conn = await Connection.newConn(options)
         const channel = await Connection.newChannel(conn, options.channel)
         const consumers = new ConsumerList()
-        if(Connection.start_consumers) await consumers.initilize(conn)
+        if(options.start_consumers) await consumers.initilize(conn)
         return new Connection(conn, channel, consumers, options)
     }
 
@@ -148,7 +144,7 @@ export class Connection {
         this.openChannel(this.conn, this.options.channel)
         .then(async (_channel) => {
             this.channel = _channel
-            if(Connection.start_consumers) await this.consumers.recconectConsumers(this.conn, this.channel)
+            if(this.options.start_consumers) await this.consumers.recconectConsumers(this.conn, this.channel)
         })
         .catch(async err => {
             console.log(err)
