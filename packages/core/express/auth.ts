@@ -19,7 +19,6 @@ import { tsapp } from "@typestackapp/core/env"
 import { TSA } from "@typestackapp/core"
 
 const config = TSA.config["@typestackapp/core"]
-export const router = new ExpressRouter()
 const t = initTRPC.context<Context>().create()
 const createContext = ({req, res}: trpcExpress.CreateExpressContextOptions) => ({req,res})
 
@@ -707,9 +706,15 @@ export const authRouter = t.router({
     }),
 })
 
+export const router = new ExpressRouter()
+
 const middleware = trpcExpress.createExpressMiddleware({
     router: authRouter,
     createContext,
 })
 
-router.use("/api/auth", config.access.ACTIVE.Auth.use, middleware)
+router.use = {
+    path: "/api/auth", 
+    access: config.access.ACTIVE.Auth.use, 
+    resolve: middleware
+}

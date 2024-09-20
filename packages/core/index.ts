@@ -1,9 +1,9 @@
+import type tsapp_config from "@typestackapp/core/codegen/tsapp.json"
 import type { Connections as DBConnections } from '@typestackapp/core/common/db'
 import type { Connections as RMQConnections } from '@typestackapp/core/common/rabbitmq/connection'
 import type { JobList } from '@typestackapp/core/common/job'
 
 import { tsapp } from "@typestackapp/core/env"
-import tsapp_config from "@typestackapp/core/codegen/tsapp.json"
 import config from "@typestackapp/core/codegen/config/output.json"
 import { T as Config} from "@typestackapp/core/codegen/config/output"
 import { getPackageConfigs } from '@typestackapp/cli/common/util'
@@ -61,6 +61,23 @@ export class TSA {
             },
             express: <T>() => {
                 return new ExpressRouter()
+            },
+            action: <T>() => {
+                // TODO return next.js server action
+            }
+        }
+    }
+
+    static get client() {
+        return {
+            graphql: <T>() => {
+                // TODO return graphql client
+            },
+            express: <T>() => {
+                // TODO return rest client
+            },
+            trpc: <T>() => {
+                // TODO return trpc client
             }
         }
     }

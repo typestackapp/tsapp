@@ -6,6 +6,8 @@
 
 import fs from "fs-extra"
 import _ from 'lodash'
+import { Response } from "express"
+import { ParamsDictionary, Query } from "express-serve-static-core"
 import type { ChangeStream, ChangeStreamDocument } from "mongodb"
 import type { Document } from "bson"
 import type { IAccessOptions, IMongoOperationType, IExpressMethod } from "@typestackapp/core"
@@ -23,9 +25,9 @@ export type ExpressErrorResponse = {
     msg: string
 }
 
-export interface ExpressResponse<Data = any, Error = ExpressErrorResponse | undefined> {
-    data: Data
-    error: Error
+export type ExpressResponse<Data = any, Error = ExpressErrorResponse> = {
+    data?: Data
+    error?: Error
 }
 
 export interface IExpressRouter {
@@ -34,65 +36,53 @@ export interface IExpressRouter {
     handlers: ExpressRequestHandler[]
 }
 
-export class ExpressRouter {
+export type ExpressHandler<ReqParams = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = Query> = {
+    body?: ReqBody
+    params?: ReqParams
+    query?: ReqQuery
+    res?: ResBody
+}
+export type ExpressHandlers = {
+    get?: ExpressHandler
+    post?: ExpressHandler
+    use?: ExpressHandler
+}
+export type ExpressResolver<Req extends AccessRequest = AccessRequest, Res extends Response = Response> = ExpressRequestHandler<Req, Res> | ExpressRequestHandler<Req, Res>[]
+export type ExpressRoute<ReqParams extends ParamsDictionary = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery extends Query = Query> = {
+    path?: string
+    access: IAccessOptions
+    resolve: ExpressResolver<AccessRequest<ReqParams, ResBody, ReqBody, ReqQuery>, Response<ResBody>>
+}
+
+type EHK = keyof ExpressHandlers
+type RouteParams<K extends EHK, T extends ExpressHandlers> = T[K] extends ExpressHandler ? NonNullable<NonNullable<T[K]>["params"]> : ParamsDictionary;
+type RouteResBody<K extends EHK, T extends ExpressHandlers> = T[K] extends ExpressHandler ? NonNullable<NonNullable<T[K]>["res"]>: any;
+type RouteReqBody<K extends EHK, T extends ExpressHandlers> = T[K] extends ExpressHandler ? NonNullable<NonNullable<T[K]>["body"]>: any;
+type RouteReqQuery<K extends EHK, T extends ExpressHandlers> = T[K] extends ExpressHandler ? NonNullable<NonNullable<T[K]>["query"]> : Query;
+type ExpressRouteType<K extends EHK, T extends ExpressHandlers> = ExpressRoute<RouteParams<K, T>, RouteResBody<K, T>, RouteReqBody<K, T>, RouteReqQuery<K, T>>
+
+export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
     private static prefix: string = "/api" // Express router prefix /${prefix}/...
     private static default_path: string  = "/" // default path is used when no path is provided when adding a route
     private static pack: Packages
     private routers: IExpressRouter[] = []
+    private routes: {[key in keyof T]?: ExpressRoute} = {}
 
-    get(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("get", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
+    set get(route: ExpressRouteType<"get", T>) {
+        this.routes.get = route
     }
 
-    post(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("post", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
+    set post(route: ExpressRouteType<"post", T>) {
+        this.routes.post = route
     }
 
-    delete(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("delete", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
-    }
-
-    patch(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("patch", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
-    }
-
-    put(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("put", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
-    }
-    
-    all(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("all", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
-    }
-
-    use(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, ...handlers: ExpressRequestHandler[]): any {
-        const _opt = this.getOptions("use", path, options)
-        const _handlers = this.getHandlers(path, options, handlers)
-        this.routers.push({ options: _opt.options, server: _opt.server, handlers: _handlers })
-    }
-
-    private getHandlers(path: string | IAccessOptions | ExpressRequestHandler, options?: IAccessOptions | ExpressRequestHandler, handlers?: ExpressRequestHandler[]): ExpressRequestHandler[] {
-        let _handlers: ExpressRequestHandler[] = []
-        if(typeof path === 'function') _handlers.push(path)
-        if(typeof options === 'function') _handlers.push(options)
-        if(handlers) _handlers = _handlers.concat(handlers)
-        return _handlers
+    set use(route: ExpressRouteType<"use", T>) {
+        this.routes.use = route
     }
 
     getOptions(
             method: IExpressMethod,
-            path: string | IAccessOptions | ExpressRequestHandler,
+            path?: string | IAccessOptions | ExpressRequestHandler,
             options?: IAccessOptions | ExpressRequestHandler
         ): {
             options?: IAccessOptions,
@@ -117,7 +107,7 @@ export class ExpressRouter {
         }
     }
 
-    private getPath(path: string | IAccessOptions | ExpressRequestHandler): string[] {
+    private getPath(path?: string | IAccessOptions | ExpressRequestHandler): string[] {
         let _paths = []
 
         // any user provided path /${prefix}/${path}

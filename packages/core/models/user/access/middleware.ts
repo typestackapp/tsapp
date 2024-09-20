@@ -7,6 +7,7 @@ import { decodeApiKey } from "@typestackapp/core/models/user/util"
 import { ApiKeyTokenOutput } from "@typestackapp/core/models/user/token/apikey"
 import { UserDocument, UserModel } from '@typestackapp/core/models/user'
 import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod, IServerAccess, IAccessOptions, Packages, TSA } from '@typestackapp/core'
+import { ParamsDictionary, Query } from "express-serve-static-core"
 import { Request, Response, NextFunction } from "express"
 import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '@typestackapp/core/common/service'
 import { tsapp } from "@typestackapp/core/env"
@@ -32,10 +33,10 @@ interface AccessRequestData {
     captcha?: CaptchaResponse // captcha is set if captcha middleware is used
 }
 
-export type AccessRequest = Request & AccessRequestData
+export type AccessRequest<P = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = Query> = Request<P, ResBody, ReqBody, ReqQuery> & AccessRequestData
 export type ExpressResources = { [key in IExpressMethod]?: IAccessOptions }
-export type ExpressRequestHandler = (req: AccessRequest, res: Response, next: NextFunction) => Promise<any> | any
-| ((req: AccessRequest, res: Response) => Promise<any> | any)
+export type ExpressRequestHandler<Req extends AccessRequest = AccessRequest, Res extends Response = Response>
+= (req: Req, res: Res, next: NextFunction) => Promise<any> | any | ((req: Req, res: Res) => Promise<any> | any)
 
 export interface GraphqlServerAccess extends IServerAccess {
     serverMethod:  IGraphqlMethod

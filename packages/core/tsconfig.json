@@ -1,6 +1,5 @@
 {
   "include": [
-    "_/**/*",
     "index.ts",
     "env.ts",
     "common/**/*",
