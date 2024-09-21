@@ -1,33 +1,42 @@
-import { TSA, packages, Packages, ExpressRouter } from "@typestackapp/core"
+import { TSA, packages, Packages, ExpressRouter, IExpressRouter } from "@typestackapp/core"
 import { tsapp } from "@typestackapp/core/env"
 import express from "express"
 
 TSA.init().then(async () => {
-    const { middleware, upsertRouterDocs } = require("@typestackapp/core/models/user/access/middleware")
+    const { middleware, upsertRouterDocs } = await import("@typestackapp/core/models/user/access/middleware")
     const app = express()
     app.use(express.json({ limit: "100mb" }))
     app.use(express.urlencoded({ extended: true , limit: "100mb" }))
     const router = express.Router()
-    const routers = new ExpressRouter()
+    const router_docs: Map<Packages, IExpressRouter[]> = new Map()
     
     for (const pack_key of Object.keys(packages) as Packages[]) {
         const _root = `${process.cwd()}/node_modules/${pack_key}/express/`
-        const _routers = await routers.loadExpressRoutes(_root, pack_key, `/api`)
-        .catch(error => {
+
+        const routers = new ExpressRouter()
+        const _routers = await routers.loadExpressRoutes(_root, pack_key, `/api`).catch(error => {
             console.log(`ERROR while loading api routes from pack: ${pack_key}: ${error}`)
             return []
         })
-        upsertRouterDocs(_routers, pack_key)
-    }
-    
-    // add api middleware at the begining of each router
-    for(const _router of routers.getRouters()){
-        if(_router.options) _router.handlers.unshift(middleware.api(_router.options))
+
+        // add api middleware at the begining of each router
+        for(const _router of _routers) {
+            if(_router.options) _router.handlers.unshift(middleware.api(_router.options))
+        }
+
+        // register routers
+        routers.register(router, _routers)
+
+        router_docs.set(pack_key, _routers)
     }
 
-    routers.registerRoters(router)
     app.use(router)
     app.listen(8000)
+
+    // upsert router docs
+    for (const [pack_key, router] of router_docs) {
+        await upsertRouterDocs(router, pack_key)
+    }
 })
 .finally(() => {
     // CONSOLE LOG SERVER INFO

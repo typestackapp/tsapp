@@ -65,7 +65,6 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
     private static prefix: string = "/api" // Express router prefix /${prefix}/...
     private static default_path: string  = "/" // default path is used when no path is provided when adding a route
     private static pack: Packages
-    private routers: IExpressRouter[] = []
     private routes: {[key in keyof T]?: ExpressRoute} = {}
 
     set get(route: ExpressRouteType<"get", T>) {
@@ -131,8 +130,16 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
         return _paths
     }
 
-    getRouters() {
-        return this.routers
+    getRouters(): IExpressRouter[] {
+        const routers: IExpressRouter[] = []
+        for(const [serverMethod, route] of Object.entries<ExpressRoute | undefined>(this.routes)) {
+            if(!route) continue
+            routers.push({
+                ...this.getOptions(serverMethod as IExpressMethod, route.path, route.access),
+                handlers: (route.resolve instanceof Array) ? route.resolve : [route.resolve]
+            })
+        }
+        return routers
     }
 
     getPaths(paths: string[]): string[] {
@@ -145,12 +152,11 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
         });
     }
 
-    registerRoters(router: Router): IExpressRouter[] {
-        this.routers.forEach(_router => {
+    register(router: Router, routers: IExpressRouter[]) {
+        routers.forEach(_router => {
             console.log(`Registering ${_router.server.serverMethod} ${this.getPaths(_router.server.path)}`)
             router[_router.server.serverMethod](this.getPaths(_router.server.path), ..._router.handlers as unknown as any[])
         })
-        return this.routers
     }
 
     static setDefaultPath(options: {default_api_route: string, pack: Packages, prefix: string}) {
@@ -216,7 +222,6 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
             }
         }
 
-        this.routers.push(...routers)
         return routers
     }
 }
