@@ -10,6 +10,7 @@ node_modules
 
 # core
 logs
+codegen/graphql
 codegen/tsapp.json
 codegen/config
 codegen/haproxy

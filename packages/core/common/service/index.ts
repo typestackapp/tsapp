@@ -19,6 +19,7 @@ import { Packages, packages } from "@typestackapp/core"
 import { DeepRequired } from "utility-types"
 import { Resolver } from "@apollo/client"
 import { GraphqlServerConfig } from "@typestackapp/cli/common/util"
+import graphql_resolver_keys from "@typestackapp/core/codegen/graphql/resolvers.json"
 
 export type ExpressErrorResponse = {
     code: string
@@ -256,14 +257,9 @@ export type GraphqlResovlerMethod = {[key:string]: {[key:string]: Resolver}}
 export class GraphqlRouter<TResolvers extends GraphqlResolverInput<TResolvers>> {
     resolvers: GraphqlResolvers<TResolvers>
 
-    constructor(resolver?: {
-        keys?: Array<keyof Required<TResolvers>>
-    }){
+    constructor() {
         const resolvers: {[key: string]: {[key: string]: {}}} = {}
-        const resolver_keys = ["Query", "Mutation", "Subscription", ...(resolver?.keys ? [resolver.keys] : [])] as string[]
-        for(const resolver of resolver_keys) {
-            resolvers[resolver] = {}
-        }
+        graphql_resolver_keys.map(resolver => resolvers[resolver] = {})
         this.resolvers = resolvers as GraphqlResolvers<TResolvers>
     }
 

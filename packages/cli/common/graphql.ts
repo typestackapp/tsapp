@@ -8,6 +8,8 @@ export type GraphqlOptions = {
 }
 
 export const graphql = async (options: GraphqlOptions) => {
+    const core_dir = `${options.cwd}/packages/core`
+    const resolvers: string[] = []
 
     for (const graphql_server of getGraphqlRouterConfigs(options.cwd)) {
         var {schema} = await getGraphqlModules(graphql_server, {schema: true, resolvers: false})
@@ -92,9 +94,35 @@ export const graphql = async (options: GraphqlOptions) => {
                 export type Resources<T> = GraphqlResources<DeepRequired<IResolvers<T>>>
             `
             fs.writeFileSync(graphql_server.typeDefPath, file_result, 'utf8')
+
+            // extract IResolvers type keys from file_result: 
+                // export type IResolvers<ContextType = any> = {
+                //   AccessDocument?: IAccessDocumentResolvers<ContextType>;
+                //   AccessInput?: IAccessInputResolvers<ContextType>;
+            // resolvers should be ["AccessDocument", "AccessInput", ...]
+            const regex = /export type IResolvers<ContextType = any> = {([^}]+)}/
+            const match = file_result.match(regex)
+            if(match){
+                const resolvers_str = match[1]
+                const resolvers_regex = /([A-Za-z]+)\?:/g
+                let resolvers_match
+                while ((resolvers_match = resolvers_regex.exec(resolvers_str)) !== null) {
+                    resolvers.push(resolvers_match[1])
+                }
+            }
         } catch (error) {
             console.error(error)
             console.log({...CodegenConfig, schema: '...'})
         }
+    }
+
+    try {
+        // create codegen/graphql/reosolvers.json file
+        const resolvers_output = `${core_dir}/codegen/graphql/resolvers.json`
+        // check if folder exists
+        if (!fs.existsSync(`${core_dir}/codegen/graphql`)) fs.mkdirSync(`${core_dir}/codegen/graphql`, { recursive: true })
+        fs.writeFileSync(resolvers_output, JSON.stringify(resolvers, null, 2), 'utf8')
+    } catch (error) {
+        console.error(error)
     }
 }
