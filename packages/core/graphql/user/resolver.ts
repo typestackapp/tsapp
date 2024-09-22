@@ -6,9 +6,7 @@ import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
 import { RoleConfigModel } from "@typestackapp/core/models/config/role"
 
 const config = TSA.config["@typestackapp/core"]
-export const router = new GraphqlRouter<IResolvers<AccessRequest>>({
-    keys: ["UserOutput"],
-})
+export const router = new GraphqlRouter<IResolvers<AccessRequest>>()
 
 router.resolvers.Query.getCurrentUser = {
     typedef: getCurrentUser,

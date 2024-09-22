@@ -1,4 +1,4 @@
-import { TSA, packages, Packages, ExpressRouter, IExpressRouter } from "@typestackapp/core"
+import { TSA, packages, Packages, ExpressRouter, IExpressRouter, ExpressResponse } from "@typestackapp/core"
 import { tsapp } from "@typestackapp/core/env"
 import express from "express"
 
@@ -21,12 +21,41 @@ TSA.init().then(async () => {
 
         // add api middleware at the begining of each router
         for(const _router of _routers) {
+            // add wrapper for last handler to return response
+            const last_handler_index = _router.handlers.length - 1
+            const last_handler = _router.handlers[last_handler_index]
+            _router.handlers[last_handler_index] = async (req, res, next) => {
+                await last_handler(req, res, next)
+                // check if response is already sent
+                if(res.headersSent) return
+                const response: ExpressResponse = { data: true }
+                res.send(response)
+            }
+
+            // wrap each handler with try catch and return ErrorResponse if one off handler throws error
+            for(const [index, handler] of _router.handlers.entries()) {
+                _router.handlers[index] = async (req, res, next) => {
+                    try {
+                        await handler(req, res, next)
+                    } catch (error) {
+                        const response: ExpressResponse = {
+                            data: false, error: { code: `unknown`, msg: `Error ${_router.options?.resourceAction}:${index} , ${error}`}
+                        }
+                        res.send(response)
+                    }
+                }
+            }
             if(_router.options) _router.handlers.unshift(middleware.api(_router.options))
+
+            // add success response handler as last handler
+            _router.handlers.push(async (req, res, next) => {
+                const response: ExpressResponse = { data: true }
+                res.send(response)
+            })
         }
 
         // register routers
         routers.register(router, _routers)
-
         router_docs.set(pack_key, _routers)
     }
 

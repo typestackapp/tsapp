@@ -17,12 +17,21 @@ router.get = {
             req.query.query = "query"
             req.params.params = "params"
             req.body = {status: 20}
-            console.log("ping")
+            console.log("get ping")
+        }
+    ]
+}
+
+router.post = {
+    access: config.access.ACTIVE.Test.getPing,
+    resolve: [
+        (req, res, next) => {
+            console.log("post ping")
             next()
         },
-        (req, res) => {
-            console.log("pong")
-            res.send({status: true})
+        (req, res, next) => {
+            console.log("post pong")
+            throw new Error("Error")
         }
     ]
 }
