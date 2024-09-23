@@ -340,7 +340,7 @@ export function objKeysIncludes(obj: any, prefix: string){
 
 export function cleanObjKeyNames(obj: any, prefix: string, export_public: boolean, is_public_obj: boolean){
     // deep copy object
-    obj = JSON.parse(JSON.stringify(obj))
+    obj = cloneObject(obj)
 
     for(const key in obj){
         let is_public_obj_tmp = is_public_obj ? true : key.startsWith('@')
@@ -367,7 +367,7 @@ export function cleanObjKeyNames(obj: any, prefix: string, export_public: boolea
 }
 
 export function cleanDestObject(dest_obj: any, is_public_obj: boolean = false, is_root_obj: boolean = true){
-    dest_obj = JSON.parse(JSON.stringify(dest_obj))
+    dest_obj = cloneObject(dest_obj)
     if(dest_obj === undefined) return {}
 
     const is_empty = isEmpty(dest_obj)
@@ -399,8 +399,8 @@ export function cleanDestObject(dest_obj: any, is_public_obj: boolean = false, i
 // updates object key values
 export function getConfigObj(mod_obj: any, dest_obj: any, export_public: boolean, is_root_obj: boolean = true) {
     // deep copy object
-    dest_obj = JSON.parse(JSON.stringify(dest_obj))
-    mod_obj = JSON.parse(JSON.stringify(mod_obj))
+    dest_obj = cloneObject(dest_obj)
+    mod_obj = cloneObject(mod_obj)
     
     // clean empty objects form dest_obj
     if(export_public) dest_obj = cleanDestObject(dest_obj)
@@ -537,9 +537,10 @@ export function emptyDir(dir: string){
     }
 }
 
+
 export function getGraphqlRouterConfigs(cwd: string): GraphqlServerConfig[] { 
     const _server: GraphqlServerConfig[] = []
-    const config = require(`${cwd}/node_modules/@typestackapp/core`).config as Config
+    const config = cloneObject(require(`${cwd}/node_modules/@typestackapp/core`).config) as Config
     for(const [package_key, pack] of Object.entries(config) as any) {
         const conf = pack.graphql.ACTIVE
         for(const [server_key, server] of Object.entries(conf)) {
@@ -745,4 +746,49 @@ export function mkDirRecursive(dir: string) {
             }
         }
     }
+}
+
+export function cloneObject(obj: any) {
+    return JSON.parse(JSON.stringify(obj))
+}
+
+export function createGraphqlResovlerFile(cwd: string) {
+    const core_dir = `${cwd}/packages/core`
+    // create codegen/graphql/reosolvers.json file
+    const resolvers_output = `${core_dir}/codegen/graphql/resolvers.json`
+    const resolvers: string[] = []
+
+    // create codegen/graphql folder if not exist
+    if (!fs.existsSync(`${core_dir}/codegen/graphql`)) fs.mkdirSync(`${core_dir}/codegen/graphql`, { recursive: true })
+    
+    // create empty resolvers file if not exist
+    if(!fs.existsSync(resolvers_output)) fs.writeFileSync(resolvers_output, JSON.stringify([], null, 2), 'utf8')
+
+    try {
+        for (const graphql_server of getGraphqlRouterConfigs(cwd)) {
+            // check if typeDefPath exists
+            if(!fs.existsSync(graphql_server.typeDefPath)) continue
+
+            let file_result = fs.readFileSync(graphql_server.typeDefPath, 'utf8')
+            // extract IResolvers type keys from file_result: 
+                // export type IResolvers<ContextType = any> = {
+                //   AccessDocument?: IAccessDocumentResolvers<ContextType>;
+                //   AccessInput?: IAccessInputResolvers<ContextType>;
+            // resolvers should be ["AccessDocument", "AccessInput", ...]
+            const regex = /export type IResolvers<ContextType = any> = {([^}]+)}/
+            const match = file_result.match(regex)
+            if(match){
+                const resolvers_str = match[1]
+                const resolvers_regex = /([A-Za-z]+)\?:/g
+                let resolvers_match
+                while ((resolvers_match = resolvers_regex.exec(resolvers_str)) !== null) {
+                    resolvers.push(resolvers_match[1])
+                }
+            }
+        }
+    } catch (error) {
+        console.error(error)
+    }
+
+    fs.writeFileSync(resolvers_output, JSON.stringify(resolvers, null, 2), 'utf8')
 }

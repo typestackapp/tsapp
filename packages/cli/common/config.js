@@ -51,6 +51,8 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     const pack_config_ts_output = `${module_folder}/output.ts`;
     const tsapp = (yield Promise.resolve(`${`${CWD}/package.json`}`).then(s => __importStar(require(s)))).tsapp;
     const packages = (0, util_1.getPackageConfigs)();
+    // initilize or replace graphql/resolvers.json file
+    (0, util_1.createGraphqlResovlerFile)(options.cwd);
     //write json to core/codegen/tsapp.json
     fs_1.default.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify(Object.assign(Object.assign({}, tsapp), { packages }), null, 4));
     // create module_folder if it dosent exist

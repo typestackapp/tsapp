@@ -17,8 +17,8 @@ const fs_1 = __importDefault(require("fs"));
 const util_1 = require("./util");
 const cli_1 = require("@graphql-codegen/cli");
 const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
-    const core_dir = `${options.cwd}/packages/core`;
-    const resolvers = [];
+    // initilize graphql/resolvers.json file
+    (0, util_1.createGraphqlResovlerFile)(options.cwd);
     for (const graphql_server of (0, util_1.getGraphqlRouterConfigs)(options.cwd)) {
         var { schema } = yield (0, util_1.getGraphqlModules)(graphql_server, { schema: true, resolvers: false });
         // if schema is empty
@@ -95,37 +95,13 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 export type Resources<T> = GraphqlResources<DeepRequired<IResolvers<T>>>
             `;
             fs_1.default.writeFileSync(graphql_server.typeDefPath, file_result, 'utf8');
-            // extract IResolvers type keys from file_result: 
-            // export type IResolvers<ContextType = any> = {
-            //   AccessDocument?: IAccessDocumentResolvers<ContextType>;
-            //   AccessInput?: IAccessInputResolvers<ContextType>;
-            // resolvers should be ["AccessDocument", "AccessInput", ...]
-            const regex = /export type IResolvers<ContextType = any> = {([^}]+)}/;
-            const match = file_result.match(regex);
-            if (match) {
-                const resolvers_str = match[1];
-                const resolvers_regex = /([A-Za-z]+)\?:/g;
-                let resolvers_match;
-                while ((resolvers_match = resolvers_regex.exec(resolvers_str)) !== null) {
-                    resolvers.push(resolvers_match[1]);
-                }
-            }
         }
         catch (error) {
             console.error(error);
             console.log(Object.assign(Object.assign({}, CodegenConfig), { schema: '...' }));
         }
     }
-    try {
-        // create codegen/graphql/reosolvers.json file
-        const resolvers_output = `${core_dir}/codegen/graphql/resolvers.json`;
-        // check if folder exists
-        if (!fs_1.default.existsSync(`${core_dir}/codegen/graphql`))
-            fs_1.default.mkdirSync(`${core_dir}/codegen/graphql`, { recursive: true });
-        fs_1.default.writeFileSync(resolvers_output, JSON.stringify(resolvers, null, 2), 'utf8');
-    }
-    catch (error) {
-        console.error(error);
-    }
+    // initilize or replace graphql/resolvers.json file
+    (0, util_1.createGraphqlResovlerFile)(options.cwd);
 });
 exports.graphql = graphql;

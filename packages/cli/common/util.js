@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mkDirRecursive = exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = exports.getPackageConfigs = void 0;
+exports.createGraphqlResovlerFile = exports.cloneObject = exports.mkDirRecursive = exports.sleep = exports.findTSAppRootDir = exports.prepareDockerFile = exports.prepareEnvVars = exports.getGraphqlModules = exports.getGraphqlRouterConfigs = exports.emptyDir = exports.addDefaultValues = exports.mergeWithoutPublicRemoval = exports.getConfigObj = exports.cleanDestObject = exports.cleanObjKeyNames = exports.objKeysIncludes = exports.isUndefined = exports.isEmpty = exports.isObject = exports.isArray = exports.getConfigFile = exports.writeJsonTypeFile = exports.writePublicFile = exports.copyConfigs = exports.buidCountryConfig = exports.getDefaultOpts = exports.extractArg = exports.getPackageVersion = exports.getPackageConfigs = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const merge_1 = __importDefault(require("../lib/merge"));
@@ -277,7 +277,7 @@ function objKeysIncludes(obj, prefix) {
 exports.objKeysIncludes = objKeysIncludes;
 function cleanObjKeyNames(obj, prefix, export_public, is_public_obj) {
     // deep copy object
-    obj = JSON.parse(JSON.stringify(obj));
+    obj = cloneObject(obj);
     for (const key in obj) {
         let is_public_obj_tmp = is_public_obj ? true : key.startsWith('@');
         const new_key = key.replace(prefix, '');
@@ -298,7 +298,7 @@ function cleanObjKeyNames(obj, prefix, export_public, is_public_obj) {
 }
 exports.cleanObjKeyNames = cleanObjKeyNames;
 function cleanDestObject(dest_obj, is_public_obj = false, is_root_obj = true) {
-    dest_obj = JSON.parse(JSON.stringify(dest_obj));
+    dest_obj = cloneObject(dest_obj);
     if (dest_obj === undefined)
         return {};
     const is_empty = isEmpty(dest_obj);
@@ -328,8 +328,8 @@ exports.cleanDestObject = cleanDestObject;
 // updates object key values
 function getConfigObj(mod_obj, dest_obj, export_public, is_root_obj = true) {
     // deep copy object
-    dest_obj = JSON.parse(JSON.stringify(dest_obj));
-    mod_obj = JSON.parse(JSON.stringify(mod_obj));
+    dest_obj = cloneObject(dest_obj);
+    mod_obj = cloneObject(mod_obj);
     // clean empty objects form dest_obj
     if (export_public)
         dest_obj = cleanDestObject(dest_obj);
@@ -453,7 +453,7 @@ function emptyDir(dir) {
 exports.emptyDir = emptyDir;
 function getGraphqlRouterConfigs(cwd) {
     const _server = [];
-    const config = require(`${cwd}/node_modules/@typestackapp/core`).config;
+    const config = cloneObject(require(`${cwd}/node_modules/@typestackapp/core`).config);
     for (const [package_key, pack] of Object.entries(config)) {
         const conf = pack.graphql.ACTIVE;
         for (const [server_key, server] of Object.entries(conf)) {
@@ -642,3 +642,47 @@ function mkDirRecursive(dir) {
     }
 }
 exports.mkDirRecursive = mkDirRecursive;
+function cloneObject(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+exports.cloneObject = cloneObject;
+function createGraphqlResovlerFile(cwd) {
+    const core_dir = `${cwd}/packages/core`;
+    // create codegen/graphql/reosolvers.json file
+    const resolvers_output = `${core_dir}/codegen/graphql/resolvers.json`;
+    const resolvers = [];
+    // create codegen/graphql folder if not exist
+    if (!fs_1.default.existsSync(`${core_dir}/codegen/graphql`))
+        fs_1.default.mkdirSync(`${core_dir}/codegen/graphql`, { recursive: true });
+    // create empty resolvers file if not exist
+    if (!fs_1.default.existsSync(resolvers_output))
+        fs_1.default.writeFileSync(resolvers_output, JSON.stringify([], null, 2), 'utf8');
+    try {
+        for (const graphql_server of getGraphqlRouterConfigs(cwd)) {
+            // check if typeDefPath exists
+            if (!fs_1.default.existsSync(graphql_server.typeDefPath))
+                continue;
+            let file_result = fs_1.default.readFileSync(graphql_server.typeDefPath, 'utf8');
+            // extract IResolvers type keys from file_result: 
+            // export type IResolvers<ContextType = any> = {
+            //   AccessDocument?: IAccessDocumentResolvers<ContextType>;
+            //   AccessInput?: IAccessInputResolvers<ContextType>;
+            // resolvers should be ["AccessDocument", "AccessInput", ...]
+            const regex = /export type IResolvers<ContextType = any> = {([^}]+)}/;
+            const match = file_result.match(regex);
+            if (match) {
+                const resolvers_str = match[1];
+                const resolvers_regex = /([A-Za-z]+)\?:/g;
+                let resolvers_match;
+                while ((resolvers_match = resolvers_regex.exec(resolvers_str)) !== null) {
+                    resolvers.push(resolvers_match[1]);
+                }
+            }
+        }
+    }
+    catch (error) {
+        console.error(error);
+    }
+    fs_1.default.writeFileSync(resolvers_output, JSON.stringify(resolvers, null, 2), 'utf8');
+}
+exports.createGraphqlResovlerFile = createGraphqlResovlerFile;

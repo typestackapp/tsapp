@@ -3,7 +3,8 @@ import {
     copyConfigs, getConfigFile, mergeWithoutPublicRemoval, writeJsonTypeFile, 
     writePublicFile, addDefaultValues, emptyDir, prepareEnvVars, prepareDockerFile, 
     mkDirRecursive, getPackageConfigs,
-    TSAppConfig
+    TSAppConfig,
+    createGraphqlResovlerFile
 } from './util'
 import child_process from 'child_process'
 import * as crypto from 'crypto'
@@ -29,6 +30,9 @@ export const config = async (options: ConfigOptions) => {
     const pack_config_ts_output = `${module_folder}/output.ts`
     const tsapp = (await import(`${CWD}/package.json`)).tsapp
     const packages = getPackageConfigs()
+
+    // initilize or replace graphql/resolvers.json file
+    createGraphqlResovlerFile(options.cwd)
 
     //write json to core/codegen/tsapp.json
     fs.writeFileSync(`${core_dir}/codegen/tsapp.json`, JSON.stringify({...tsapp, packages}, null, 4))
