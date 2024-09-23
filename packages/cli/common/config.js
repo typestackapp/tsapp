@@ -143,7 +143,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         for (const env_file of env_files) {
             const env_file_name = env_file.split('.')[0];
             const env_file_tags = env_file.split('.').slice(1).slice(0, -1);
-            const env_file_tag = env_file_tags.length > 0 ? `.${env_file_tags.join('.')}` : '';
+            const env_file_tag = env_file_tags.length > 0 ? env_file_tags.join('.') : '';
             // check if directory is empty and exists
             if (!fs_1.default.existsSync(docker_folder) || fs_1.default.readdirSync(docker_folder).length === 0)
                 continue;
@@ -188,7 +188,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
         for (const env_file of env_files) {
             const env_file_name = env_file.split('.')[0];
             const env_file_tags = env_file.split('.').slice(1).slice(0, -1);
-            const env_file_tag = env_file_tags.length > 0 ? `.${env_file_tags.join('.')}` : '';
+            const env_file_tag = env_file_tags.length > 0 ? env_file_tags.join('.') : '';
             const env_file_path = `${pack_folder}/${env_file}`;
             const output_folder = `${CWD}/docker-${env_file_name}/`;
             let env_vars = (0, util_1.prepareEnvVars)(env_file_path);
@@ -285,14 +285,18 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 }
             }
             env_vars["@ALIAS"] = _config.alias;
-            env_vars["@DEFAULT_FILES"] = `[${default_files.join(', ')}]`;
+            env_vars["@PACKAGE"] = pack_key;
+            env_vars["@ENV_DEFAULTS"] = `[${default_files.join(', ')}]`;
             env_vars["@ENV_FILE"] = env_file;
+            env_vars["@ENV_NAME"] = env_file_name;
+            env_vars["@ENV_TAG"] = env_file_tag;
+            const env_file_tag_with_dot = env_file_tag ? `.${env_file_tag}` : '';
             // foreach docker-compose file in package
             const compose_files = (_c = fs_1.default.readdirSync(docker_folder)) === null || _c === void 0 ? void 0 : _c.filter(file => file.includes('.yml') && !file.includes('global.yml'));
             for (const cfile of compose_files) {
                 const input_file_path = `${docker_folder}/${cfile}`;
                 const docker_file_name = cfile.replace('.yml', '').replace('compose.', '');
-                const output_file_path = `${output_folder}/compose.${_config.alias}.${docker_file_name}${env_file_tag}.yml`;
+                const output_file_path = `${output_folder}/compose.${_config.alias}${env_file_tag_with_dot}.${docker_file_name}.yml`;
                 // console.log(`Creating ${output_file_path}`)
                 // console.log(`Using ${input_file_path}`)
                 (0, util_1.prepareDockerFile)(docker_global_file, env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`);
@@ -302,7 +306,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             for (const dfile of docker_files) {
                 const input_file_path = `${docker_folder}/${dfile}`;
                 const compose_file_name = dfile.replace('Dockerfile.', '');
-                const output_file_path = `${output_folder}/Dockerfile.${_config.alias}.${compose_file_name}${env_file_tag}`;
+                const output_file_path = `${output_folder}/Dockerfile.${_config.alias}${env_file_tag}.${compose_file_name}`;
                 // console.log(`Creating ${output_file_path}`)
                 // console.log(`Using ${input_file_path}`)
                 (0, util_1.prepareDockerFile)("", env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`);

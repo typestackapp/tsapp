@@ -5,7 +5,7 @@ services:
       context: ./
       dockerfile: ./Dockerfile.${@ALIAS}.tsapp
     restart: always
-    env_file: ${@DEFAULT_FILES}
+    env_file: ${@ENV_DEFAULTS}
     networks:
       default_network:
         ipv4_address: ${TSAPP_IP}
