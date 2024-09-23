@@ -7,9 +7,7 @@ jest.setTimeout(10000) // extend timeout to 10 seconds
 
 import { setup, Setup } from "@typestackapp/core/common/test/util"
 var core_tsapp_test: Setup = {} as any
-beforeAll(async () => {
-    core_tsapp_test = await setup()
-})
+beforeAll(async () => core_tsapp_test = await setup())
 
 describe('Test email config', () => {
 

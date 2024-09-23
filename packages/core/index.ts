@@ -18,6 +18,7 @@ export const packages = getPackageConfigs() as {[key in Packages]: ReturnType<ty
 export type Packages = keyof typeof tsapp_config.packages
 
 export class TSA {
+    private static _init: Promise<void>
     private static _db: DBConnections
     private static _rmq: RMQConnections
     private static _jobs: JobList
@@ -26,16 +27,21 @@ export class TSA {
         start_rmq_consumers?: boolean
         start_jobs?: boolean
     }) {
-        const DB = (await import("@typestackapp/core/common/db")).default
-        TSA._db = await DB.getInstance()
+        if(TSA._init) return TSA._init
+        return TSA._init = new Promise(async (resolve, reject) => {
+            const DB = (await import("@typestackapp/core/common/db")).default
+            TSA._db = await DB.getInstance()
 
-        const ModelLoader = (await import('@typestackapp/core/common/model')).ModelLoader
-        const { ConnectionList } = await import("@typestackapp/core/common/rabbitmq/connection")
-        const JobList = (await import('@typestackapp/core/common/job')).JobList
+            const ModelLoader = (await import('@typestackapp/core/common/model')).ModelLoader
+            const { ConnectionList } = await import("@typestackapp/core/common/rabbitmq/connection")
+            const JobList = (await import('@typestackapp/core/common/job')).JobList
 
-        await ModelLoader.loadAllModels()
-        TSA._rmq = await ConnectionList.initilize(options?.start_rmq_consumers)
-        TSA._jobs = await JobList.getInstance(options?.start_jobs)
+            await ModelLoader.loadAllModels()
+            TSA._rmq = await ConnectionList.initilize(options?.start_rmq_consumers)
+            TSA._jobs = await JobList.getInstance(options?.start_jobs)
+
+            resolve()
+        })
     }
 
     static get rmq(): RMQConnections {

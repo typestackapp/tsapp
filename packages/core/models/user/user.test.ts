@@ -4,9 +4,7 @@ import { tsapp } from "@typestackapp/core/env"
 
 import { setup, Setup } from "@typestackapp/core/common/test/util"
 var core_tsapp_test: Setup = {} as any
-beforeAll(async () => {
-    core_tsapp_test = await setup()
-})
+beforeAll(async () => core_tsapp_test = await setup())
 
 describe('Test users', () => {
     it('should check if password can be validated', async () => {

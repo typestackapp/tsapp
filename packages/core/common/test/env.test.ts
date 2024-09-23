@@ -3,9 +3,7 @@ import { TSA } from "@typestackapp/core"
 
 import { setup, Setup } from "@typestackapp/core/common/test/util"
 var core_tsapp_test: Setup = {} as any
-beforeAll(async () => {
-    core_tsapp_test = await setup()
-})
+beforeAll(async () => core_tsapp_test = await setup())
 
 describe('Test global variabless', () => {
     it('should have global config', () => {

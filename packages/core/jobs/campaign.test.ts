@@ -9,9 +9,7 @@ jest.setTimeout(20000)
 
 import { setup, Setup } from "@typestackapp/core/common/test/util"
 var core_tsapp_test: Setup = {} as any
-beforeAll(async () => {
-    core_tsapp_test = await setup()
-})
+beforeAll(async () => core_tsapp_test = await setup())
 
 describe(`Test job type: ${discriminator}`, () => {
     var job: CampaignDocument

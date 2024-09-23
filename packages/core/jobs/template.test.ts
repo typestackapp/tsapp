@@ -7,9 +7,7 @@ import { Types } from "mongoose"
 
 import { setup, Setup } from "@typestackapp/core/common/test/util"
 var core_tsapp_test: Setup = {} as any
-beforeAll(async () => {
-    core_tsapp_test = await setup()
-})
+beforeAll(async () => core_tsapp_test = await setup())
 
 describe(`Test job type ${discriminator}`, () => {
     const job_id = "63281deb77824ea0ca9190fb"

@@ -14,9 +14,7 @@ const client_id = default_user_app_client_id
 
 import { api_key_base64, setup, Setup } from "@typestackapp/core/common/test/util"
 var core_tsapp_test: Setup = {} as any
-beforeAll(async () => {
-    core_tsapp_test = await setup()
-})
+beforeAll(async () => core_tsapp_test = await setup())
 
 describe('Test Bearer token', () => {
     beforeAll(async () => {
