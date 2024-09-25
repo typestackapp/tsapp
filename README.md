@@ -34,11 +34,12 @@ pm2 logs
 ```
 
 ### Access admin panel
+```
 username: test@test.com
 password: root-psw
 https://localhost:7443/admin
 https://10.44.44.41:7443/admin
-
+```
 
 
 ### Express endpoints examples
