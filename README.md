@@ -6,38 +6,38 @@
 
 ### Configure and build
 ```bash
-    git clone https://github.com/typestackapp/tsapp.git
-    cd tsapp
-    npm install
-    tsa init
-    tsa config --link=0
-    npm run build --workspaces --if-present
+git clone https://github.com/typestackapp/tsapp.git
+cd tsapp
+npm install
+tsa init
+tsa config --link=0
+npm run build --workspaces --if-present
 ```
 
 ###  Start docker containers
 ```bash
-    docker-compose -f ./docker-dev/compose.core.certbot.yml up -d
-    docker-compose -f ./docker-dev/compose.core.haproxy.yml up -d
-    docker-compose -f ./docker-dev/compose.core.mongo.yml up -d
-    docker-compose -f ./docker-dev/compose.core.rabbitmq.yml up -d
-    docker-compose -f ./docker-dev/compose.core.tsapp.yml up -d
+docker-compose -f ./docker-dev/compose.core.certbot.yml up -d
+docker-compose -f ./docker-dev/compose.core.haproxy.yml up -d
+docker-compose -f ./docker-dev/compose.core.mongo.yml up -d
+docker-compose -f ./docker-dev/compose.core.rabbitmq.yml up -d
+docker-compose -f ./docker-dev/compose.core.tsapp.yml up -d
 ```
 
 ### Update and restart services
 ```bash
-    docker-compose -f ./docker-dev/compose.core.tsapp.yml exec tsapp /bin/bash
-    cd /tsapp
-    tsa update
-    pm2 ls
-    pm2 restart all
-    pm2 logs
+docker-compose -f ./docker-dev/compose.core.tsapp.yml exec tsapp /bin/bash
+cd /tsapp
+tsa update
+pm2 ls
+pm2 restart all
+pm2 logs
 ```
 
 ### Access admin panel
-    username: test@test.com
-    password: root-psw
-    https://localhost:7443/admin
-    https://10.44.44.41:7443/admin
+username: test@test.com
+password: root-psw
+https://localhost:7443/admin
+https://10.44.44.41:7443/admin
 
 
 
