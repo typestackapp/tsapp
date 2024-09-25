@@ -12,14 +12,12 @@ export const router = new ExpressRouter<{
 
 router.get = {
     access: config.access.ACTIVE.Test.getPing,
-    resolve: [
-        (req, res, next) => {
-            req.query.query = "query"
-            req.params.params = "params"
-            req.body = {status: 20}
-            console.log("get ping")
-        }
-    ]
+    resolve: (req, res, next) => {
+        req.query.query = "query"
+        req.params.params = "params"
+        req.body = {status: 20}
+        console.log("get ping")
+    }
 }
 
 router.post = {

@@ -2,6 +2,7 @@
 import type { ConfigOptions } from "./common/config"
 import type { ServiceOptions } from "./common/service"
 import type { GraphqlOptions } from "./common/graphql"
+import type { InitOptions } from "common/init"
 import { findTSAppRootDir } from "./common/util"
 import { UpdateOptions } from "./common/update"
 import minimist from "./lib/minimist"
@@ -36,6 +37,11 @@ const update_options: UpdateOptions = {
     cwd
 }
 
+const init_options: InitOptions = {
+    cwd,
+    env: argv?.env
+}
+
 switch(action) {
     case 'config':
         import("./common/config")
@@ -57,8 +63,13 @@ switch(action) {
         .then(module => module.service(service_options))
         .catch(error => console.log(error))
     break
+    case 'init':
+        import("./common/init")
+        .then(module => module.init(init_options))
+        .catch(error => console.log(error))
+    break
     default:
         console.log(`Unknown action: ${action}`)
-        console.log(`Available actions: config, service, docker, test, update`)
+        console.log(`Available actions: init, config, service, docker, update`)
     break
 }

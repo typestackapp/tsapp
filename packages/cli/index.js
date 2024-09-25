@@ -54,6 +54,10 @@ const graphql_options = {
 const update_options = {
     cwd
 };
+const init_options = {
+    cwd,
+    env: argv === null || argv === void 0 ? void 0 : argv.env
+};
 switch (action) {
     case 'config':
         Promise.resolve().then(() => __importStar(require("./common/config"))).then(module => module.config(config_options))
@@ -71,8 +75,12 @@ switch (action) {
         Promise.resolve().then(() => __importStar(require("./common/service"))).then(module => module.service(service_options))
             .catch(error => console.log(error));
         break;
+    case 'init':
+        Promise.resolve().then(() => __importStar(require("./common/init"))).then(module => module.init(init_options))
+            .catch(error => console.log(error));
+        break;
     default:
         console.log(`Unknown action: ${action}`);
-        console.log(`Available actions: config, service, docker, test, update`);
+        console.log(`Available actions: init, config, service, docker, update`);
         break;
 }
