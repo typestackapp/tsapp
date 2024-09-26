@@ -21,17 +21,6 @@ TSA.init().then(async () => {
 
         // add api middleware at the begining of each router
         for(const _router of _routers) {
-            // add wrapper for last handler to return response
-            const last_handler_index = _router.handlers.length - 1
-            const last_handler = _router.handlers[last_handler_index]
-            _router.handlers[last_handler_index] = async (req, res, next) => {
-                await last_handler(req, res, next)
-                // check if response is already sent
-                if(res.headersSent) return
-                const response: ExpressResponse = { data: true }
-                res.send(response)
-            }
-
             // wrap each handler with try catch and return ErrorResponse if one off handler throws error
             for(const [index, handler] of _router.handlers.entries()) {
                 _router.handlers[index] = async (req, res, next) => {

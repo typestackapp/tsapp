@@ -3,7 +3,7 @@ import { ExpressRouter, TSA } from "@typestackapp/core"
 const config = TSA.config["@typestackapp/core"]
 export const router = new ExpressRouter<{
     get: {
-        res: { status: boolean } 
+        res: { data: boolean } 
         body: { status: number }
         params: { params: "params"} 
         query: { query: "query" }
@@ -17,6 +17,7 @@ router.get = {
         req.params.params = "params"
         req.body = {status: 20}
         console.log("get ping")
+        res.send({data: true})
     }
 }
 

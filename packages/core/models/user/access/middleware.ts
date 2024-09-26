@@ -35,8 +35,8 @@ interface AccessRequestData {
 
 export type AccessRequest<P = ParamsDictionary, ResBody = any, ReqBody = any, ReqQuery = Query> = Request<P, ResBody, ReqBody, ReqQuery> & AccessRequestData
 export type ExpressResources = { [key in IExpressMethod]?: IAccessOptions }
-export type ExpressRequestHandler<Req extends AccessRequest = AccessRequest, Res extends Response = Response>
-= (req: Req, res: Res, next: NextFunction) => Promise<any> | any | ((req: Req, res: Res) => Promise<any> | any)
+export type ExpressRequestHandler<Req extends AccessRequest = AccessRequest, Res extends Response = Response, Return extends Promise<any> | any = Promise<any> | any>
+= (req: Req, res: Res, next: NextFunction) => Return | ((req: Req, res: Res) => Return)
 
 export interface GraphqlServerAccess extends IServerAccess {
     serverMethod:  IGraphqlMethod
