@@ -144,20 +144,40 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
         return routers
     }
 
-    getPaths(paths: string[]): string[] {
+    static getPaths(paths: string[]): string[] {
         return paths.map(path => {
-            // Replace underscores that are not inside square brackets
-            let updatedPath = path.replace(/_+(?![^\[]*\])/g, '/');
-            
-            // Replace [param] with :param
-            return updatedPath.replace(/\[(.*?)\]/g, ":$1");
+            let _path = path
+            // replace [] with :
+            _path = _path.replace(/\[(.*?)\]/g, ":$1")
+    
+            // replace _ with /
+            return _path.replace(/_/g, (match, offset, string) => {
+                // console.log(_path, match, offset, string)
+    
+                // if next char is : then replace with /
+                if (string[offset + 1] == ':') return '/'
+    
+                // check if _ is part of param
+                // crawl backwards till find : or / or offset is 0
+                    // if : then replace with nothing
+                    // if / or offset 0 then replace with /
+                let i = offset - 1
+                while(i >= 0) {
+                    if (string[i] == ':') return match
+                    if (string[i] == '/') return '/'
+                    if (i == 0) return '/'
+                    i--
+                }
+                
+                return match
+            })
         });
     }
 
     register(router: Router, routers: IExpressRouter[]) {
         routers.forEach(_router => {
-            console.log(`Registering ${_router.server.serverMethod} ${this.getPaths(_router.server.path)}`)
-            router[_router.server.serverMethod](this.getPaths(_router.server.path), ..._router.handlers as unknown as any[])
+            console.log(`Registering ${_router.server.serverMethod} ${ExpressRouter.getPaths(_router.server.path)}`)
+            router[_router.server.serverMethod](ExpressRouter.getPaths(_router.server.path), ..._router.handlers as unknown as any[])
         })
     }
 

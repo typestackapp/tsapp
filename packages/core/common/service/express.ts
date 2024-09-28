@@ -28,19 +28,13 @@ TSA.init().then(async () => {
                         await handler(req, res, next)
                     } catch (error) {
                         const response: ExpressResponse = {
-                            data: false, error: { code: `unknown`, msg: `Error ${_router.options?.resourceAction}:${index} , ${error}`}
+                            error: { code: `unknown`, msg: `Error ${_router.options?.resourceAction}:${index} , ${error}`}
                         }
                         res.send(response)
                     }
                 }
             }
             if(_router.options) _router.handlers.unshift(middleware.api(_router.options))
-
-            // add success response handler as last handler
-            _router.handlers.push(async (req, res, next) => {
-                const response: ExpressResponse = { data: true }
-                res.send(response)
-            })
         }
 
         // register routers
