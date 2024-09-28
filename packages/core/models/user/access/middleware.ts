@@ -193,14 +193,14 @@ export const middleware = {
 
 export async function middlewares( req: AccessRequest, options: IAccessOptions ): Promise<MiddlewareResult> {
     let error = "unknown-error"
-    let msg = "unknown-error"
+    let req_log: UserAccessLogDocument | undefined
 
     try {
         error = "invalid-req-id"
         req.id = req.id || new mongoose.Types.ObjectId()
 
         error = "invalid-log"
-        await log(req, options)
+        req_log = await log(req, options)
 
         error = "access-disabled"
         await disabled(req, options)
@@ -214,10 +214,10 @@ export async function middlewares( req: AccessRequest, options: IAccessOptions )
         error = "invalid-captcha"
         await captcha(req, options)
 
-        if(req.log) await req.log.addInfo(`middleware-ok`)
+        await req_log?.addInfo(`middleware-ok`)
         return  { success: true }
     } catch (err) {
-        if(req.log) await req.log.addInfo(error, `${err}`)
+        await req_log?.addInfo(error, `${err}`)
         return  { success: false, error: { code: error, msg: `${err}` } }
     }
 }
@@ -227,7 +227,7 @@ export function getResourceInfo( options: IAccessOptions | undefined ): string {
     return `${options.resource}.${options.action}.`
 }
 
-async function log( req: AccessRequest, options: IAccessOptions ): Promise<void> {
+async function log( req: AccessRequest, options: IAccessOptions ) {
     if(options.log?.enabled == false) return
 
     const ipJoin = (...ip: (string[] | string | undefined)[]): string | undefined => {
@@ -261,6 +261,7 @@ async function log( req: AccessRequest, options: IAccessOptions ): Promise<void>
 
     const log = new UserAccessLogModel(log_input)
     req.log = await log.save()
+    return log
 }
 
 async function disabled( req: AccessRequest, options: IAccessOptions ): Promise<void> {
