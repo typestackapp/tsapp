@@ -387,16 +387,16 @@ export const config = async (options: ConfigOptions) => {
     fs.writeFileSync(pack_config_output, JSON.stringify(configs, null, 4))
     writeJsonTypeFile(pack_config_output)
 
-
     const output_dir = `${core_dir}/codegen/next`
-    // delete `${output_dir}/app` and `${output_dir}/public`
-    if(fs.existsSync(`${output_dir}/app`) && LINK) fs.rmSync(`${output_dir}/app`, { recursive:true })
-    if(fs.existsSync(`${output_dir}/public`) && LINK) fs.rmSync(`${output_dir}/public`, { recursive:true })
+
     // create output_dir/app
     if(!fs.existsSync(`${output_dir}/app`) && LINK) fs.mkdirSync(`${output_dir}/app`, { recursive:true })
     // create output_dir/public
     if(!fs.existsSync(`${output_dir}/public`) && LINK) fs.mkdirSync(`${output_dir}/public`, { recursive:true })
 
+    // empty `${output_dir}/app` and `${output_dir}/public`
+    if(fs.existsSync(`${output_dir}/app`) && LINK) emptyDir(`${output_dir}/app`)
+    if(fs.existsSync(`${output_dir}/public`) && LINK) emptyDir(`${output_dir}/public`)
 
     const linkFolder = (source: string, target: string) => {
         // use fs.linkSync to lin each file in source to target

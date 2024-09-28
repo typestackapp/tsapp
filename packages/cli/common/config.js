@@ -387,17 +387,17 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     fs_1.default.writeFileSync(pack_config_output, JSON.stringify(configs, null, 4));
     (0, util_1.writeJsonTypeFile)(pack_config_output);
     const output_dir = `${core_dir}/codegen/next`;
-    // delete `${output_dir}/app` and `${output_dir}/public`
-    if (fs_1.default.existsSync(`${output_dir}/app`) && LINK)
-        fs_1.default.rmSync(`${output_dir}/app`, { recursive: true });
-    if (fs_1.default.existsSync(`${output_dir}/public`) && LINK)
-        fs_1.default.rmSync(`${output_dir}/public`, { recursive: true });
     // create output_dir/app
     if (!fs_1.default.existsSync(`${output_dir}/app`) && LINK)
         fs_1.default.mkdirSync(`${output_dir}/app`, { recursive: true });
     // create output_dir/public
     if (!fs_1.default.existsSync(`${output_dir}/public`) && LINK)
         fs_1.default.mkdirSync(`${output_dir}/public`, { recursive: true });
+    // empty `${output_dir}/app` and `${output_dir}/public`
+    if (fs_1.default.existsSync(`${output_dir}/app`) && LINK)
+        (0, util_1.emptyDir)(`${output_dir}/app`);
+    if (fs_1.default.existsSync(`${output_dir}/public`) && LINK)
+        (0, util_1.emptyDir)(`${output_dir}/public`);
     const linkFolder = (source, target) => {
         // use fs.linkSync to lin each file in source to target
         // if target dosent exist create it
