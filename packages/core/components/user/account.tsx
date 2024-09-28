@@ -1,10 +1,9 @@
 'use client'
 import React from 'react'
-import { useQuery } from "@apollo/client"
-import { getAdminUserDataQuery } from '@typestackapp/core/components/util'
+import { getAdminUserData, useQuery } from '@typestackapp/core/components/queries'
 
 export default function AccountComponent() {
-  const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
+  const { data } = useQuery(getAdminUserData, { fetchPolicy: "cache-first" })
 
   if(!data) return <div>Loading...</div>
 

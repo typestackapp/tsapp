@@ -27,15 +27,15 @@ export interface Scalars {
   Packages: { input: Packages; output: Packages; }
 }
 
-export interface IAccessDocument extends IAccessInput, IMongoTimeStamps {
+export interface IAccessDocument extends IAccessInput, IMongoTimeStampsMeybe {
   action?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
   created_by?: Maybe<Scalars['ObjectId']['output']>;
   pack: Scalars['Packages']['output'];
   permissions: Array<IPermissionType>;
   resource: Scalars['String']['output'];
   status: IAccessStatus;
-  updatedAt: Scalars['DateTime']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updated_by?: Maybe<Scalars['ObjectId']['output']>;
 }
 
@@ -53,36 +53,27 @@ export interface IAccessOptions extends IEnabled {
   action: Scalars['String']['output'];
   auth?: Maybe<IAuthOptions>;
   captcha?: Maybe<ICaptchaOptions>;
-  config?: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
   limit?: Maybe<ILimitOptions>;
   log: ILogOptions;
+  model?: Maybe<IModelOptions>;
   pack: Scalars['Packages']['output'];
   resource: Scalars['String']['output'];
   resourceAction: Scalars['String']['output'];
-  type?: Maybe<ITypeOptions>;
-  types?: Maybe<Array<IAccessType>>;
 }
 
 export type IAccessStatus =
   | 'Disabled'
   | 'Enabled';
 
-export interface IAccessType {
-  info?: Maybe<Array<Scalars['String']['output']>>;
-  pack: Scalars['Packages']['output'];
-  path: Scalars['String']['output'];
-  type: Scalars['String']['output'];
-}
-
-export interface IAuthOptions {
+export interface IAuthOptions extends IEnabled {
   authParamKeyName?: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
   permission?: Maybe<IPermissionType>;
   tokens: Array<ITokenType>;
 }
 
-export interface ICaptchaOptions {
+export interface ICaptchaOptions extends IEnabled {
   enabled: Scalars['Boolean']['output'];
   pack: Scalars['Packages']['output'];
   type: Scalars['String']['output'];
@@ -211,7 +202,6 @@ export interface IDefaultAccessOptions {
   pack: Scalars['Packages']['output'];
   resource: Scalars['String']['output'];
   resourceAction: Scalars['String']['output'];
-  types?: Maybe<Array<IAccessType>>;
 }
 
 export interface IEnabled {
@@ -354,13 +344,13 @@ export type IJobStepStatus =
   | 'InQueue'
   | 'Initilized';
 
-export interface ILimitOptions {
+export interface ILimitOptions extends IEnabled {
   enabled: Scalars['Boolean']['output'];
   limitInterval: Scalars['String']['output'];
   limitTreshold: Scalars['Int']['output'];
 }
 
-export interface ILogOptions {
+export interface ILogOptions extends IEnabled {
   enabled: Scalars['Boolean']['output'];
 }
 
@@ -372,6 +362,10 @@ export interface ILogOptionsDocument {
 export interface ILogOptionsInput {
   enabled?: Maybe<Scalars['Boolean']['output']>;
   max?: Maybe<Scalars['Int']['output']>;
+}
+
+export interface IModelOptions {
+  mongoose?: Maybe<Scalars['String']['output']>;
 }
 
 export interface IMongoId {
@@ -473,6 +467,8 @@ export type IPermissionType =
   | 'Write';
 
 export interface IQuery {
+  getAllAccessConfigs: Array<IAccessOptions>;
+  getAllRoles?: Maybe<Array<IRoleConfigDocument>>;
   getConfig?: Maybe<IConfigOutput>;
   getCountry?: Maybe<ICountryDocument>;
   getCurrentUser?: Maybe<IUserOutput>;
@@ -538,14 +534,16 @@ export interface IRoleConfigDataInput {
   resource_access: Array<IAccessInput>;
 }
 
-export interface IRoleConfigDocument {
+export interface IRoleConfigDocument extends IMongoTimeStamps {
   _id?: Maybe<Scalars['ObjectId']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   created_by: Scalars['ObjectId']['output'];
   data: IRoleConfigDataDocument;
   log: ILogOptionsDocument;
   pack: Scalars['Packages']['output'];
   title: Scalars['String']['output'];
   type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   updated_by: Scalars['ObjectId']['output'];
 }
 
@@ -647,10 +645,6 @@ export type ITokenType =
   | 'Bearer'
   | 'Cookie';
 
-export interface ITypeOptions {
-  mongoose?: Maybe<Scalars['String']['output']>;
-}
-
 export interface IUserDocument extends IMongoId, IMongoTimeStamps {
   _id: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -674,6 +668,11 @@ export interface IUserOutput extends IMongoId, IMongoTimeStamps {
   updatedAt: Scalars['DateTime']['output'];
   usn: Scalars['String']['output'];
 }
+
+export type IGetRoleManagerDataQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type IGetRoleManagerDataQuery = { getAllAccessConfigs: Array<{ enabled: boolean, resource: string, pack: Packages, action: string, resourceAction: string, limit?: { enabled: boolean } | null, log: { enabled: boolean }, auth?: { enabled: boolean } | null, captcha?: { enabled: boolean } | null, model?: { mongoose?: string | null } | null }>, getAllRoles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, created_by: MongooseTypes.ObjectId, updated_by: MongooseTypes.ObjectId, pack: Packages, type: string, createdAt: Date, updatedAt: Date, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType>, created_by?: MongooseTypes.ObjectId | null, updated_by?: MongooseTypes.ObjectId | null, createdAt?: Date | null, updatedAt?: Date | null }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null };
 
 export type IGetAdminUserDataQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -751,29 +750,22 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping of interface types */
 export type IResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
   AccessInput: ( IAccessDocument );
-  AccessType: never;
-  AuthOptions: never;
-  CaptchaOptions: never;
   CountryInput: ( ICountryDocument );
-  DefaultAccessOptions: never;
-  Enabled: ( Omit<IAccessOptions, 'auth' | 'captcha' | 'limit' | 'log' | 'type' | 'types'> & { auth?: Maybe<_RefType['AuthOptions']>, captcha?: Maybe<_RefType['CaptchaOptions']>, limit?: Maybe<_RefType['LimitOptions']>, log: _RefType['LogOptions'], type?: Maybe<_RefType['TypeOptions']>, types?: Maybe<Array<_RefType['AccessType']>> } );
+  Enabled: ( IAccessOptions ) | ( IAuthOptions ) | ( ICaptchaOptions ) | ( ILimitOptions ) | ( ILogOptions );
   JobActionInput: ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } );
   JobBase: ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } );
   JobInput: ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } );
   JobStepInput: never;
-  LimitOptions: never;
-  LogOptions: never;
   LogOptionsDocument: never;
   LogOptionsInput: never;
   MongoId: ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( IUserDocument ) | ( IUserOutput );
   MongoIdMeybe: never;
-  MongoTimeStamps: ( IAccessDocument ) | ( Omit<IConfigOutput, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IConfigSearch, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( IMongoTimeStampsType ) | ( IUserDocument ) | ( IUserOutput );
-  MongoTimeStampsMeybe: never;
+  MongoTimeStamps: ( Omit<IConfigOutput, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IConfigSearch, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobActionDocument, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( IMongoTimeStampsType ) | ( Omit<IRoleConfigDocument, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( IUserDocument ) | ( IUserOutput );
+  MongoTimeStampsMeybe: ( IAccessDocument );
   Pagination: ( IConfigPagination ) | ( ICountryPagination ) | ( IJobActionPagination ) | ( IJobPagination ) | ( ITimeZonePagination );
   SearchScore: ( Omit<IConfigSearch, 'log'> & { log: _RefType['LogOptionsDocument'] } ) | ( ICountrySearch ) | ( Omit<IJobActionSearch, 'steps'> & { steps: Array<_RefType['JobStepInput']> } ) | ( Omit<IJobSearch, 'log'> & { log?: Maybe<_RefType['LogOptionsInput']> } ) | ( ITimeZoneSearch );
   ServerAccess: never;
   TimeZoneInput: ( ITimeZoneDocument );
-  TypeOptions: never;
   UserInput: never;
 };
 
@@ -781,12 +773,11 @@ export type IResolversInterfaceTypes<_RefType extends Record<string, unknown>> =
 export type IResolversTypes = {
   AccessDocument: ResolverTypeWrapper<IAccessDocument>;
   AccessInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AccessInput']>;
-  AccessOptions: ResolverTypeWrapper<Omit<IAccessOptions, 'auth' | 'captcha' | 'limit' | 'log' | 'type' | 'types'> & { auth?: Maybe<IResolversTypes['AuthOptions']>, captcha?: Maybe<IResolversTypes['CaptchaOptions']>, limit?: Maybe<IResolversTypes['LimitOptions']>, log: IResolversTypes['LogOptions'], type?: Maybe<IResolversTypes['TypeOptions']>, types?: Maybe<Array<IResolversTypes['AccessType']>> }>;
+  AccessOptions: ResolverTypeWrapper<IAccessOptions>;
   AccessStatus: IAccessStatus;
-  AccessType: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AccessType']>;
-  AuthOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AuthOptions']>;
+  AuthOptions: ResolverTypeWrapper<IAuthOptions>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  CaptchaOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['CaptchaOptions']>;
+  CaptchaOptions: ResolverTypeWrapper<ICaptchaOptions>;
   ConfigBase: ResolverTypeWrapper<IConfigBase>;
   ConfigDocument: ResolverTypeWrapper<Omit<IConfigDocument, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
   ConfigDocumentBase: ResolverTypeWrapper<Omit<IConfigDocumentBase, 'log'> & { log: IResolversTypes['LogOptionsDocument'] }>;
@@ -800,7 +791,7 @@ export type IResolversTypes = {
   CountrySearch: ResolverTypeWrapper<ICountrySearch>;
   CountryUpdate: ICountryUpdate;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
-  DefaultAccessOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['DefaultAccessOptions']>;
+  DefaultAccessOptions: ResolverTypeWrapper<IDefaultAccessOptions>;
   Enabled: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['Enabled']>;
   ExpressMethod: IExpressMethod;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
@@ -819,10 +810,11 @@ export type IResolversTypes = {
   JobStatus: IJobStatus;
   JobStepInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['JobStepInput']>;
   JobStepStatus: IJobStepStatus;
-  LimitOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LimitOptions']>;
-  LogOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LogOptions']>;
+  LimitOptions: ResolverTypeWrapper<ILimitOptions>;
+  LogOptions: ResolverTypeWrapper<ILogOptions>;
   LogOptionsDocument: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LogOptionsDocument']>;
   LogOptionsInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['LogOptionsInput']>;
+  ModelOptions: ResolverTypeWrapper<IModelOptions>;
   MongoId: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['MongoId']>;
   MongoIdMeybe: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['MongoIdMeybe']>;
   MongoOperationType: IMongoOperationType;
@@ -858,7 +850,6 @@ export type IResolversTypes = {
   TimeZonePagination: ResolverTypeWrapper<ITimeZonePagination>;
   TimeZoneSearch: ResolverTypeWrapper<ITimeZoneSearch>;
   TokenType: ITokenType;
-  TypeOptions: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['TypeOptions']>;
   UserDocument: ResolverTypeWrapper<IUserDocument>;
   UserInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['UserInput']>;
   UserOutput: ResolverTypeWrapper<IUserOutput>;
@@ -868,11 +859,10 @@ export type IResolversTypes = {
 export type IResolversParentTypes = {
   AccessDocument: IAccessDocument;
   AccessInput: IResolversInterfaceTypes<IResolversParentTypes>['AccessInput'];
-  AccessOptions: Omit<IAccessOptions, 'auth' | 'captcha' | 'limit' | 'log' | 'type' | 'types'> & { auth?: Maybe<IResolversParentTypes['AuthOptions']>, captcha?: Maybe<IResolversParentTypes['CaptchaOptions']>, limit?: Maybe<IResolversParentTypes['LimitOptions']>, log: IResolversParentTypes['LogOptions'], type?: Maybe<IResolversParentTypes['TypeOptions']>, types?: Maybe<Array<IResolversParentTypes['AccessType']>> };
-  AccessType: IResolversInterfaceTypes<IResolversParentTypes>['AccessType'];
-  AuthOptions: IResolversInterfaceTypes<IResolversParentTypes>['AuthOptions'];
+  AccessOptions: IAccessOptions;
+  AuthOptions: IAuthOptions;
   Boolean: Scalars['Boolean']['output'];
-  CaptchaOptions: IResolversInterfaceTypes<IResolversParentTypes>['CaptchaOptions'];
+  CaptchaOptions: ICaptchaOptions;
   ConfigBase: IConfigBase;
   ConfigDocument: Omit<IConfigDocument, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
   ConfigDocumentBase: Omit<IConfigDocumentBase, 'log'> & { log: IResolversParentTypes['LogOptionsDocument'] };
@@ -886,7 +876,7 @@ export type IResolversParentTypes = {
   CountrySearch: ICountrySearch;
   CountryUpdate: ICountryUpdate;
   DateTime: Scalars['DateTime']['output'];
-  DefaultAccessOptions: IResolversInterfaceTypes<IResolversParentTypes>['DefaultAccessOptions'];
+  DefaultAccessOptions: IDefaultAccessOptions;
   Enabled: IResolversInterfaceTypes<IResolversParentTypes>['Enabled'];
   Float: Scalars['Float']['output'];
   GraphqlAccess: IGraphqlAccess;
@@ -901,10 +891,11 @@ export type IResolversParentTypes = {
   JobPagination: IJobPagination;
   JobSearch: Omit<IJobSearch, 'log'> & { log?: Maybe<IResolversParentTypes['LogOptionsInput']> };
   JobStepInput: IResolversInterfaceTypes<IResolversParentTypes>['JobStepInput'];
-  LimitOptions: IResolversInterfaceTypes<IResolversParentTypes>['LimitOptions'];
-  LogOptions: IResolversInterfaceTypes<IResolversParentTypes>['LogOptions'];
+  LimitOptions: ILimitOptions;
+  LogOptions: ILogOptions;
   LogOptionsDocument: IResolversInterfaceTypes<IResolversParentTypes>['LogOptionsDocument'];
   LogOptionsInput: IResolversInterfaceTypes<IResolversParentTypes>['LogOptionsInput'];
+  ModelOptions: IModelOptions;
   MongoId: IResolversInterfaceTypes<IResolversParentTypes>['MongoId'];
   MongoIdMeybe: IResolversInterfaceTypes<IResolversParentTypes>['MongoIdMeybe'];
   MongoStream: Omit<IMongoStream, 'documentKey'> & { documentKey: IResolversParentTypes['MongoId'] };
@@ -935,7 +926,6 @@ export type IResolversParentTypes = {
   TimeZoneInput: IResolversInterfaceTypes<IResolversParentTypes>['TimeZoneInput'];
   TimeZonePagination: ITimeZonePagination;
   TimeZoneSearch: ITimeZoneSearch;
-  TypeOptions: IResolversInterfaceTypes<IResolversParentTypes>['TypeOptions'];
   UserDocument: IUserDocument;
   UserInput: IResolversInterfaceTypes<IResolversParentTypes>['UserInput'];
   UserOutput: IUserOutput;
@@ -943,13 +933,13 @@ export type IResolversParentTypes = {
 
 export type IAccessDocumentResolvers<ContextType = any, ParentType extends IResolversParentTypes['AccessDocument'] = IResolversParentTypes['AccessDocument']> = {
   action?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
-  createdAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<IResolversTypes['DateTime']>, ParentType, ContextType>;
   created_by?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   permissions?: Resolver<Array<IResolversTypes['PermissionType']>, ParentType, ContextType>;
   resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<IResolversTypes['AccessStatus'], ParentType, ContextType>;
-  updatedAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<IResolversTypes['DateTime']>, ParentType, ContextType>;
   updated_by?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -969,39 +959,29 @@ export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResol
   action?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   auth?: Resolver<Maybe<IResolversTypes['AuthOptions']>, ParentType, ContextType>;
   captcha?: Resolver<Maybe<IResolversTypes['CaptchaOptions']>, ParentType, ContextType>;
-  config?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
   limit?: Resolver<Maybe<IResolversTypes['LimitOptions']>, ParentType, ContextType>;
   log?: Resolver<IResolversTypes['LogOptions'], ParentType, ContextType>;
+  model?: Resolver<Maybe<IResolversTypes['ModelOptions']>, ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   resourceAction?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-  type?: Resolver<Maybe<IResolversTypes['TypeOptions']>, ParentType, ContextType>;
-  types?: Resolver<Maybe<Array<IResolversTypes['AccessType']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type IAccessTypeResolvers<ContextType = any, ParentType extends IResolversParentTypes['AccessType'] = IResolversParentTypes['AccessType']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
-  info?: Resolver<Maybe<Array<IResolversTypes['String']>>, ParentType, ContextType>;
-  pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
-  path?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-  type?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-};
-
 export type IAuthOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['AuthOptions'] = IResolversParentTypes['AuthOptions']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   authParamKeyName?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
   permission?: Resolver<Maybe<IResolversTypes['PermissionType']>, ParentType, ContextType>;
   tokens?: Resolver<Array<IResolversTypes['TokenType']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ICaptchaOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['CaptchaOptions'] = IResolversParentTypes['CaptchaOptions']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   type?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type IConfigBaseResolvers<ContextType = any, ParentType extends IResolversParentTypes['ConfigBase'] = IResolversParentTypes['ConfigBase']> = {
@@ -1127,16 +1107,15 @@ export interface IDateTimeScalarConfig extends GraphQLScalarTypeConfig<IResolver
 }
 
 export type IDefaultAccessOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['DefaultAccessOptions'] = IResolversParentTypes['DefaultAccessOptions']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   action?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   resourceAction?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-  types?: Resolver<Maybe<Array<IResolversTypes['AccessType']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type IEnabledResolvers<ContextType = any, ParentType extends IResolversParentTypes['Enabled'] = IResolversParentTypes['Enabled']> = {
-  __resolveType: TypeResolveFn<'AccessOptions', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AccessOptions' | 'AuthOptions' | 'CaptchaOptions' | 'LimitOptions' | 'LogOptions', ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
 };
 
@@ -1259,15 +1238,15 @@ export type IJobStepInputResolvers<ContextType = any, ParentType extends IResolv
 };
 
 export type ILimitOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['LimitOptions'] = IResolversParentTypes['LimitOptions']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
   limitInterval?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   limitTreshold?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ILogOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['LogOptions'] = IResolversParentTypes['LogOptions']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ILogOptionsDocumentResolvers<ContextType = any, ParentType extends IResolversParentTypes['LogOptionsDocument'] = IResolversParentTypes['LogOptionsDocument']> = {
@@ -1280,6 +1259,11 @@ export type ILogOptionsInputResolvers<ContextType = any, ParentType extends IRes
   __resolveType: TypeResolveFn<null, ParentType, ContextType>;
   enabled?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
   max?: Resolver<Maybe<IResolversTypes['Int']>, ParentType, ContextType>;
+};
+
+export type IModelOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['ModelOptions'] = IResolversParentTypes['ModelOptions']> = {
+  mongoose?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type IMongoIdResolvers<ContextType = any, ParentType extends IResolversParentTypes['MongoId'] = IResolversParentTypes['MongoId']> = {
@@ -1316,13 +1300,13 @@ export type IMongoStreamUpdateDescriptionResolvers<ContextType = any, ParentType
 };
 
 export type IMongoTimeStampsResolvers<ContextType = any, ParentType extends IResolversParentTypes['MongoTimeStamps'] = IResolversParentTypes['MongoTimeStamps']> = {
-  __resolveType: TypeResolveFn<'AccessDocument' | 'ConfigOutput' | 'ConfigSearch' | 'JobActionDocument' | 'JobActionSearch' | 'JobDocument' | 'JobSearch' | 'MongoTimeStampsType' | 'UserDocument' | 'UserOutput', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'ConfigOutput' | 'ConfigSearch' | 'JobActionDocument' | 'JobActionSearch' | 'JobDocument' | 'JobSearch' | 'MongoTimeStampsType' | 'RoleConfigDocument' | 'UserDocument' | 'UserOutput', ParentType, ContextType>;
   createdAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
   updatedAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
 export type IMongoTimeStampsMeybeResolvers<ContextType = any, ParentType extends IResolversParentTypes['MongoTimeStampsMeybe'] = IResolversParentTypes['MongoTimeStampsMeybe']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AccessDocument', ParentType, ContextType>;
   createdAt?: Resolver<Maybe<IResolversTypes['DateTime']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<IResolversTypes['DateTime']>, ParentType, ContextType>;
 };
@@ -1376,6 +1360,8 @@ export type IPaginationResolvers<ContextType = any, ParentType extends IResolver
 };
 
 export type IQueryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']> = {
+  getAllAccessConfigs?: Resolver<Array<IResolversTypes['AccessOptions']>, ParentType, ContextType>;
+  getAllRoles?: Resolver<Maybe<Array<IResolversTypes['RoleConfigDocument']>>, ParentType, ContextType>;
   getConfig?: Resolver<Maybe<IResolversTypes['ConfigOutput']>, ParentType, ContextType, RequireFields<IQueryGetConfigArgs, 'id'>>;
   getCountry?: Resolver<Maybe<IResolversTypes['CountryDocument']>, ParentType, ContextType, RequireFields<IQueryGetCountryArgs, 'alpha2'>>;
   getCurrentUser?: Resolver<Maybe<IResolversTypes['UserOutput']>, ParentType, ContextType>;
@@ -1404,12 +1390,14 @@ export type IRoleConfigDataInputResolvers<ContextType = any, ParentType extends 
 
 export type IRoleConfigDocumentResolvers<ContextType = any, ParentType extends IResolversParentTypes['RoleConfigDocument'] = IResolversParentTypes['RoleConfigDocument']> = {
   _id?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
+  createdAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<IResolversTypes['ObjectId'], ParentType, ContextType>;
   data?: Resolver<IResolversTypes['RoleConfigDataDocument'], ParentType, ContextType>;
   log?: Resolver<IResolversTypes['LogOptionsDocument'], ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   title?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
   updated_by?: Resolver<IResolversTypes['ObjectId'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1474,11 +1462,6 @@ export type ITimeZoneSearchResolvers<ContextType = any, ParentType extends IReso
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ITypeOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['TypeOptions'] = IResolversParentTypes['TypeOptions']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
-  mongoose?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
-};
-
 export type IUserDocumentResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserDocument'] = IResolversParentTypes['UserDocument']> = {
   _id?: Resolver<IResolversTypes['ObjectId'], ParentType, ContextType>;
   createdAt?: Resolver<IResolversTypes['DateTime'], ParentType, ContextType>;
@@ -1510,7 +1493,6 @@ export type IResolvers<ContextType = any> = {
   AccessDocument?: IAccessDocumentResolvers<ContextType>;
   AccessInput?: IAccessInputResolvers<ContextType>;
   AccessOptions?: IAccessOptionsResolvers<ContextType>;
-  AccessType?: IAccessTypeResolvers<ContextType>;
   AuthOptions?: IAuthOptionsResolvers<ContextType>;
   CaptchaOptions?: ICaptchaOptionsResolvers<ContextType>;
   ConfigBase?: IConfigBaseResolvers<ContextType>;
@@ -1542,6 +1524,7 @@ export type IResolvers<ContextType = any> = {
   LogOptions?: ILogOptionsResolvers<ContextType>;
   LogOptionsDocument?: ILogOptionsDocumentResolvers<ContextType>;
   LogOptionsInput?: ILogOptionsInputResolvers<ContextType>;
+  ModelOptions?: IModelOptionsResolvers<ContextType>;
   MongoId?: IMongoIdResolvers<ContextType>;
   MongoIdMeybe?: IMongoIdMeybeResolvers<ContextType>;
   MongoStream?: IMongoStreamResolvers<ContextType>;
@@ -1569,7 +1552,6 @@ export type IResolvers<ContextType = any> = {
   TimeZoneInput?: ITimeZoneInputResolvers<ContextType>;
   TimeZonePagination?: ITimeZonePaginationResolvers<ContextType>;
   TimeZoneSearch?: ITimeZoneSearchResolvers<ContextType>;
-  TypeOptions?: ITypeOptionsResolvers<ContextType>;
   UserDocument?: IUserDocumentResolvers<ContextType>;
   UserInput?: IUserInputResolvers<ContextType>;
   UserOutput?: IUserOutputResolvers<ContextType>;
@@ -1577,6 +1559,7 @@ export type IResolvers<ContextType = any> = {
 
 
 
+export const GetRoleManagerDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getRoleManagerData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAllAccessConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"resourceAction"}},{"kind":"Field","name":{"kind":"Name","value":"limit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"log"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auth"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"captcha"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"model"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mongoose"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"getAllRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<IGetRoleManagerDataQuery, IGetRoleManagerDataQueryVariables>;
 export const GetAdminUserDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminUserData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"usn"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<IGetAdminUserDataQuery, IGetAdminUserDataQueryVariables>;
     
                 // additional types generated by build-graphql.js script!

@@ -8,13 +8,13 @@ import config from "@typestackapp/core/codegen/config/output.json"
 import { T as Config} from "@typestackapp/core/codegen/config/output"
 import { getPackageConfigs } from '@typestackapp/cli/common/util'
 import { ExpressRouter, GraphqlRouter } from '@typestackapp/core/common/service'
+import { IAccessOptions } from "@typestackapp/core/codegen/system"
 
 export * from "@typestackapp/core/common/service"
 export type * from "@typestackapp/core/codegen/system"
 
 export { config }
 export type { Config }
-export const packages = getPackageConfigs() as {[key in Packages]: ReturnType<typeof getPackageConfigs>[string]}
 export type Packages = keyof typeof tsapp_config.packages
 
 export class TSA {
@@ -56,10 +56,6 @@ export class TSA {
         return TSA._jobs
     }
 
-    static get config() {
-        return config as Config
-    }
-
     static get router() {
         return {
             graphql: <T>() => {
@@ -95,5 +91,32 @@ export class TSA {
             if(c_serv) rcs.push(...c_serv)
         }
         return rcs
+    }
+
+    static get config() {
+        return config as Config
+    }
+
+    static get package() {
+        const configs = getPackageConfigs() as {[key in Packages]: ReturnType<typeof getPackageConfigs>[string]}
+        const keys = Object.keys(configs) as Packages[]
+
+        // initilize object with empty arrays
+        const access: IAccessOptions[] = []
+
+        for(const key of keys) {
+            const _config = config[key].access.ACTIVE
+            for(const [_key, value] of Object.entries(_config)) {
+                for(const [__key, __value] of Object.entries(value)) {
+                    access.push(__value as any)
+                }
+            } 
+        }
+
+        return {
+            configs,
+            keys,
+            access
+        }
     }
 }

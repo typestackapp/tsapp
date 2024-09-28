@@ -2,13 +2,12 @@ import React, { useState } from 'react'
 import { apps } from '@typestackapp/core/codegen/next/apps'
 import Link from 'next/link'
 import TSAppClient from '@typestackapp/core/models/user/app/oauth/client/tsapp'
-import { useQuery } from "@apollo/client"
 import { context } from '@typestackapp/core/components/global'
 import { AccessCheckOptions, AccessValidator } from '@typestackapp/core/models/user/access/util'
 import type { AuthOutput } from "@typestackapp/core/express/auth"
-import { gql } from '@typestackapp/core/codegen/system/client'
 import { Packages } from '@typestackapp/core'
 import { ValuesType } from 'utility-types'
+import { getAdminUserData, useQuery } from '@typestackapp/core/components/queries'
 
 export { apps }
 
@@ -48,35 +47,6 @@ export class ErrourBoundary extends React.Component<{ children: React.ReactNode 
     return this.props.children
   }
 }
-
-export const getAdminUserDataQuery = gql(`#graphql
-  query GetAdminUserData {
-    getCurrentUser {
-      _id
-      usn
-      roles {
-        _id
-        title
-        pack
-        type
-        data {
-          name
-          resource_access {
-            status
-            pack
-            resource
-            action
-            permissions
-          }
-          graphql_access {
-            pack
-            services
-          }
-        }
-      }
-    }
-  }
-`)
 
 export const getActiveApp = (params: AdminParams): ValuesType<typeof apps> | undefined => {
   const state = getNavState(params)
@@ -155,7 +125,7 @@ export function UserNav({client, path}: {
   path: string
 }) {
   const [revokeStatus, setRevokeStatus] = React.useState<AuthOutput["revoke"] | undefined>()
-  const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
+  const { data } = useQuery(getAdminUserData, { fetchPolicy: "cache-first" })
 
   const handleSignOut = (event: any) => {
     event.preventDefault()
@@ -220,7 +190,7 @@ export function AdminAppList({ open, path, apps, app }: {
   path: string, // current base path
 }) {
   const globalContext = React.useContext(context)
-  const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
+  const { data } = useQuery(getAdminUserData, { fetchPolicy: "cache-first" })
   const access = data?.getCurrentUser?.roles?.map( role => role.data.resource_access )
   const [adminApps, setAdminApps] = React.useState<AdminApp[] | undefined>(globalContext?.apps?.state)
 
@@ -321,7 +291,7 @@ export function Admin({ path, apps, app, children }: {
   children: React.ReactNode
 }) {
   const [isOpened, setIsOpened] = useState(true)
-  const { data } = useQuery(getAdminUserDataQuery, { fetchPolicy: "cache-first" })
+  const { data } = useQuery(getAdminUserData, { fetchPolicy: "cache-first" })
 
   function getOverlay() {
     return <div className='fixed h-full w-full bg-gray-200 opacity-30 pointer-events-none'></div>

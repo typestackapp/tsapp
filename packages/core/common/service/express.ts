@@ -1,4 +1,4 @@
-import { TSA, packages, Packages, ExpressRouter, IExpressRouter, ExpressResponse } from "@typestackapp/core"
+import { TSA, Packages, ExpressRouter, IExpressRouter, ExpressResponse } from "@typestackapp/core"
 import { tsapp } from "@typestackapp/core/env"
 import express from "express"
 
@@ -10,7 +10,7 @@ TSA.init().then(async () => {
     const router = express.Router()
     const router_docs: Map<Packages, IExpressRouter[]> = new Map()
     
-    for (const pack_key of Object.keys(packages) as Packages[]) {
+    for (const pack_key of Object.keys(TSA.package.configs) as Packages[]) {
         const _root = `${process.cwd()}/node_modules/${pack_key}/express/`
 
         const routers = new ExpressRouter()

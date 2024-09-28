@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "#graphql\n  query getRoleManagerData {\n    getAllAccessConfigs {\n      enabled\n      resource\n      pack\n      action\n      resourceAction\n      limit {\n        enabled\n      }\n      log {\n        enabled\n      }\n      auth {\n        enabled\n      }\n      captcha {\n        enabled\n      }\n      model {\n        mongoose\n      }\n    }\n    getAllRoles {\n      _id\n      title\n      created_by\n      updated_by\n      pack\n      type\n      data {\n        name\n        resource_access {\n          status\n          pack\n          resource\n          action\n          permissions\n          created_by\n          updated_by\n          createdAt\n          updatedAt\n        }\n        graphql_access {\n          pack\n          services\n        }\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetRoleManagerDataDocument,
     "#graphql\n  query GetAdminUserData {\n    getCurrentUser {\n      _id\n      usn\n      roles {\n        _id\n        title\n        pack\n        type\n        data {\n          name\n          resource_access {\n            status\n            pack\n            resource\n            action\n            permissions\n          }\n          graphql_access {\n            pack\n            services\n          }\n        }\n      }\n    }\n  }\n": types.GetAdminUserDataDocument,
 };
 
@@ -30,6 +31,10 @@ const documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "#graphql\n  query getRoleManagerData {\n    getAllAccessConfigs {\n      enabled\n      resource\n      pack\n      action\n      resourceAction\n      limit {\n        enabled\n      }\n      log {\n        enabled\n      }\n      auth {\n        enabled\n      }\n      captcha {\n        enabled\n      }\n      model {\n        mongoose\n      }\n    }\n    getAllRoles {\n      _id\n      title\n      created_by\n      updated_by\n      pack\n      type\n      data {\n        name\n        resource_access {\n          status\n          pack\n          resource\n          action\n          permissions\n          created_by\n          updated_by\n          createdAt\n          updatedAt\n        }\n        graphql_access {\n          pack\n          services\n        }\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["#graphql\n  query getRoleManagerData {\n    getAllAccessConfigs {\n      enabled\n      resource\n      pack\n      action\n      resourceAction\n      limit {\n        enabled\n      }\n      log {\n        enabled\n      }\n      auth {\n        enabled\n      }\n      captcha {\n        enabled\n      }\n      model {\n        mongoose\n      }\n    }\n    getAllRoles {\n      _id\n      title\n      created_by\n      updated_by\n      pack\n      type\n      data {\n        name\n        resource_access {\n          status\n          pack\n          resource\n          action\n          permissions\n          created_by\n          updated_by\n          createdAt\n          updatedAt\n        }\n        graphql_access {\n          pack\n          services\n        }\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

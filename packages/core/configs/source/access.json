@@ -57,10 +57,10 @@
             }
         },
         "User": {
-            "accountApp": {
+            "AccountApp": {
                 "next": {
                     "import": "@typestackapp/core/components/user/account",
-                    "title": "Account"
+                    "title": "My Account"
                 }
             },
             "getCurrentUser": {
@@ -76,9 +76,12 @@
                 "auth": { "tokens": ["Bearer"], "permission": "Read" }
             }
         },
-        "UserApiKey": {},
-        "UserBearerKey": {},
-        "UserInformation": {},
+        "Access": {
+            "getAllAccessConfigs": {
+                "info": [ "Allows user to get all access configs" ],
+                "auth": { "tokens": ["Bearer"], "permission": "Read" }
+            }
+        },
         "Config": {
             "searchConfigs": {
                 "info": [ "Allows user to search for configs with Read permission" ],
@@ -89,6 +92,26 @@
                 "info": [ "Allows user to get config with Read permission by providing config id" ],
                 "auth": { "tokens": ["Bearer", "ApiKey"], "permission": "Read" },
                 "model": { "mongoose": "@typestackapp/core/models/config" }
+            }
+        },
+        "RoleConfig": {
+            "RoleManagerApp": {
+                "next": {
+                    "import": "@typestackapp/core/components/user/role",
+                    "title": "Role Manager"
+                }
+            },
+            "getAllRoles": {
+                "info": [ "Allows user to get all roles" ],
+                "auth": { "tokens": ["Bearer", "Cookie"], "permission": "Read" }
+            },
+            "upsertRole": {
+                "info": [ "Allows user to insert or update role" ],
+                "auth": { "tokens": ["Bearer", "Cookie"], "permission": "Write" }
+            },
+            "deleteRole": {
+                "info": [ "Allows user to remove role" ],
+                "auth": { "tokens": ["Bearer", "Cookie"], "permission": "Delete" }
             }
         },
         "Job": {

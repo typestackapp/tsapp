@@ -7,7 +7,7 @@ import { Transaction } from "@typestackapp/core/models/update"
 import { secretHash, randomSecret } from "@typestackapp/core/models/user/access/util"
 import { UserInput, UserModel } from "@typestackapp/core/models/user"
 import { config, Config, Packages, IAccessInput } from "@typestackapp/core"
-import { AccessDocument } from "@typestackapp/core/models/user/access"
+import { AccessDocument, AccessModel } from "@typestackapp/core/models/user/access"
 import { tsapp, haproxy } from "@typestackapp/core/env"
 
 export const system_admin_id = new Types.ObjectId("62082b4a4a13ab628afc0cce")
@@ -31,8 +31,7 @@ export function getAllAccessInputs(): AccessDocument[] {
                 resource: resource_key,
                 permissions: ["Read", "Write", "Update", "Delete"]
             }
-            let doc = doc_input as any
-            _access.push(doc)
+            _access.push(new AccessModel(doc_input))
         }
     }
     return _access

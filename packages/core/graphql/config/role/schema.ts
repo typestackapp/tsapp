@@ -1,6 +1,11 @@
 import { ConfigBase, ConfigDocumentBase } from "@typestackapp/core/graphql/config/schema"
+import { MongoTimeStamps } from "@typestackapp/core/graphql/common/schema"
 
 export const schema = `#graphql
+    extend type Query {
+        getAllRoles: [RoleConfigDocument!]
+    }
+    
     type GraphqlAccess {
         pack: Packages!
         services: [String!]!
@@ -24,9 +29,10 @@ export const schema = `#graphql
         data: RoleConfigDataInput!
     }
 
-    type RoleConfigDocument {
+    type RoleConfigDocument implements MongoTimeStamps {
         ${ConfigBase}
         ${ConfigDocumentBase}
+        ${MongoTimeStamps}
         data: RoleConfigDataDocument!
     }
 `

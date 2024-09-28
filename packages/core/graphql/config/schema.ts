@@ -22,10 +22,6 @@ export const schema = `#graphql
     extend type Subscription {
         streamConfig(stream: MongoStreamInput!): MongoStream
     }
-
-    extend type AccessOptions {
-        config: String
-    }
     
     type ConfigBase {
         data: Object

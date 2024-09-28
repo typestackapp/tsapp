@@ -1,5 +1,3 @@
-import { GraphqlRouter } from '@typestackapp/core/common/service'
-
 export const Pagination = `
     total: Int
 `
@@ -40,7 +38,6 @@ export const DefaultAccessOptions = `
     pack: Packages! # package name
     action: String! # any string value used to namespace AccessOptions
     resourceAction: String! # resource and action names combined
-    types: [AccessType!] # resource could return multiple types of data
 `
 
 export const AuthOptions = `
@@ -62,7 +59,7 @@ export const LimitOptions = `
     limitTreshold: Int! #  number of requests per interval
 `
 
-export const TypeOptions = `
+export const ModelOptions = `
     mongoose: String # model name: @typestackapp/core/models/config
 `
 
@@ -226,39 +223,32 @@ export default `#graphql
         ${ServerAccess}
     }
 
-    interface AuthOptions implements Enabled {
+    type AuthOptions implements Enabled {
         ${Enabled}
         ${AuthOptions}
     }
 
-    interface LogOptions implements Enabled {
+    type LogOptions implements Enabled {
         ${Enabled}
         ${LogOptions}
     }
 
-    interface CaptchaOptions implements Enabled {
+    type CaptchaOptions implements Enabled {
         ${Enabled}
         ${CaptchaOptions}
     }
 
-    interface LimitOptions implements Enabled {
+    type LimitOptions implements Enabled {
         ${Enabled}
         ${LimitOptions}
     }
 
-    interface TypeOptions {
-        ${TypeOptions}
+    type ModelOptions {
+        ${ModelOptions}
     }
 
-    interface DefaultAccessOptions {
+    type DefaultAccessOptions {
         ${DefaultAccessOptions}
-    }
-
-    interface AccessType {
-        pack: Packages!
-        type: String!
-        path: String!
-        info: [String!]
     }
 
     type AccessOptions implements Enabled { 
@@ -266,7 +256,7 @@ export default `#graphql
         auth: AuthOptions
         captcha: CaptchaOptions
         limit: LimitOptions
-        type: TypeOptions
+        model: ModelOptions
         ${Enabled}
         ${DefaultAccessOptions}
     }
@@ -275,9 +265,9 @@ export default `#graphql
         ${AccessInput}
     }
 
-    type AccessDocument implements AccessInput & MongoTimeStamps { # access to resource, used in user.access, key.access
+    type AccessDocument implements AccessInput & MongoTimeStampsMeybe { # access to resource, used in user.access, key.access
         ${AccessInput}
-        ${MongoTimeStamps}
+        ${MongoTimeStampsMeybe}
     }
     
     enum ExpressMethod {

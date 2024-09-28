@@ -15,7 +15,7 @@ import type { ApolloServerPlugin } from '@apollo/server'
 import type { AccessRequest, GraphqlServerAccess, ExpressRequestHandler, ExpressServerAccess} from "@typestackapp/core/models/user/access/middleware"
 import type { Router } from "express"
 import { IGraphqlMethod } from "@typestackapp/core"
-import { Packages, packages } from "@typestackapp/core"
+import { Packages, TSA } from "@typestackapp/core"
 import { DeepRequired } from "utility-types"
 import { Resolver } from "@apollo/client"
 import { GraphqlServerConfig } from "@typestackapp/cli/common/util"
@@ -119,7 +119,7 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
         _paths.push(`${ExpressRouter.prefix}/${ExpressRouter.pack}${ExpressRouter.default_path}/`)
 
         // alias path /${prefix}/${alias}/${file_structure}/${file_name}
-        const alias = packages[ExpressRouter.pack]?.alias
+        const alias = TSA.package.configs[ExpressRouter.pack]?.alias
         if(alias)
             _paths.push(`${ExpressRouter.prefix}/${alias}${ExpressRouter.default_path}/`)
 

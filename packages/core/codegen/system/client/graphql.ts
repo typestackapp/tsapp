@@ -20,16 +20,16 @@ export type Scalars = {
   Packages: { input: any; output: any; }
 };
 
-export type AccessDocument = AccessInput & MongoTimeStamps & {
+export type AccessDocument = AccessInput & MongoTimeStampsMeybe & {
   __typename?: 'AccessDocument';
   action?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
   created_by?: Maybe<Scalars['ObjectId']['output']>;
   pack: Scalars['Packages']['output'];
   permissions: Array<PermissionType>;
   resource: Scalars['String']['output'];
   status: AccessStatus;
-  updatedAt: Scalars['DateTime']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updated_by?: Maybe<Scalars['ObjectId']['output']>;
 };
 
@@ -48,15 +48,13 @@ export type AccessOptions = Enabled & {
   action: Scalars['String']['output'];
   auth?: Maybe<AuthOptions>;
   captcha?: Maybe<CaptchaOptions>;
-  config?: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
   limit?: Maybe<LimitOptions>;
   log: LogOptions;
+  model?: Maybe<ModelOptions>;
   pack: Scalars['Packages']['output'];
   resource: Scalars['String']['output'];
   resourceAction: Scalars['String']['output'];
-  type?: Maybe<TypeOptions>;
-  types?: Maybe<Array<AccessType>>;
 };
 
 export enum AccessStatus {
@@ -64,21 +62,16 @@ export enum AccessStatus {
   Enabled = 'Enabled'
 }
 
-export type AccessType = {
-  info?: Maybe<Array<Scalars['String']['output']>>;
-  pack: Scalars['Packages']['output'];
-  path: Scalars['String']['output'];
-  type: Scalars['String']['output'];
-};
-
-export type AuthOptions = {
+export type AuthOptions = Enabled & {
+  __typename?: 'AuthOptions';
   authParamKeyName?: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
   permission?: Maybe<PermissionType>;
   tokens: Array<TokenType>;
 };
 
-export type CaptchaOptions = {
+export type CaptchaOptions = Enabled & {
+  __typename?: 'CaptchaOptions';
   enabled: Scalars['Boolean']['output'];
   pack: Scalars['Packages']['output'];
   type: Scalars['String']['output'];
@@ -213,11 +206,11 @@ export type CountryUpdate = {
 };
 
 export type DefaultAccessOptions = {
+  __typename?: 'DefaultAccessOptions';
   action: Scalars['String']['output'];
   pack: Scalars['Packages']['output'];
   resource: Scalars['String']['output'];
   resourceAction: Scalars['String']['output'];
-  types?: Maybe<Array<AccessType>>;
 };
 
 export type Enabled = {
@@ -371,13 +364,15 @@ export enum JobStepStatus {
   Initilized = 'Initilized'
 }
 
-export type LimitOptions = {
+export type LimitOptions = Enabled & {
+  __typename?: 'LimitOptions';
   enabled: Scalars['Boolean']['output'];
   limitInterval: Scalars['String']['output'];
   limitTreshold: Scalars['Int']['output'];
 };
 
-export type LogOptions = {
+export type LogOptions = Enabled & {
+  __typename?: 'LogOptions';
   enabled: Scalars['Boolean']['output'];
 };
 
@@ -389,6 +384,11 @@ export type LogOptionsDocument = {
 export type LogOptionsInput = {
   enabled?: Maybe<Scalars['Boolean']['output']>;
   max?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ModelOptions = {
+  __typename?: 'ModelOptions';
+  mongoose?: Maybe<Scalars['String']['output']>;
 };
 
 export type MongoId = {
@@ -500,6 +500,8 @@ export enum PermissionType {
 
 export type Query = {
   __typename?: 'Query';
+  getAllAccessConfigs: Array<AccessOptions>;
+  getAllRoles?: Maybe<Array<RoleConfigDocument>>;
   getConfig?: Maybe<ConfigOutput>;
   getCountry?: Maybe<CountryDocument>;
   getCurrentUser?: Maybe<UserOutput>;
@@ -567,15 +569,17 @@ export type RoleConfigDataInput = {
   resource_access: Array<AccessInput>;
 };
 
-export type RoleConfigDocument = {
+export type RoleConfigDocument = MongoTimeStamps & {
   __typename?: 'RoleConfigDocument';
   _id?: Maybe<Scalars['ObjectId']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   created_by: Scalars['ObjectId']['output'];
   data: RoleConfigDataDocument;
   log: LogOptionsDocument;
   pack: Scalars['Packages']['output'];
   title: Scalars['String']['output'];
   type: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
   updated_by: Scalars['ObjectId']['output'];
 };
 
@@ -685,10 +689,6 @@ export enum TokenType {
   Cookie = 'Cookie'
 }
 
-export type TypeOptions = {
-  mongoose?: Maybe<Scalars['String']['output']>;
-};
-
 export type UserDocument = MongoId & MongoTimeStamps & {
   __typename?: 'UserDocument';
   _id: Scalars['ObjectId']['output'];
@@ -715,10 +715,16 @@ export type UserOutput = MongoId & MongoTimeStamps & {
   usn: Scalars['String']['output'];
 };
 
+export type GetRoleManagerDataQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetRoleManagerDataQuery = { __typename?: 'Query', getAllAccessConfigs: Array<{ __typename?: 'AccessOptions', enabled: boolean, resource: string, pack: any, action: string, resourceAction: string, limit?: { __typename?: 'LimitOptions', enabled: boolean } | null, log: { __typename?: 'LogOptions', enabled: boolean }, auth?: { __typename?: 'AuthOptions', enabled: boolean } | null, captcha?: { __typename?: 'CaptchaOptions', enabled: boolean } | null, model?: { __typename?: 'ModelOptions', mongoose?: string | null } | null }>, getAllRoles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, created_by: any, updated_by: any, pack: any, type: string, createdAt: any, updatedAt: any, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource: string, action?: string | null, permissions: Array<PermissionType>, created_by?: any | null, updated_by?: any | null, createdAt?: any | null, updatedAt?: any | null }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null };
+
 export type GetAdminUserDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAdminUserDataQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserOutput', _id: any, usn: string, roles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, pack: any, type: string, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource: string, action?: string | null, permissions: Array<PermissionType> }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null } | null };
 
 
+export const GetRoleManagerDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getRoleManagerData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAllAccessConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"resourceAction"}},{"kind":"Field","name":{"kind":"Name","value":"limit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"log"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auth"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"captcha"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"model"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mongoose"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"getAllRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetRoleManagerDataQuery, GetRoleManagerDataQueryVariables>;
 export const GetAdminUserDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAdminUserData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"usn"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetAdminUserDataQuery, GetAdminUserDataQueryVariables>;
