@@ -115,7 +115,7 @@ export function extractArg(args: any, arg_name: string, required: boolean) {
     return arg_value
 }
 
-export function getDefaultOpts(options: any) {
+export function getDefaultOpts(options: { [key: string]: any }) {
 
     function isEnabled(input: any, overwrite: any) {
         if(typeof overwrite == 'boolean') return overwrite
@@ -152,7 +152,8 @@ export function getDefaultOpts(options: any) {
             ...options?.log,
             enabled: options?.log?.enabled != undefined ? options?.log?.enabled : true
         }, {}),
-        type: getDefault(options.type, {})
+        model: getDefault(options.model, {}),
+        captcha: getDefault(options.captcha, {}),
     }
 }
 

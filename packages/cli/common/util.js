@@ -123,7 +123,7 @@ function getDefaultOpts(options) {
     return Object.assign(Object.assign({}, options), { enabled: isEnabled(options, (options === null || options === void 0 ? void 0 : options.enabled) || true), resource: options.resource, action: options.action, resourceAction: options.resourceAction, auth: getDefault(options.auth, {}), limit: getDefault(options.limit, {
             limitInterval: ((_a = options.limit) === null || _a === void 0 ? void 0 : _a.limitInterval) || '1m',
             limitTreshold: ((_b = options.limit) === null || _b === void 0 ? void 0 : _b.limitTreshold) || 500,
-        }), log: getDefault(Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.log), { enabled: ((_c = options === null || options === void 0 ? void 0 : options.log) === null || _c === void 0 ? void 0 : _c.enabled) != undefined ? (_d = options === null || options === void 0 ? void 0 : options.log) === null || _d === void 0 ? void 0 : _d.enabled : true }), {}), type: getDefault(options.type, {}) });
+        }), log: getDefault(Object.assign(Object.assign({}, options === null || options === void 0 ? void 0 : options.log), { enabled: ((_c = options === null || options === void 0 ? void 0 : options.log) === null || _c === void 0 ? void 0 : _c.enabled) != undefined ? (_d = options === null || options === void 0 ? void 0 : options.log) === null || _d === void 0 ? void 0 : _d.enabled : true }), {}), model: getDefault(options.model, {}), captcha: getDefault(options.captcha, {}) });
 }
 exports.getDefaultOpts = getDefaultOpts;
 function buidCountryConfig(tsapp_src, output_folder) {
