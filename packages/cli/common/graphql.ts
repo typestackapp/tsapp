@@ -28,7 +28,7 @@ export const graphql = async (options: GraphqlOptions) => {
                 typesPrefix: 'I',
                 declarationKind: 'interface',
                 scalars: {
-                    Object: 'any',
+                    Object: '{[key:string]: any}',
                     DateTime: 'Date',
                     Packages: 'Packages',
                     ObjectId: 'MongooseTypes.ObjectId',
@@ -46,10 +46,10 @@ export const graphql = async (options: GraphqlOptions) => {
                     typesPrefix: 'I',
                     declarationKind: 'interface',
                     scalars: {
-                        Object: 'any',
-                        DateTime: 'any',
-                        Packages: 'any',
-                        ObjectId: 'any',
+                        Object: '{[key:string]: any}',
+                        DateTime: 'Date',
+                        Packages: 'string',
+                        ObjectId: 'string',
                     },
                     enumsAsTypes: true,
                     skipTypename: true,
@@ -76,8 +76,8 @@ export const graphql = async (options: GraphqlOptions) => {
 
             let file_result = fs.readFileSync(graphql_server.typeDefPath, 'utf8')
             file_result = `
-                import { DeepRequired } from 'utility-types'
-                import { Packages } from '@typestackapp/core'
+                import type { DeepRequired } from 'utility-types'
+                import type { Packages } from '@typestackapp/core'
                 import type { Types as MongooseTypes } from 'mongoose'
     
                 ${file_result}
@@ -96,7 +96,7 @@ export const graphql = async (options: GraphqlOptions) => {
             fs.writeFileSync(graphql_server.typeDefPath, file_result, 'utf8')
         } catch (error) {
             console.error(error)
-            console.log({...CodegenConfig, schema: '...'})
+            // console.log({...CodegenConfig, schema: '...'})
         }
     }
 

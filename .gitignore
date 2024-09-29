@@ -5,8 +5,9 @@ Dockerfile.*
 logs/*
 packages/*
 package-lock.json
-!packages/core
 !packages/cli
+!packages/core
+!packages/dev
 
 # JAVA projects
 HELP.md

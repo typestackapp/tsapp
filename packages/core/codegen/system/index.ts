@@ -442,7 +442,7 @@ export interface IMongoUpdateRes {
 }
 
 export interface IMutation {
-  getPing?: Maybe<Scalars['Boolean']['output']>;
+  _?: Maybe<Scalars['Boolean']['output']>;
 }
 
 export interface IMySqlRes {
@@ -467,13 +467,13 @@ export type IPermissionType =
   | 'Write';
 
 export interface IQuery {
+  _?: Maybe<Scalars['Boolean']['output']>;
   getAllAccessConfigs: Array<IAccessOptions>;
   getAllRoles?: Maybe<Array<IRoleConfigDocument>>;
   getConfig?: Maybe<IConfigOutput>;
   getCountry?: Maybe<ICountryDocument>;
   getCurrentUser?: Maybe<IUserOutput>;
   getJob?: Maybe<IJobDocument>;
-  getPing?: Maybe<Scalars['Boolean']['output']>;
   getUser?: Maybe<IUserOutput>;
   searchConfigs?: Maybe<IConfigPagination>;
   searchCountry: Array<ICountrySearch>;
@@ -591,7 +591,7 @@ export type IServerType =
   | 'GRAPHQL';
 
 export interface ISubscription {
-  getPing?: Maybe<Scalars['Boolean']['output']>;
+  _?: Maybe<Scalars['Boolean']['output']>;
   streamConfig?: Maybe<IMongoStream>;
   streamJob?: Maybe<IMongoStream>;
   streamJobAction?: Maybe<IMongoStream>;
@@ -1327,7 +1327,7 @@ export type IMongoUpdateResResolvers<ContextType = any, ParentType extends IReso
 };
 
 export type IMutationResolvers<ContextType = any, ParentType extends IResolversParentTypes['Mutation'] = IResolversParentTypes['Mutation']> = {
-  getPing?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
+  _?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
 };
 
 export type IMySqlResResolvers<ContextType = any, ParentType extends IResolversParentTypes['MySqlRes'] = IResolversParentTypes['MySqlRes']> = {
@@ -1360,13 +1360,13 @@ export type IPaginationResolvers<ContextType = any, ParentType extends IResolver
 };
 
 export type IQueryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']> = {
+  _?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
   getAllAccessConfigs?: Resolver<Array<IResolversTypes['AccessOptions']>, ParentType, ContextType>;
   getAllRoles?: Resolver<Maybe<Array<IResolversTypes['RoleConfigDocument']>>, ParentType, ContextType>;
   getConfig?: Resolver<Maybe<IResolversTypes['ConfigOutput']>, ParentType, ContextType, RequireFields<IQueryGetConfigArgs, 'id'>>;
   getCountry?: Resolver<Maybe<IResolversTypes['CountryDocument']>, ParentType, ContextType, RequireFields<IQueryGetCountryArgs, 'alpha2'>>;
   getCurrentUser?: Resolver<Maybe<IResolversTypes['UserOutput']>, ParentType, ContextType>;
   getJob?: Resolver<Maybe<IResolversTypes['JobDocument']>, ParentType, ContextType, RequireFields<IQueryGetJobArgs, 'id'>>;
-  getPing?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
   getUser?: Resolver<Maybe<IResolversTypes['UserOutput']>, ParentType, ContextType, RequireFields<IQueryGetUserArgs, 'id'>>;
   searchConfigs?: Resolver<Maybe<IResolversTypes['ConfigPagination']>, ParentType, ContextType, RequireFields<IQuerySearchConfigsArgs, 'search'>>;
   searchCountry?: Resolver<Array<IResolversTypes['CountrySearch']>, ParentType, ContextType, Partial<IQuerySearchCountryArgs>>;
@@ -1425,7 +1425,7 @@ export type IServerAccessResolvers<ContextType = any, ParentType extends IResolv
 };
 
 export type ISubscriptionResolvers<ContextType = any, ParentType extends IResolversParentTypes['Subscription'] = IResolversParentTypes['Subscription']> = {
-  getPing?: SubscriptionResolver<Maybe<IResolversTypes['Boolean']>, "getPing", ParentType, ContextType>;
+  _?: SubscriptionResolver<Maybe<IResolversTypes['Boolean']>, "_", ParentType, ContextType>;
   streamConfig?: SubscriptionResolver<Maybe<IResolversTypes['MongoStream']>, "streamConfig", ParentType, ContextType, RequireFields<ISubscriptionStreamConfigArgs, 'stream'>>;
   streamJob?: SubscriptionResolver<Maybe<IResolversTypes['MongoStream']>, "streamJob", ParentType, ContextType, RequireFields<ISubscriptionStreamJobArgs, 'stream'>>;
   streamJobAction?: SubscriptionResolver<Maybe<IResolversTypes['MongoStream']>, "streamJobAction", ParentType, ContextType, RequireFields<ISubscriptionStreamJobActionArgs, 'stream'>>;

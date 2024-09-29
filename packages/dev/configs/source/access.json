@@ -1,0 +1,13 @@
+{
+    "ACTIVE": {
+        "Test": {
+            "getPing": {},
+            "DevApp": {
+                "next": {
+                    "import": "@typestackapp/dev/next/app/test/page",
+                    "title": "Dev App"
+                }
+            }
+        }
+    }
+}

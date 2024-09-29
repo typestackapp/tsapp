@@ -89,12 +89,6 @@ export const LogOptionsInput = `
     max: Int
 `
 
-export const queries = `#graphql
-    query getPing($ping: String!) {
-        getPing
-    }
-`
-
 export default `#graphql
     scalar DateTime
     scalar Object
@@ -102,15 +96,15 @@ export default `#graphql
     scalar Packages
 
     type Query {
-        getPing: Boolean
+        _: Boolean
     }
 
     type Mutation {
-        getPing: Boolean
+        _: Boolean
     }
 
     type Subscription {
-        getPing: Boolean
+        _: Boolean
     }
 
     input SearchInput {

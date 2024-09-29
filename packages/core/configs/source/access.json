@@ -151,9 +151,6 @@
             "getCountry": {},
             "searchCountry": {},
             "searchTimezone": {}
-        },
-        "Test": {
-            "getPing": {}
         }
     }
 }

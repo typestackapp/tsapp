@@ -472,7 +472,7 @@ export type MongoUpdateRes = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  getPing?: Maybe<Scalars['Boolean']['output']>;
+  _?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type MySqlRes = {
@@ -500,13 +500,13 @@ export enum PermissionType {
 
 export type Query = {
   __typename?: 'Query';
+  _?: Maybe<Scalars['Boolean']['output']>;
   getAllAccessConfigs: Array<AccessOptions>;
   getAllRoles?: Maybe<Array<RoleConfigDocument>>;
   getConfig?: Maybe<ConfigOutput>;
   getCountry?: Maybe<CountryDocument>;
   getCurrentUser?: Maybe<UserOutput>;
   getJob?: Maybe<JobDocument>;
-  getPing?: Maybe<Scalars['Boolean']['output']>;
   getUser?: Maybe<UserOutput>;
   searchConfigs?: Maybe<ConfigPagination>;
   searchCountry: Array<CountrySearch>;
@@ -631,7 +631,7 @@ export enum ServerType {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  getPing?: Maybe<Scalars['Boolean']['output']>;
+  _?: Maybe<Scalars['Boolean']['output']>;
   streamConfig?: Maybe<MongoStream>;
   streamJob?: Maybe<MongoStream>;
   streamJobAction?: Maybe<MongoStream>;

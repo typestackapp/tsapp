@@ -16,10 +16,6 @@ npm run build --workspaces --if-present
 
 ###  Start docker containers
 ```bash
-docker-compose -f ./docker-dev/compose.core.certbot.yml up -d
-docker-compose -f ./docker-dev/compose.core.haproxy.yml up -d
-docker-compose -f ./docker-dev/compose.core.mongo.yml up -d
-docker-compose -f ./docker-dev/compose.core.rabbitmq.yml up -d
 docker-compose -f ./docker-dev/compose.core.tsapp.yml up -d
 ```
 
@@ -41,9 +37,8 @@ https://localhost:7443/admin
 https://10.44.44.41:7443/admin
 ```
 
-
 ### Express endpoints examples
-- [express/ping](packages/core/express/v1.0/test/[ping].ts)
+- [express/ping](packages/dev/express/test_[any_param].ts)
 
 ### Graphql modules examples:
 - [graphql/common](packages/core/graphql/common)

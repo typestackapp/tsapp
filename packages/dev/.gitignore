@@ -1,0 +1,15 @@
+# tsapp
+node_modules
+!docker/*
+/**/*.js
+/**/*.map
+/**/*.d.ts
+!env.js
+*.env
+!example.env
+
+# dev
+configs/*
+codegen/*
+!codegen/system
+!configs/source

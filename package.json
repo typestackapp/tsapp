@@ -5,6 +5,10 @@
       "@typestackapp/core": {
         "haproxy": { "rewrite": true },
         "disable_next_alias": true
+      },
+      "@typestackapp/dev": {
+        "haproxy": { "rewrite": false },
+        "disable_next_alias": true
       }
     }
   }

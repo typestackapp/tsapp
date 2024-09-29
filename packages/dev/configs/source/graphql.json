@@ -1,0 +1,18 @@
+{
+    "ACTIVE": {
+        "system": {
+            "isServer": true,
+            "isPublic": true,
+            "genClient": true,
+            "modules": [
+                "@typestackapp/core/graphql/common/",
+                "@typestackapp/dev/graphql/test/"
+            ],
+            "documents": [
+                "@typestackapp/dev/graphql/**/*.{ts,tsx}",
+                "@typestackapp/dev/components/**/*.{ts,tsx}",
+                "@typestackapp/dev/next/app/**/*.{ts,tsx}"
+            ]
+        }
+    }
+}
