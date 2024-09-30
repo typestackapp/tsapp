@@ -42,7 +42,7 @@ export const transaction: Transaction = async (session, update) => {
 
     // ADD JWT FOR REFRESH TOKEN
     const refresh_token_config = await JWKConfigModel.findOne({ _id: refresh_token_config_id }, {}, { session })
-    if(!refresh_token_config || tsapp.env.TSAPP_ENV_TYPE == "dev") {
+    if(!refresh_token_config) {
         const pair = await generateKeyPair("RS256")
         const key = await exportJWK(pair.privateKey)
         const refresh_token_config_input: JWKConfigInput<RefreshTokenJWKData> = {
@@ -73,7 +73,7 @@ export const transaction: Transaction = async (session, update) => {
 
     // ADD JWT FOR ACCESS TOKEN
     const access_token_config = await JWKConfigModel.findOne({ _id: access_token_config_id }, {}, { session })
-    if(!access_token_config || tsapp.env.TSAPP_ENV_TYPE == "dev") {
+    if(!access_token_config) {
         const pair = await generateKeyPair("RS256")
         const key = await exportJWK(pair.privateKey)
         const access_token_config_input: JWKConfigInput<AccessTokenJWKData> = {
