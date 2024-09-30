@@ -79,7 +79,7 @@
         "Access": {
             "getAllAccessConfigs": {
                 "info": [ "Allows user to get all access configs" ],
-                "auth": { "tokens": ["Bearer"], "permission": "Read" }
+                "auth": { "tokens": ["Bearer", "Cookie"], "permission": "Read" }
             }
         },
         "Config": {

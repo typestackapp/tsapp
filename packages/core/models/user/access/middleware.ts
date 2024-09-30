@@ -54,7 +54,8 @@ export type ServerAccess =  GraphqlServerAccess | ExpressServerAccess
 
 type MiddlewareResult = {
     error?: ExpressErrorResponse
-    success: boolean,
+    success: boolean
+    req_log?: UserAccessLogDocument
 }
 
 interface UserTokenOutput {
@@ -151,13 +152,12 @@ export const applyMiddlewareToGraphqlModule = function (module: GraphqlResovlerM
             ) continue
 
             if(resovler_access) {
-                const new_resolver_method = async (parent: any, args: any, context: AccessRequest, info: any) => {
-                    const res = await middleware.graphql(context, resovler_access)
-                    const result = await resolver.resolve(parent, args, context, info)
-                    if(result instanceof Error) throw result
-                    return result
+                resolver_method = async (parent: any, args: any, context: AccessRequest, info: any) => {
+                    const result = await middleware.graphql(context, resovler_access)
+                    const resolver_result = await resolver.resolve(parent, args, {...context, log: result.req_log, middleware:result }, info)
+                    if(resolver_result instanceof Error) throw resolver_result
+                    return resolver_result
                 }
-                resolver_method = new_resolver_method
             }
             
             resolvers[resolver_name_l1] = {
@@ -172,7 +172,9 @@ export const applyMiddlewareToGraphqlModule = function (module: GraphqlResovlerM
 export const middleware = {
     api: (options: IAccessOptions, catchResult: boolean = false): ExpressRequestHandler => {
         return async (req, res, next) => {
-            req.middleware = await middlewares(req, options)
+            const result = await middlewares(req, options)
+            req.middleware = result
+            req.log = req.middleware.req_log
 
             if(!catchResult && !req.middleware.success) {
                 const response: ExpressResponse = {
@@ -186,8 +188,9 @@ export const middleware = {
         }
     },
     graphql: async (context: AccessRequest, options: IAccessOptions, catchResult: boolean = false) => {
-        context.middleware = await middlewares(context, options)
-        if(!catchResult && !context.middleware.success) throw context.middleware.error?.msg
+        const result = await middlewares(context, options)
+        if(!catchResult && !result.success) throw result.error?.msg
+        return result
     }
 }
 
@@ -201,6 +204,7 @@ export async function middlewares( req: AccessRequest, options: IAccessOptions )
 
         error = "invalid-log"
         req_log = await log(req, options)
+        req_log = await req_log?.save()
 
         error = "access-disabled"
         await disabled(req, options)
@@ -209,16 +213,16 @@ export async function middlewares( req: AccessRequest, options: IAccessOptions )
         if(options.limit?.enabled == true) throw `Limit, limit is not supported yet`
 
         error = "invalid-auth"
-        await auth(req, options)
+        await auth(req, options, req_log)
 
         error = "invalid-captcha"
         await captcha(req, options)
 
         await req_log?.addInfo(`middleware-ok`)
-        return  { success: true }
+        return  { req_log, success: true }
     } catch (err) {
         await req_log?.addInfo(error, `${err}`)
-        return  { success: false, error: { code: error, msg: `${err}` } }
+        return  { req_log, success: false, error: { code: error, msg: `${err}` } }
     }
 }
 
@@ -259,9 +263,7 @@ async function log( req: AccessRequest, options: IAccessOptions ) {
         access_id: user_access?._id
     }
 
-    const log = new UserAccessLogModel(log_input)
-    req.log = await log.save()
-    return log
+    return new UserAccessLogModel(log_input)
 }
 
 async function disabled( req: AccessRequest, options: IAccessOptions ): Promise<void> {
@@ -269,7 +271,7 @@ async function disabled( req: AccessRequest, options: IAccessOptions ): Promise<
         throw `Access to resource ${getResourceInfo(options)} is disabled`
 }
 
-export async function auth( req: AccessRequest, options: IAccessOptions ): Promise<void> {
+export async function auth( req: AccessRequest, options: IAccessOptions, log?: UserAccessLogDocument ): Promise<void> {
     // show warning if user set auth.enabled to false
     if(options.auth?.enabled == false) {
         console.log(`WARNING, authentification disabled for ${getResourceInfo(options)}`)
@@ -296,13 +298,13 @@ export async function auth( req: AccessRequest, options: IAccessOptions ): Promi
         }
     }
 
-    if(req.log) {
-        req.log.user = {
+    if(log) {
+        log.user = {
             id: user._id,
             token_id: token?._id,
             token_type,
         }
-        await req.log.save()
+        await log.save()
     }
 
     // user key should have access to resource
