@@ -18,8 +18,9 @@ export type Apps = {
 export abstract class IGlobalContext {
     abstract readonly config: typeof frontend
     abstract readonly tsappClient: TSAppClient
-    
+
     apps: Apps | undefined
+    app_filter: string
 
     get session(): Session | undefined {
         return this.session
@@ -36,4 +37,5 @@ export const context = createContext<IGlobalContext>({
     config: frontend,
     session: undefined,
     apps: undefined,
+    app_filter: '',
 })

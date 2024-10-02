@@ -70,20 +70,6 @@ export class TSA {
         }
     }
 
-    static get client() {
-        return {
-            graphql: <T>() => {
-                // TODO return graphql client
-            },
-            express: <T>() => {
-                // TODO return rest client
-            },
-            trpc: <T>() => {
-                // TODO return trpc client
-            }
-        }
-    }
-
     static get rcs() {
         const rcs: string[] = []
         if( tsapp.env.TSAPP_RCS || tsapp.env.TSAPP_RCS !== "" ) {

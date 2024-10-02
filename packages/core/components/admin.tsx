@@ -1,19 +1,15 @@
 import React from 'react'
 import LoginComponent from '@typestackapp/core/components/user/access/login'
 import { context } from '@typestackapp/core/components/global'
-import { DisplayComponent, Admin, apps, getBasePath, AdminParams, getActiveApp, ErrourBoundary, AdminApp } from '@typestackapp/core/components/util'
-import { useParams, usePathname } from 'next/navigation'
+import { Admin, apps, ErrourBoundary } from '@typestackapp/core/components/util'
 import { ApolloProvider } from "@apollo/client"
 
 export default function AdminLayout({ children }: {
   children: React.ReactNode 
 }) {
   const init = React.useRef(false)
-  const params = useParams() as AdminParams
-  const path: string = getBasePath(usePathname())
   const globalContext = React.useContext(context)
   const [session, setSession] = React.useState(globalContext.tsappClient.getCurrentSession())
-  const [app, setApp] = React.useState(getActiveApp(params))
   globalContext.session = {state: session, setState: setSession}
 
   React.useEffect(() => {
@@ -48,11 +44,10 @@ export default function AdminLayout({ children }: {
   )
 
   // admin
-  const appContent = app ? <DisplayComponent component={app.next.import}/> : children
   return (
     <context.Provider value={globalContext}>
       <ApolloProvider client={globalContext.tsappClient.graphql["@typestackapp/core"].system}>
-        <Admin apps={apps} app={app} path={path} children={appContent}/>
+        <Admin apps={apps} children={children} />
       </ApolloProvider>
     </context.Provider>
   )
