@@ -33,7 +33,7 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 typesPrefix: 'I',
                 declarationKind: 'interface',
                 scalars: {
-                    Object: 'any',
+                    Object: '{[key:string]: any}',
                     DateTime: 'Date',
                     Packages: 'Packages',
                     ObjectId: 'MongooseTypes.ObjectId',
@@ -50,10 +50,10 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
                     typesPrefix: 'I',
                     declarationKind: 'interface',
                     scalars: {
-                        Object: 'any',
-                        DateTime: 'any',
-                        Packages: 'any',
-                        ObjectId: 'any',
+                        Object: '{[key:string]: any}',
+                        DateTime: 'Date',
+                        Packages: 'string',
+                        ObjectId: 'string',
                     },
                     enumsAsTypes: true,
                     skipTypename: true,
@@ -77,8 +77,8 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
             yield (0, cli_1.generate)(CodegenConfig, true);
             let file_result = fs_1.default.readFileSync(graphql_server.typeDefPath, 'utf8');
             file_result = `
-                import { DeepRequired } from 'utility-types'
-                import { Packages } from '@typestackapp/core'
+                import type { DeepRequired } from 'utility-types'
+                import type { Packages } from '@typestackapp/core'
                 import type { Types as MongooseTypes } from 'mongoose'
     
                 ${file_result}
@@ -98,7 +98,7 @@ const graphql = (options) => __awaiter(void 0, void 0, void 0, function* () {
         }
         catch (error) {
             console.error(error);
-            console.log(Object.assign(Object.assign({}, CodegenConfig), { schema: '...' }));
+            // console.log({...CodegenConfig, schema: '...'})
         }
     }
     // initilize or replace graphql/resolvers.json file

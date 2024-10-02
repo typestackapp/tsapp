@@ -109,7 +109,7 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
     }
 
     private getPath(path?: string | IAccessOptions | ExpressRequestHandler): string[] {
-        let _paths = []
+        let _paths: string[] = []
 
         // any user provided path /${prefix}/${path}
         if(typeof path === 'string') 

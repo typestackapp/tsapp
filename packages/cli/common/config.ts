@@ -211,7 +211,7 @@ export const config = async (options: ConfigOptions) => {
                     for(const [env_key, env] of Object.entries(env_js)) {
                         if(env_key == "default") continue
                         if(!env.root && !env.extended) continue
-                        global_file += `# ${env_key} ${pack_key} ${env.extended? `extended ${env.parent.getPackage()?.name}`: ""} \n${env.toFile(env.filter(env_vars))}\n\n`
+                        global_file += `# ${env_key} ${pack_key} ${env.extended? `extended ${env.parent?.getPackage()?.name}`: ""} \n${env.toFile(env.filter(env_vars))}\n\n`
                     }
                     
                     if(global_env_files[env_file_name]){
@@ -302,7 +302,7 @@ export const config = async (options: ConfigOptions) => {
 
     // write global.env file
     for(const [env_file_name, global_file] of Object.entries(global_env_files)) {
-        fs.writeFileSync(`${CWD}/docker-${env_file_name}/!global.env`, global_file)
+        if(global_file) fs.writeFileSync(`${CWD}/docker-${env_file_name}/!global.env`, global_file)
     }
 
     // -------------------- CONFIG --------------------
@@ -519,9 +519,9 @@ export const config = async (options: ConfigOptions) => {
         if(!_config.access?.ACTIVE) continue
 
         // loop trough each resource
-        for(const [resource_key, _resource] of Object.entries(_config.access.ACTIVE)){
+        for(const [resource_key, _resource] of Object.entries<any>(_config.access.ACTIVE)){
             // loop trough each action
-            for(const [action_key, _action] of Object.entries(_resource)){
+            for(const [action_key, _action] of Object.entries<any>(_resource)){
                 if(_action.next)
                     apps_config.push({
                         alias: _config.alias,

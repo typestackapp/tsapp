@@ -165,7 +165,7 @@ export function buidCountryConfig(tsapp_src: string, output_folder: string) {
     fs.copyFileSync(source_file, dest_file)
 
     function cleanCountryList(list: any[]) {
-        const new_list = []
+        const new_list: any[] = []
         for(let country of list) {
             // convert form stirng to int
             if(country.population)
@@ -186,7 +186,7 @@ export function buidCountryConfig(tsapp_src: string, output_folder: string) {
     function generateCountryList(list: any[], tz_list: any[]) {
 
         function resolveTimeZones(alpha2: string, tz_list: any[]) {
-            const tz_list_arr = []
+            const tz_list_arr: any[] = []
 
             for(let i = 0; i < tz_list.length; i++) {
                 const tz = tz_list[i]

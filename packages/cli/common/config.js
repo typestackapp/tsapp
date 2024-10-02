@@ -42,7 +42,7 @@ const child_process_1 = __importDefault(require("child_process"));
 const crypto = __importStar(require("crypto"));
 const exec = child_process_1.default.execSync;
 const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     const CWD = options.cwd;
     const LINK = options.link;
     const core_dir = `${CWD}/packages/core`;
@@ -224,7 +224,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                             continue;
                         if (!env.root && !env.extended)
                             continue;
-                        global_file += `# ${env_key} ${pack_key} ${env.extended ? `extended ${(_b = env.parent.getPackage()) === null || _b === void 0 ? void 0 : _b.name}` : ""} \n${env.toFile(env.filter(env_vars))}\n\n`;
+                        global_file += `# ${env_key} ${pack_key} ${env.extended ? `extended ${(_c = (_b = env.parent) === null || _b === void 0 ? void 0 : _b.getPackage()) === null || _c === void 0 ? void 0 : _c.name}` : ""} \n${env.toFile(env.filter(env_vars))}\n\n`;
                     }
                     if (global_env_files[env_file_name]) {
                         global_env_files[env_file_name] += global_file;
@@ -292,7 +292,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
             env_vars["@ENV_TAG"] = env_file_tag;
             const env_file_tag_with_dot = env_file_tag ? `.${env_file_tag}` : '';
             // foreach docker-compose file in package
-            const compose_files = (_c = fs_1.default.readdirSync(docker_folder)) === null || _c === void 0 ? void 0 : _c.filter(file => file.includes('.yml') && !file.includes('global.yml'));
+            const compose_files = (_d = fs_1.default.readdirSync(docker_folder)) === null || _d === void 0 ? void 0 : _d.filter(file => file.includes('.yml') && !file.includes('global.yml'));
             for (const cfile of compose_files) {
                 const input_file_path = `${docker_folder}/${cfile}`;
                 const docker_file_name = cfile.replace('.yml', '').replace('compose.', '');
@@ -302,7 +302,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
                 (0, util_1.prepareDockerFile)(docker_global_file, env_vars, input_file_path, output_file_path, `${_config.alias}/${env_file}`);
             }
             // foreach docker file in package
-            const docker_files = (_d = fs_1.default.readdirSync(docker_folder)) === null || _d === void 0 ? void 0 : _d.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'));
+            const docker_files = (_e = fs_1.default.readdirSync(docker_folder)) === null || _e === void 0 ? void 0 : _e.filter(file => !file.includes('.yml') && file.startsWith('Dockerfile'));
             for (const dfile of docker_files) {
                 const input_file_path = `${docker_folder}/${dfile}`;
                 const compose_file_name = dfile.replace('Dockerfile.', '');
@@ -315,7 +315,8 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // write global.env file
     for (const [env_file_name, global_file] of Object.entries(global_env_files)) {
-        fs_1.default.writeFileSync(`${CWD}/docker-${env_file_name}/!global.env`, global_file);
+        if (global_file)
+            fs_1.default.writeFileSync(`${CWD}/docker-${env_file_name}/!global.env`, global_file);
     }
     // -------------------- CONFIG --------------------
     // for each tsapp module in package.json create output config
@@ -515,7 +516,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     };
     const pack_config = JSON.parse(fs_1.default.readFileSync(pack_config_output, 'utf8'));
     for (const [pack_key, _config] of Object.entries(pack_config)) {
-        if (!((_e = _config.access) === null || _e === void 0 ? void 0 : _e.ACTIVE))
+        if (!((_f = _config.access) === null || _f === void 0 ? void 0 : _f.ACTIVE))
             continue;
         // loop trough each resource
         for (const [resource_key, _resource] of Object.entries(_config.access.ACTIVE)) {
@@ -620,7 +621,7 @@ const config = (options) => __awaiter(void 0, void 0, void 0, function* () {
     `;
     let graphql_services = "";
     for (const [pack_key, _config] of Object.entries(pack_config)) {
-        if (!((_f = _config === null || _config === void 0 ? void 0 : _config.graphql) === null || _f === void 0 ? void 0 : _f.ACTIVE)
+        if (!((_g = _config === null || _config === void 0 ? void 0 : _config.graphql) === null || _g === void 0 ? void 0 : _g.ACTIVE)
             || Object.keys(_config.graphql.ACTIVE).length === 0)
             continue;
         graphql_services = `${graphql_services}

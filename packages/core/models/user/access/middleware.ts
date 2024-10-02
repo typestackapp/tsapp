@@ -104,7 +104,7 @@ export type CaptchaResponse = {
 }
 
 export const upsertRouterDocs = async function (routers: IExpressRouter[] | IGraphqlRouter[], pack: Packages) {
-    const _promsises = []
+    const _promsises: Promise<any>[] = []
 
     for(const _router of routers) {
         const access_input: UserAccessInput = {
@@ -382,7 +382,7 @@ async function captcha(req: AccessRequest, options: IAccessOptions): Promise<Cap
 
 // Validates user provided token
 export async function validateUserToken( req: Request, options?: IAccessOptions): Promise<ValidUserToken> {
-    var authParamKeyName = undefined
+    var authParamKeyName: string | undefined = undefined
 
     if(options?.auth?.authParamKeyName) {
         authParamKeyName = req.params[options.auth?.authParamKeyName]

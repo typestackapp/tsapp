@@ -31,8 +31,8 @@ export default function Page() {
   const searchParams = useSearchParams()
 
   const adminSearchParams = {
-    code: searchParams.get("code"),
-    state: searchParams.get("state")
+    code: searchParams?.get("code") || null,
+    state: searchParams?.get("state") || null
   } satisfies AdminSearchParams
 
   React.useEffect(() => {

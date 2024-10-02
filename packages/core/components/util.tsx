@@ -66,6 +66,16 @@ export const getNavState = (params: AdminParams): NavState => {
   return state
 }
 
+export function Main({ children }: {
+  children: React.ReactNode 
+}) {
+  return (
+    <main className='h-full overflow-y-auto overflow-x-hidden'>
+      {children}
+    </main>
+  )
+}
+
 export const DisplayComponent = (props: { component: any }) => {
   const Component = props.component
   return <Component/>
