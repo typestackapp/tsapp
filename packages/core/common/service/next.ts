@@ -4,28 +4,26 @@ import express from "express"
 import next from "next"
 import { NextServerOptions } from "next/dist/server/next"
 
-const nextBuild = async (dir: string) => {
-    return new Promise(async (resolve, reject) => {
-        // change cwd directory to dir and run next build ./next
-        const { exec } = await import("child_process")
-        exec(`npx next build ./codegen/next/`, { cwd: dir }, (err, stdout, stderr) => {
-            // CONSOLE LOG SERVER INFO
-            console.log(`--------------------NEXT BUILD-------------------------`)
-            console.log(`dir: ${dir}`)
-            console.log(`cwd: ${process.cwd()}`)
-            console.log(`-------------------------------------------------------`)
+const nextBuild = async (dir: string) => new Promise(async (resolve, reject) => {
+    // change cwd directory to dir and run next build ./next
+    const { exec } = await import("child_process")
+    exec(`npx next build ./codegen/next/`, { cwd: dir }, (err, stdout, stderr) => {
+        // CONSOLE LOG SERVER INFO
+        console.log(`--------------------NEXT BUILD-------------------------`)
+        console.log(`dir: ${dir}`)
+        console.log(`cwd: ${process.cwd()}`)
+        console.log(`-------------------------------------------------------`)
 
-            if(err) {
-                console.log(err)
-                reject(err)
-            }else {
-                console.log(stdout)
-                console.log(stderr)
-                resolve(true)
-            }
-        })
+        if(err) {
+            console.log(err)
+            reject(err)
+        }else {
+            console.log(stdout)
+            console.log(stderr)
+            resolve(true)
+        }
     })
-}
+})
 
 TSA.init()
 .then(async () => {
