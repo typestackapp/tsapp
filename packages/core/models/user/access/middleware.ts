@@ -312,16 +312,17 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
                 token_type: valid_token.token_type,
                 _id: undefined,
             }
-        }else {
-            throw `Auth, invalid token type`
         }
     }
+
+    if(!token) 
+        throw `Auth, token not found`
 
     if(log) {
         log.user = {
             id: user._id,
-            token_id: token?._id,
-            token_type: token?.token_type
+            token_id: token._id,
+            token_type: token.token_type
         }
         await log.save()
     }
@@ -331,7 +332,7 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
         const validator = new AccessValidator(token.access)
         if(!validator.checkAccess(options))
             throw `Auth, user apikey has insuficient permission access to resource: ${getResourceInfo(options)}`
-    } else if(token?.token_type === "Bearer" || token?.token_type === "Cookie") {
+    }else if(token?.token_type === "Bearer" || token?.token_type === "Cookie") {
         const app = await OauthAppModel.findOne({ "data.client_id": token.client_id })
         if(!app)
             throw `Auth, Bearer app:${token.client_id} not found`
@@ -339,9 +340,9 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
         if(!validator.checkAccess(options))
             throw `Auth, user app: ${token.client_id} has insuficient permission access to resource: ${getResourceInfo(options)}`
     
-    } else if(token?.token_type === "Basic") {
+    }else if(token?.token_type === "Basic") {
         // do nothing
-    } else {
+    }else {
         throw `Auth, undefined auth key`
     }
 }

@@ -26,7 +26,7 @@ export interface AccessLogInfo {
 export interface AccessLogUser {
     id: mongoose.Types.ObjectId
     token_id?: mongoose.Types.ObjectId | string
-    token_type?: ITokenType
+    token_type: ITokenType
 }
 
 export interface UserAccessInput {
@@ -69,7 +69,7 @@ export const accessLogInfoSchema = new Schema<AccessLogInfo>({
 }, { _id : false })
 
 export const accessLogUserSchema = new Schema<AccessLogUser>({
-    id: { type: Schema.Types.ObjectId, ref: 'users', index: true, required: false },
+    id: { type: Schema.Types.ObjectId, ref: 'users', index: true, required: true },
     token_id: { type: Schema.Types.ObjectId, index: true, required: false },
     token_type: { type: String, index: true, required: true },
 }, { _id : false })

@@ -3,7 +3,6 @@ import moment from "moment"
 import { DeepPartial } from "utility-types"
 import { Types } from "mongoose"
 import { newRefreshToken, newAccessToken } from "@typestackapp/core/models/user/util"
-import { BearerTokenModel } from "@typestackapp/core/models/user/token/bearer"
 import { default_user_app_client_id } from "@typestackapp/core/updates/main"
 import { AccessInput, AccessOptions, UserAccessLogModel, UserAccessLogInput } from "@typestackapp/core/models/user/access"
 import { AccessRequest, auth, validateApiKey, validateBearerKey } from "@typestackapp/core/models/user/access/middleware"
@@ -17,10 +16,6 @@ var core_tsapp_test: Setup = {} as any
 beforeAll(async () => core_tsapp_test = await setup())
 
 describe('Test Bearer token', () => {
-    beforeAll(async () => {
-        await BearerTokenModel.deleteMany({})
-    })
-
     it('should use valid access token and suceed', async () => {
         token = await newRefreshToken(core_tsapp_test.root_user, client_id, "refresh_token", {
             time: moment().subtract(10, 'seconds'), // token was created 10 seconds ago
