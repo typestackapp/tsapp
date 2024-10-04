@@ -292,31 +292,28 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
     if(!user || !token) {
         var valid_token = await validateUserToken(req, options)
         req.user = user = valid_token.user
-        switch (valid_token.token_type) {
-            case "ApiKey":
-                console.log(valid_token.token)
-                token = {
-                    token_type: valid_token.token_type,
-                    _id: valid_token.token._id,
-                    user_id: valid_token.token.user_id,
-                    access: valid_token.token.data.access,
-                }
-            break
-            case ("Bearer" || "Cookie"):
-                token = {
-                    token_type: valid_token.token_type,
-                    _id: valid_token.token._id,
-                    client_id: valid_token.token.client_id,
-                    user_id: valid_token.token.user_id,
-                    issuer: valid_token.token.issuer,
-                }
-            break
-            case "Basic":
-                token = {
-                    token_type: valid_token.token_type,
-                    _id: undefined,
-                }
-            break
+        if (valid_token.token_type === "ApiKey") {
+            req.token = token = {
+                token_type: valid_token.token_type,
+                _id: valid_token.token._id,
+                user_id: valid_token.token.user_id,
+                access: valid_token.token.data.access,
+            } 
+        }else if (valid_token.token_type === "Bearer" || valid_token.token_type === "Cookie") {
+            req.token = token = {
+                token_type: valid_token.token_type,
+                _id: valid_token.token._id,
+                client_id: valid_token.token.client_id,
+                user_id: valid_token.token.user_id,
+                issuer: valid_token.token.issuer,
+            }
+        }else if (valid_token.token_type === "Basic") {
+            req.token = token = {
+                token_type: valid_token.token_type,
+                _id: undefined,
+            }
+        }else {
+            throw `Auth, invalid token type`
         }
     }
 
@@ -334,7 +331,7 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
         const validator = new AccessValidator(token.access)
         if(!validator.checkAccess(options))
             throw `Auth, user apikey has insuficient permission access to resource: ${getResourceInfo(options)}`
-    } else if(token?.token_type == "Bearer" || token?.token_type == "Cookie") {
+    } else if(token?.token_type === "Bearer" || token?.token_type === "Cookie") {
         const app = await OauthAppModel.findOne({ "data.client_id": token.client_id })
         if(!app)
             throw `Auth, Bearer app:${token.client_id} not found`
@@ -342,7 +339,7 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
         if(!validator.checkAccess(options))
             throw `Auth, user app: ${token.client_id} has insuficient permission access to resource: ${getResourceInfo(options)}`
     
-    } else if(token?.token_type == "Basic") {
+    } else if(token?.token_type === "Basic") {
         // do nothing
     } else {
         throw `Auth, undefined auth key`

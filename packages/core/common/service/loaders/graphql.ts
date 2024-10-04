@@ -17,7 +17,7 @@ import express from "express"
 import http from "http"
 
 export async function graphqlLoader(server: http.Server) {
-    const { applyMiddlewareToGraphqlModule, upsertRouterDocs, validateUserToken } = await import('@typestackapp/core/models/user/access/middleware')
+    const { applyMiddlewareToGraphqlModule, validateUserToken } = await import('@typestackapp/core/models/user/access/middleware')
     const router = express.Router()
     const docs: IGraphqlRouter[] = []
 
