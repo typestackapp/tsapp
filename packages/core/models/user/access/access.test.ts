@@ -246,37 +246,27 @@ describe('Test access', () => {
         }
 
         const input: UserAccessLogInput = {
+            access: options,
             req_id: new Types.ObjectId(),
             device: {
                 ip_address: "10.10.10.44",
                 agent: "test agent"
-            },
-            access: {
-                enabled: true,
-                resource: "User",
-                action: "getCurrentUser",
-                resourceAction: "User_getCurrentUser",
-                pack: "@typestackapp/core",
-                log: { enabled: true },
-                auth: { enabled: true, tokens: ["ApiKey"] }
             }
         }
 
         const log = await UserAccessLogModel.create(input)
-
         const req: DeepPartial<AccessRequest> = {
-            log,
             headers: {
                 authorization: `ApiKey ${api_key_base64}`
             }
         }
 
-        await auth(req as any, options)
+        await auth(req as any, options, log)
 
-        expect(req.log?.user).to.be.not.undefined
-        expect(req.log?.user?.id).to.be.not.undefined
-        expect(req.log?.user?.token_id).to.be.not.undefined
-        expect(req.log?.user?.token_type).to.be.not.undefined
+        expect(log?.user).to.be.not.undefined
+        expect(log?.user?.id).to.be.not.undefined
+        expect(log?.user?.token_id).to.be.not.undefined
+        expect(log?.user?.token_type).to.be.not.undefined
     })
 
 })

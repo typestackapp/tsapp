@@ -59,31 +59,35 @@ type MiddlewareResult = {
 }
 
 interface UserTokenOutput {
-    _id: string // token id
+    _id: string
     user_id: string
     client_id?: string
-    issuer?: string
 }
 
-interface AccessRequestToken extends UserTokenOutput {
-    token_type: ITokenType
-}
-
-type UserToken<Token extends UserTokenOutput | undefined, Type extends ITokenType = ITokenType> = {
-    user: UserDocument
+type ValidToken<Token extends UserTokenOutput | undefined, Type extends ITokenType = ITokenType> = {
     token: Token
     token_type: Type
 }
 
-export type BearerTokenOutput = AccessTokenJWTPayload & {
-    _id: string
+type RequestToken<Token extends UserTokenOutput | undefined, Type extends ITokenType = ITokenType> = Token & {
+    token_type: Type
 }
 
+export type BearerTokenOutput = UserTokenOutput & AccessTokenJWTPayload & {
+    client_id: string
+}
+
+type AccessRequestToken = 
+RequestToken<UserTokenOutput & { access: ApiKeyTokenOutput["data"]["access"] }, "ApiKey">
+| RequestToken<BearerTokenOutput, "Bearer">
+| RequestToken<BearerTokenOutput, "Cookie">
+| { _id: undefined, token_type: "Basic" }
+
 export type ValidUserToken = 
-| UserToken<ApiKeyTokenOutput, "ApiKey">
-| UserToken<BearerTokenOutput, "Bearer">
-| UserToken<undefined, "Basic">
-| UserToken<BearerTokenOutput, "Cookie">
+| ValidToken<ApiKeyTokenOutput, "ApiKey"> & { user: UserDocument }
+| ValidToken<BearerTokenOutput, "Bearer"> & { user: UserDocument }
+| ValidToken<BearerTokenOutput, "Cookie"> & { user: UserDocument }
+| ValidToken<undefined, "Basic"> & { user: UserDocument }
 
 export type CaptchaOptions = {
     enabled: boolean
@@ -273,28 +277,46 @@ async function disabled( req: AccessRequest, options: IAccessOptions ): Promise<
 
 export async function auth( req: AccessRequest, options: IAccessOptions, log?: UserAccessLogDocument ): Promise<void> {
     // show warning if user set auth.enabled to false
-    if(options.auth?.enabled == false) {
+    if(options.auth?.enabled === false) {
         console.log(`WARNING, authentification disabled for ${getResourceInfo(options)}`)
         if(req.log) await req.log.addInfo(`auth-disabled`)
         return
     }
 
     // authentification by default is disabled
-    if(options.auth?.enabled == undefined) return
+    if(options.auth?.enabled === undefined) return
 
-    // already authentificated
-    if(req.user && req.token) return
+    var user = req.user
+    var token = req.token
 
-    const {user, token, token_type} = await validateUserToken(req, options)
-    req.user = user
-
-    if(!token){
-        req.token = undefined
-    }else{
-        req.token = {
-            _id: token._id,
-            user_id: token.user_id,
-            token_type
+    if(!user || !token) {
+        var valid_token = await validateUserToken(req, options)
+        req.user = user = valid_token.user
+        switch (valid_token.token_type) {
+            case "ApiKey":
+                console.log(valid_token.token)
+                token = {
+                    token_type: valid_token.token_type,
+                    _id: valid_token.token._id,
+                    user_id: valid_token.token.user_id,
+                    access: valid_token.token.data.access,
+                }
+            break
+            case ("Bearer" || "Cookie"):
+                token = {
+                    token_type: valid_token.token_type,
+                    _id: valid_token.token._id,
+                    client_id: valid_token.token.client_id,
+                    user_id: valid_token.token.user_id,
+                    issuer: valid_token.token.issuer,
+                }
+            break
+            case "Basic":
+                token = {
+                    token_type: valid_token.token_type,
+                    _id: undefined,
+                }
+            break
         }
     }
 
@@ -302,17 +324,17 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
         log.user = {
             id: user._id,
             token_id: token?._id,
-            token_type,
+            token_type: token?.token_type
         }
         await log.save()
     }
 
     // user key should have access to resource
-    if(token_type == "ApiKey") {
-        const validator = new AccessValidator(token.data.access)
+    if(token?.token_type == "ApiKey") {
+        const validator = new AccessValidator(token.access)
         if(!validator.checkAccess(options))
             throw `Auth, user apikey has insuficient permission access to resource: ${getResourceInfo(options)}`
-    } else if(token_type == "Bearer" || token_type == "Cookie") {
+    } else if(token?.token_type == "Bearer" || token?.token_type == "Cookie") {
         const app = await OauthAppModel.findOne({ "data.client_id": token.client_id })
         if(!app)
             throw `Auth, Bearer app:${token.client_id} not found`
@@ -320,7 +342,7 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
         if(!validator.checkAccess(options))
             throw `Auth, user app: ${token.client_id} has insuficient permission access to resource: ${getResourceInfo(options)}`
     
-    } else if(token_type == "Basic") {
+    } else if(token?.token_type == "Basic") {
         // do nothing
     } else {
         throw `Auth, undefined auth key`
