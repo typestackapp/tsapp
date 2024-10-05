@@ -10,10 +10,10 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import mongoose from "mongoose"
-import { TSAppGraphqlPlugin, IGraphqlRouter } from '@typestackapp/core/common/service'
+import { TSAppGraphqlPlugin, IGraphqlRouter, GraphqlContext } from '@typestackapp/core/common/service'
 import { findTSAppRootDir, getGraphqlModules, getGraphqlRouterConfigs, GraphqlServerConfig } from '@typestackapp/cli/common/util'
 import type { AccessRequest } from '@typestackapp/core/models/user/access/middleware'
-import express from "express"
+import express, { Response } from "express"
 import http from "http"
 
 export async function graphqlLoader(server: http.Server) {
@@ -25,15 +25,15 @@ export async function graphqlLoader(server: http.Server) {
         return {
             async requestDidStart(req) {
                 return {
-                    async didResolveOperation(req) {
+                    async didResolveOperation(ctx) {
                         if (options.isPublic == false) {
                             // one request can access multiple resources
                             // for all resource requests generate a unique request id
                             // this request id will be used when logging resource access
-                            req.contextValue.id = new mongoose.Types.ObjectId()
+                            ctx.contextValue.req.id = new mongoose.Types.ObjectId()
     
                             // must have valid user key, otherwise throw error
-                            const {user, token} = await validateUserToken(req.contextValue)
+                            const {user, token} = await validateUserToken(ctx.contextValue.req)
     
                             // user role must have access to graphql service
                             await user.haveAccessToGraphqlService(options)
@@ -63,7 +63,7 @@ export async function graphqlLoader(server: http.Server) {
         const gql_server = new WebSocketServer({ server, path: graphql_server.serverPath })
         const gql_clenup = useServer({ schema: gql_schema }, gql_server)
 
-        const _server: ApolloServer<AccessRequest> = new ApolloServer({
+        const _server: ApolloServer<GraphqlContext> = new ApolloServer({
             schema: gql_schema,
             introspection: true,
             validationRules: [ depthLimit(7) ],
@@ -71,9 +71,9 @@ export async function graphqlLoader(server: http.Server) {
                 ApolloServerPluginDrainHttpServer({ httpServer: server }), {
                     async serverWillStart() {
                         return {
-                        async drainServer() {
-                            await gql_clenup.dispose();
-                        },
+                            async drainServer() {
+                                await gql_clenup.dispose();
+                            },
                         };
                     },
                 },
@@ -83,9 +83,12 @@ export async function graphqlLoader(server: http.Server) {
 
         await _server.start()
 
-        const express_middleware_options: WithRequired<ExpressMiddlewareOptions<AccessRequest>, 'context'> = {
+        const express_middleware_options: WithRequired<ExpressMiddlewareOptions<GraphqlContext>, 'context'> = {
             context: async ({req, res}) => {
-                return req as AccessRequest
+                return {
+                    req: req as AccessRequest,
+                    res
+                }
             }
         }
 
@@ -93,7 +96,7 @@ export async function graphqlLoader(server: http.Server) {
             `${graphql_server.serverPath}`,
             cors<cors.CorsRequest>(),
             express.json({limit: "100mb"}),
-            expressMiddleware<AccessRequest>(_server, express_middleware_options)
+            expressMiddleware<GraphqlContext>(_server, express_middleware_options)
         )
 
         console.log(`---GRAPHQL ${graphql_server.pack} ${graphql_server.name} SERVER INFO-------`)

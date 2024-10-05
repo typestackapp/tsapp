@@ -104,7 +104,6 @@ export const userAccessSchema = new Schema<UserAccessDocument, Model<UserAccessD
 userAccessLogSchema.methods.addInfo = async function(type: string, msg?: string) {
     const info: AccessLogInfo = { type, msg }
     this.info.push(info)
-    await this.save()
 }
 
 export const AccessModel = mongoose.model('access', accessSchema)

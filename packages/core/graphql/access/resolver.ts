@@ -1,8 +1,7 @@
-import { GraphqlRouter, IResolvers, TSA } from "@typestackapp/core"
-import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
+import { GraphqlContext, GraphqlRouter, IResolvers, TSA } from "@typestackapp/core"
 
 const access = TSA.config["@typestackapp/core"].access.ACTIVE
-export const router = new GraphqlRouter<IResolvers<AccessRequest>>()
+export const router = new GraphqlRouter<IResolvers<GraphqlContext>>()
 
 router.resolvers.Query.getAllAccessConfigs = {
     access: access.Access.getAllAccessConfigs,

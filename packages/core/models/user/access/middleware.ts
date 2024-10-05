@@ -9,7 +9,7 @@ import { UserDocument, UserModel } from '@typestackapp/core/models/user'
 import { IAccessInput, ITokenType, IExpressMethod, IGraphqlMethod, IServerAccess, IAccessOptions, Packages, TSA } from '@typestackapp/core'
 import { ParamsDictionary, Query } from "express-serve-static-core"
 import { Request, Response, NextFunction } from "express"
-import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod } from '@typestackapp/core/common/service'
+import { IGraphqlRouter, IExpressRouter, ExpressResponse, ExpressErrorResponse, GraphqlResovlerModule, GraphqlResovlerMethod, GraphqlContext } from '@typestackapp/core/common/service'
 import { tsapp } from "@typestackapp/core/env"
 import { ApiKeyTokenModel } from '@typestackapp/core/models/user/token/apikey'
 import { AccessTokenJWKData, JWKCache } from "@typestackapp/core/models/config/jwk"
@@ -156,7 +156,7 @@ export const applyMiddlewareToGraphqlModule = function (module: GraphqlResovlerM
             ) continue
 
             if(resovler_access) {
-                resolver_method = async (parent: any, args: any, context: AccessRequest, info: any) => {
+                resolver_method = async (parent: any, args: any, context: GraphqlContext, info: any) => {
                     const result = await middleware.graphql(context, resovler_access)
                     const resolver_result = await resolver.resolve(parent, args, {...context, log: result.req_log, middleware:result }, info)
                     if(resolver_result instanceof Error) throw resolver_result
@@ -178,11 +178,11 @@ export const middleware = {
         return async (req, res, next) => {
             const result = await middlewares(req, options)
             req.middleware = result
-            req.log = req.middleware.req_log
-
-            if(!catchResult && !req.middleware.success) {
+            req.log = result.req_log
+            res.once('finish', () => result.req_log?.save())
+            if(!catchResult && !result.success) {
                 const response: ExpressResponse = {
-                    error: req.middleware.error,
+                    error: result.error,
                     data: undefined
                 }
                 res.send(response)
@@ -191,8 +191,9 @@ export const middleware = {
             }
         }
     },
-    graphql: async (context: AccessRequest, options: IAccessOptions, catchResult: boolean = false) => {
-        const result = await middlewares(context, options)
+    graphql: async (context: GraphqlContext, options: IAccessOptions, catchResult: boolean = false) => {
+        const result = await middlewares(context.req, options)
+        context.res.once('finish', () => result.req_log?.save())
         if(!catchResult && !result.success) throw result.error?.msg
         return result
     }
@@ -208,7 +209,6 @@ export async function middlewares( req: AccessRequest, options: IAccessOptions )
 
         error = "invalid-log"
         req_log = await log(req, options)
-        req_log = await req_log?.save()
 
         error = "access-disabled"
         await disabled(req, options)
@@ -324,7 +324,6 @@ export async function auth( req: AccessRequest, options: IAccessOptions, log?: U
             token_id: token._id,
             token_type: token.token_type
         }
-        await log.save()
     }
 
     // user key should have access to resource

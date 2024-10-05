@@ -1,10 +1,9 @@
 import { IResolvers, TSA } from "@typestackapp/core"
-import { GraphqlRouter, StreamListener } from "@typestackapp/core/common/service"
+import { GraphqlContext, GraphqlRouter, StreamListener } from "@typestackapp/core/common/service"
 import * as j from "@typestackapp/core/models/job"
-import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
 
 const config = TSA.config["@typestackapp/core"]
-export const router = new GraphqlRouter<IResolvers<AccessRequest>>()
+export const router = new GraphqlRouter<IResolvers<GraphqlContext>>()
 
 const job_stream = j.JobModel.watch<j.JobDocument<any>>([])
 const job_exec_action_stream = j.JobActionModel.watch<j.JobActionDocument>([])

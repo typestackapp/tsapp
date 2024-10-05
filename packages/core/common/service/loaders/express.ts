@@ -20,8 +20,9 @@ export async function expressLoader(server: http.Server) {
             return []
         })
 
-        // add api middleware at the begining of each router
+        // add middleware to each handler
         for(const _router of _routers) {
+            
             // wrap each handler with try catch and return ErrorResponse if one off handler throws error
             for(const [index, handler] of _router.handlers.entries()) {
                 _router.handlers[index] = async (req, res, next) => {
@@ -35,6 +36,8 @@ export async function expressLoader(server: http.Server) {
                     }
                 }
             }
+
+            // add api middleware at the begining of each router
             if(_router.options) _router.handlers.unshift(middleware.api(_router.options))
         }
 

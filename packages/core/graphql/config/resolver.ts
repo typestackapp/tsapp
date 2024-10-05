@@ -1,10 +1,9 @@
 import { ConfigModel } from "@typestackapp/core/models/config"
 import { PipelineStage } from "mongoose"
-import { GraphqlRouter, IResolvers, TSA } from "@typestackapp/core"
-import { AccessRequest } from "@typestackapp/core/models/user/access/middleware"
+import { GraphqlContext, GraphqlRouter, IResolvers, TSA } from "@typestackapp/core"
 
 const config = TSA.config["@typestackapp/core"]
-export const router = new GraphqlRouter<IResolvers<AccessRequest>>()
+export const router = new GraphqlRouter<IResolvers<GraphqlContext>>()
 
 router.resolvers.Query.searchConfigs = {
     access: config.access.ACTIVE.Config.searchConfigs,

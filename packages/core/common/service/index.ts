@@ -318,7 +318,12 @@ export class GraphqlRouter<TResolvers extends GraphqlResolverInput<TResolvers>> 
     }
 }
 
-export interface TSAppGraphqlPlugin extends ApolloServerPlugin<AccessRequest> {}
+export type GraphqlContext = {
+    req: AccessRequest
+    res: Response
+}
+
+export interface TSAppGraphqlPlugin extends ApolloServerPlugin<GraphqlContext> {}
 
 // listens on mongo change stream
 export class StreamListener<T extends Document = Document> {
