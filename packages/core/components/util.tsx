@@ -226,12 +226,21 @@ export function Admin({ apps, children, access }: {
     <div className='flex h-full w-full max-md:flex-col md:flex-row'>
       <AdminNavBar path={path} setIsOpened={setIsOpened} isOpened={isOpened}/>
       {isOpened && ctx.apps?.state && <AdminAppList path={path} apps={ctx.apps.state}/>}
-      <div className="h-full w-full overflow-auto max-md:flex-1" onClick={() => (isOpened && setIsOpened(false))}>
-        {isOpened && <div className='fixed h-full w-full bg-gray-200 opacity-30 pointer-events-none'></div>}
+      <div className="h-full w-full overflow-auto max-md:flex-1" onClick={() => setIsOpened(false)}>
+        {isOpened && <div className='fixed h-full w-full bg-gray-200 opacity-0 pointer-events-none'></div>}
         {appContent}
       </div>
     </div>
   </div>
+}
+
+function getAppPackMap(apps: AdminApp[]): [string, AdminApp[]][] {
+  const map: {[key: string]: AdminApp[]} = {}
+  apps.forEach(app => {
+    if(!map[app.pack]) map[app.pack] = []
+    map[app.pack].push(app)
+  })
+  return Object.entries(map)
 }
 
 export function AdminAppList({ path, apps }: {
@@ -255,6 +264,25 @@ export function AdminAppList({ path, apps }: {
     ctx.app_filter = search
     if(search === '') return setFilteredApps(apps)
     setFilteredApps(filterApps(search))
+  }
+
+  // grey line in at both sides of text
+  function PackageTitle({ pack }: { pack: string }) {
+    return <div>
+      <div className='flex items-center'>
+        <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
+        <div className='text-center text-gray-600 font-bold text-xs p-2'>{pack}</div>
+        <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
+      </div>
+    </div>
+  }
+
+  function AppSection({ children }: { children: React.ReactNode }) {
+    return <div className='min-w-[150px] gap-3 place-content-center
+      max-md:flex max-md:flex-wrap max-md:gap-x-[3%]
+      md:grid md:grid-cols-4'> 
+      {children}
+    </div>
   }
 
   return <div className='
@@ -288,11 +316,15 @@ export function AdminAppList({ path, apps }: {
     </div>
 
     <div className='flex-grow overflow-y-auto bg-gray-50'>
-      <div className='min-w-[150px] gap-3 place-content-center
-        max-md:flex max-md:flex-wrap max-md:gap-x-[3%]
-        md:grid md:grid-cols-4'>
-        {filteredApps.map(app => <AppTile key={app.admin.hash} app={app} path={path}/>)}
-      </div>
+      {filterValue && <AppSection>{filteredApps.map(app =><AppTile key={app.admin.hash} app={app} path={path}/>)}</AppSection>}
+      {!filterValue && getAppPackMap(filteredApps).map(([pack, apps]) => 
+        <div className='pb-4' key={pack}>
+          <PackageTitle pack={pack}/>
+          <AppSection>
+              {apps.map(app => <AppTile key={app.admin.hash} app={app} path={path}/>)}
+          </AppSection>
+        </div>
+      )}
     </div>
   </div>
 }
