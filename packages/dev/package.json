@@ -4,7 +4,7 @@
   "description": "tsapp package example",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p ./tsconfig.json && tailwindcss -c ./tailwind/config.js -i ./tailwind/input.css -o ./next/public/dev.css --minify",
+    "build": "tsc -p ./tsconfig.json",
     "build:watch": "tsc -w -p ./tsconfig.json",
     "tailwind:watch": "tailwindcss -c ./tailwind/config.js -i ./tailwind/input.css -o ./next/public/dev.css --watch",
     "test": "jest \"/.*\\.test\\.js\" --env=node --bail=1 --setupFiles ./common/test/env.js"
