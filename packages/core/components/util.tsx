@@ -6,8 +6,8 @@ import { AccessCheckOptions, AccessValidator } from '@typestackapp/core/models/u
 import { Packages } from '@typestackapp/core'
 import { ValuesType } from 'utility-types'
 import { useParams, usePathname } from 'next/navigation'
-import { getAdminUserData, useQuery } from '@typestackapp/core/components/queries'
-import { AccessDocument } from '../codegen/system/client/graphql'
+import { AccessDocument, GetAdminDataQuery } from '@typestackapp/core/codegen/admin/client/graphql'
+import { QueryResult } from '@apollo/client'
 
 export { apps }
 
@@ -177,21 +177,17 @@ export function getAccesableAdminApps(access: AccessDocument [][] | undefined, _
   })
 }
 
-export function Admin({ apps, children }: {
+export function Admin({ apps, children, access }: {
   apps: AdminApp[]
   children: React.ReactNode
+  access: AccessDocument [][] | undefined
 }) {
-  const globalContext = React.useContext(context)
+  const ctx = React.useContext(context)
   const params = useParams() as AdminParams
   const path: string = getBasePath(usePathname() || '')
   const [isOpened, setIsOpened] = useState(true)
-  const [adminApps, setAdminApps] = React.useState<AdminApp[] | undefined>(globalContext.apps?.state || undefined)
-  const adminUser = useQuery(getAdminUserData, { fetchPolicy: "cache-first" })
-  const access = adminUser?.data?.getCurrentUser?.roles?.map( role => role.data.resource_access )
   const app = getActiveApp(params)
   const appContent = app ? <DisplayComponent component={app.next.import}/> : children
-
-  globalContext.apps = { state: adminApps, setState: setAdminApps }
 
   // watch app change
   React.useEffect(() => {
@@ -209,14 +205,13 @@ export function Admin({ apps, children }: {
     if(side_nav_active_app) 
       side_nav_active_app.is_active = true
 
-    setAdminApps(adminApps)
-    globalContext.apps = { state: adminApps, setState: setAdminApps }
-  }, [adminUser])
+    ctx.apps?.setState(adminApps)
+  }, [])
 
   return <div className='h-full w-full overflow-hidden'>
     <div className='flex h-full w-full max-md:flex-col md:flex-row'>
       <AdminNavBar path={path} setIsOpened={setIsOpened} isOpened={isOpened}/>
-      {isOpened && adminApps && <AdminAppList path={path} apps={adminApps}/>}
+      {isOpened && ctx.apps?.state && <AdminAppList path={path} apps={ctx.apps.state}/>}
       <div className="h-full w-full overflow-auto max-md:flex-1" onClick={() => (isOpened && setIsOpened(false))}>
         {isOpened && <div className='fixed h-full w-full bg-gray-200 opacity-30 pointer-events-none'></div>}
         {appContent}
@@ -229,12 +224,12 @@ export function AdminAppList({ path, apps }: {
   apps: AdminApp[]
   path: string
 }) {
-  const globalContext = React.useContext(context)
-  const [filteredApps, setFilteredApps] = React.useState<AdminApp[]>(filterApps(globalContext.app_filter))
-  const [filterValue, setFilterValue] = React.useState(globalContext.app_filter)
+  const ctx = React.useContext(context)
+  const [filteredApps, setFilteredApps] = React.useState<AdminApp[]>(filterApps(ctx.app_filter))
+  const [filterValue, setFilterValue] = React.useState(ctx.app_filter)
 
   React.useEffect(() => {
-    updateApps(globalContext.app_filter)
+    updateApps(ctx.app_filter)
   }, [apps])
 
   function filterApps(search: string) {
@@ -243,7 +238,7 @@ export function AdminAppList({ path, apps }: {
 
   function updateApps(search: string) {
     setFilterValue(search)
-    globalContext.app_filter = search
+    ctx.app_filter = search
     if(search === '') return setFilteredApps(apps)
     setFilteredApps(filterApps(search))
   }

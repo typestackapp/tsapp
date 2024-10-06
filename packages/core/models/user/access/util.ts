@@ -1,6 +1,6 @@
 
 import crypto from "crypto"
-import type { IAccessInput, IAccessStatus, IPermissionType, IAccessOptions } from '@typestackapp/core/codegen/system'
+import type { IAccessInput, IAccessStatus, IPermissionType, IAccessOptions } from '@typestackapp/core/codegen/admin'
 import type { RoleConfigDocument } from '@typestackapp/core/models/config/role'
 import type { AccessOutput } from "@typestackapp/core/models/user/access"
 import type { Maybe } from "graphql/jsutils/Maybe"

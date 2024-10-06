@@ -9,6 +9,7 @@ export default class TSAppClient extends Client {
     readonly graphql: GraphqlClients // tsapp graphql clients
     options: ClientOptions
     session: ClientSession
+    private sessionRequest: Promise<ClientSession> | undefined
 
     constructor(options: ClientOptions) {
         super()
@@ -55,7 +56,11 @@ export default class TSAppClient extends Client {
     async getActiveSession() {
         if(this.isTokenValid()) return this.session
         const client = this.getAuthClient({})
-        const result = await client.token.session.mutate({client_id: this.options.client_id})
+
+        if(!this.sessionRequest)
+            this.sessionRequest = client.token.session.mutate({client_id: this.options.client_id})
+
+        const result = await this.sessionRequest
         return this.session = {
             data: result.data,
             error: result.error

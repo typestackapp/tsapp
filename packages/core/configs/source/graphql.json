@@ -1,6 +1,6 @@
 {
     "ACTIVE": {
-        "system": {
+        "admin": {
             "isServer": true,
             "isPublic": false,
             "genClient": true,

@@ -2,6 +2,7 @@ import { MongooseDocument } from "@typestackapp/core/models/util"
 import { ConfigModel, ConfigInput } from "@typestackapp/core/models/config"
 import { Model, Schema, Document, Types } from 'mongoose'
 import { JWK } from 'jose'
+import { GraphObj } from "@typestackapp/core"
 
 export const pack = "@typestackapp/core"
 export const type = "JWKConfig"
@@ -19,13 +20,13 @@ export interface RefreshTokenJWKData extends AccessTokenJWKData {
     extendLifeTime: boolean  // should refresh token lifetime be extended
 }
 
-export interface JWKConfigInput<Data> extends ConfigInput {
+export interface JWKConfigInput<Data extends GraphObj> extends ConfigInput {
     data: Data
     key: JWK
     cacheSeconds: number
 }
 
-export type JWKConfigDocument<Data> = JWKConfigInput<Data> & MongooseDocument & {
+export type JWKConfigDocument<Data extends GraphObj> = JWKConfigInput<Data> & MongooseDocument & {
     pack: typeof pack
     type: typeof type
 }
@@ -48,7 +49,7 @@ export class JWKCache {
         }
     } = {}
 
-    public static async get<TData = any>(_id: string | Types.ObjectId): Promise<JWKConfigDocument<TData>> {
+    public static async get<TData extends GraphObj = {}>(_id: string | Types.ObjectId): Promise<JWKConfigDocument<TData>> {
         const cached = this.cache[_id.toString()]
         if (cached && cached.expires > Date.now()) {
             //console.log(`JWKConfig cache hit for jwk:${_id}`)

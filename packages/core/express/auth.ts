@@ -186,10 +186,6 @@ export const tokenRouter = t.router({
             setCookie(res, `${client_id}_rt`, token.key.refresh.tk, token_expires_at, req.baseUrl)
             setCookie(res, `${client_id}_at`, token.key.access.tk, token_expires_at, "/")
     
-            console.log(req.originalUrl);     // baseURL + url
-            console.log();         // baseURL
-            console.log(req.path);            // url
-    
             response.data = {
                 ...token.key,
                 refresh: undefined

@@ -1,6 +1,5 @@
-import { gql } from '@typestackapp/core/codegen/system/client'
+import { gql } from "@typestackapp/core/codegen/admin/client"
 import { useQuery } from "@apollo/client"
-
 export { useQuery }
 
 export const getRoleManagerData = gql(`#graphql
@@ -58,8 +57,8 @@ export const getRoleManagerData = gql(`#graphql
   }
 `)
 
-export const getAdminUserData = gql(`#graphql
-  query GetAdminUserData {
+export const getAdminData = gql(`#graphql
+  query getAdminData {
     getCurrentUser {
       _id
       usn

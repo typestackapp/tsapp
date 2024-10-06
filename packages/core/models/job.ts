@@ -1,19 +1,19 @@
 
 import { Document, Model, Schema, Types } from "mongoose"
-import { IJobInput, IJobDocument, TSA } from "@typestackapp/core"
+import { GraphObj, IJobInput, IJobDocument, TSA } from "@typestackapp/core"
 import { IJobActionInput, IJobStepInput } from "@typestackapp/core"
 import { LogOptionsDocument, logOptionsSchema } from "@typestackapp/core/models/log"
 import { MongooseDocument } from "@typestackapp/core/models/util"
 
-export interface JobInput<TParams, TData = undefined> extends IJobInput { _id?: Types.ObjectId, params: TParams, data: TData }
+export interface JobInput<TParams extends GraphObj, TData extends GraphObj | undefined = undefined> extends IJobInput { _id?: Types.ObjectId, params: TParams, data: TData }
 export interface JobActionInput extends IJobActionInput { steps: JobStepInput<any>[]}
-export interface JobStepInput<TData> extends IJobStepInput { data: TData }
+export interface JobStepInput<TData extends GraphObj> extends IJobStepInput { data: TData }
 
 export type JobActionDocument = MongooseDocument & JobActionInput & {
-    getStep<TStep>(step_identifier: string | undefined): JobStepInput<TStep> | undefined
+    getStep<TStep extends GraphObj>(step_identifier: string | undefined): JobStepInput<TStep> | undefined
 }
 
-export interface JobDocument<TParams, TData = undefined> extends Document, IJobDocument {
+export interface JobDocument<TParams extends GraphObj, TData extends GraphObj | undefined = undefined> extends Document, IJobDocument {
     _id: Types.ObjectId
     params: TParams,
     data: TData,

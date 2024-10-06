@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
-import { getAdminUserData, useQuery } from '@typestackapp/core/components/queries'
+import { getAdminData, useQuery } from '@typestackapp/core/components/queries'
 
 export default function AccountComponent() {
-  const { data } = useQuery(getAdminUserData, { fetchPolicy: "cache-first" })
+  const { data } = useQuery(getAdminData, { fetchPolicy: "cache-first" })
 
   if(!data) return <div>Loading...</div>
 

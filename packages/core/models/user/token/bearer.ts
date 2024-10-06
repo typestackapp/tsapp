@@ -1,5 +1,5 @@
 import { accessSchema } from "@typestackapp/core/models/user/access"
-import { IAccessInput } from "@typestackapp/core/codegen/system"
+import { IAccessInput } from "@typestackapp/core/codegen/admin"
 import { TokenDefaults, TokenDocument, TokenInput, TokenModel } from "@typestackapp/core/models/user/token"
 import { Schema, Model, Types } from 'mongoose'
 import { Serialize } from "@trpc/server/shared"

@@ -1,4 +1,4 @@
-import { gql } from '@typestackapp/dev/codegen/system/client'
+import { gql } from '@typestackapp/devcodegen/admin/client'
 import { useQuery } from "@apollo/client"
 
 export { useQuery }

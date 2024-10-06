@@ -2,16 +2,16 @@ import type tsapp_config from "@typestackapp/core/codegen/tsapp.json"
 import type { Connections as DBConnections } from '@typestackapp/core/common/db'
 import type { Connections as RMQConnections } from '@typestackapp/core/common/rabbitmq/connection'
 import type { JobList } from '@typestackapp/core/common/job'
+import type { IAccessOptions } from "@typestackapp/core/codegen/admin"
 
 import { tsapp } from "@typestackapp/core/env"
 import config from "@typestackapp/core/codegen/config/output.json"
 import { T as Config} from "@typestackapp/core/codegen/config/output"
 import { getPackageConfigs } from '@typestackapp/cli/common/util'
 import { ExpressRouter, GraphqlRouter } from '@typestackapp/core/common/service'
-import { IAccessOptions } from "@typestackapp/core/codegen/system"
 
 export * from "@typestackapp/core/common/service"
-export type * from "@typestackapp/core/codegen/system"
+export type * from "@typestackapp/core/codegen/admin"
 
 export { config }
 export type { Config }

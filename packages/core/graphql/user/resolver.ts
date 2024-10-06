@@ -1,6 +1,6 @@
 import { GraphqlContext, GraphqlRouter, TSA } from "@typestackapp/core"
 import { UserModel } from "@typestackapp/core/models/user"
-import { getCurrentUser, getUser } from "./schema"
+import { getCurrentUser, getUser } from "@typestackapp/core/graphql/user/schema"
 import { IResolvers } from "@typestackapp/core"
 import { RoleConfigModel } from "@typestackapp/core/models/config/role"
 
