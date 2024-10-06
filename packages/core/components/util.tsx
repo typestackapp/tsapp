@@ -271,7 +271,7 @@ export function AdminAppList({ path, apps }: {
     return <div>
       <div className='flex items-center'>
         <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
-        <div className='text-center text-gray-600 font-bold text-xs p-2'>{pack}</div>
+        <div className='text-center text-gray-600 font-bold text-xs p-2'>{pack.replace(/@/g, "").replace(/\//g, " ")}</div>
         <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
       </div>
     </div>
