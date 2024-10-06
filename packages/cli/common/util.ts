@@ -13,9 +13,10 @@ export type TSAppConfig = {
     pack: string
     resource: string
     action: string
-    next: {
+    admin: {
+        app?: string
+        iframe?: string
         hash: string
-        import: string
         title: string
         icon?: string
     }

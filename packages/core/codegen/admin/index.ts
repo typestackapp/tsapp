@@ -51,6 +51,7 @@ export interface IAccessInput {
 
 export interface IAccessOptions extends IEnabled {
   action: Scalars['String']['output'];
+  admin?: Maybe<IAdminOptions>;
   auth?: Maybe<IAuthOptions>;
   captcha?: Maybe<ICaptchaOptions>;
   enabled: Scalars['Boolean']['output'];
@@ -65,6 +66,14 @@ export interface IAccessOptions extends IEnabled {
 export type IAccessStatus =
   | 'Disabled'
   | 'Enabled';
+
+export interface IAdminOptions {
+  app?: Maybe<Scalars['String']['output']>;
+  hash: Scalars['String']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  iframe?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+}
 
 export interface IAuthOptions extends IEnabled {
   authParamKeyName?: Maybe<Scalars['String']['output']>;
@@ -672,7 +681,7 @@ export interface IUserOutput extends IMongoId, IMongoTimeStamps {
 export type IGetRoleManagerDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IGetRoleManagerDataQuery = { getAllAccessConfigs: Array<{ enabled: boolean, resource: string, pack: Packages, action: string, resourceAction: string, limit?: { enabled: boolean } | null, log: { enabled: boolean }, auth?: { enabled: boolean } | null, captcha?: { enabled: boolean } | null, model?: { mongoose?: string | null } | null }>, getAllRoles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, created_by: MongooseTypes.ObjectId, updated_by: MongooseTypes.ObjectId, pack: Packages, type: string, createdAt: Date, updatedAt: Date, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType>, created_by?: MongooseTypes.ObjectId | null, updated_by?: MongooseTypes.ObjectId | null, createdAt?: Date | null, updatedAt?: Date | null }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null };
+export type IGetRoleManagerDataQuery = { getAllAccessConfigs: Array<{ enabled: boolean, resource: string, pack: Packages, action: string, resourceAction: string, limit?: { enabled: boolean } | null, log: { enabled: boolean }, auth?: { enabled: boolean } | null, captcha?: { enabled: boolean } | null, model?: { mongoose?: string | null } | null, admin?: { app?: string | null, iframe?: string | null, title: string } | null }>, getAllRoles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, created_by: MongooseTypes.ObjectId, updated_by: MongooseTypes.ObjectId, pack: Packages, type: string, createdAt: Date, updatedAt: Date, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType>, created_by?: MongooseTypes.ObjectId | null, updated_by?: MongooseTypes.ObjectId | null, createdAt?: Date | null, updatedAt?: Date | null }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null };
 
 export type IGetAdminDataQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -775,6 +784,7 @@ export type IResolversTypes = {
   AccessInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AccessInput']>;
   AccessOptions: ResolverTypeWrapper<IAccessOptions>;
   AccessStatus: IAccessStatus;
+  AdminOptions: ResolverTypeWrapper<IAdminOptions>;
   AuthOptions: ResolverTypeWrapper<IAuthOptions>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CaptchaOptions: ResolverTypeWrapper<ICaptchaOptions>;
@@ -860,6 +870,7 @@ export type IResolversParentTypes = {
   AccessDocument: IAccessDocument;
   AccessInput: IResolversInterfaceTypes<IResolversParentTypes>['AccessInput'];
   AccessOptions: IAccessOptions;
+  AdminOptions: IAdminOptions;
   AuthOptions: IAuthOptions;
   Boolean: Scalars['Boolean']['output'];
   CaptchaOptions: ICaptchaOptions;
@@ -957,6 +968,7 @@ export type IAccessInputResolvers<ContextType = any, ParentType extends IResolve
 
 export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['AccessOptions'] = IResolversParentTypes['AccessOptions']> = {
   action?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  admin?: Resolver<Maybe<IResolversTypes['AdminOptions']>, ParentType, ContextType>;
   auth?: Resolver<Maybe<IResolversTypes['AuthOptions']>, ParentType, ContextType>;
   captcha?: Resolver<Maybe<IResolversTypes['CaptchaOptions']>, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
@@ -966,6 +978,15 @@ export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResol
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   resourceAction?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IAdminOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['AdminOptions'] = IResolversParentTypes['AdminOptions']> = {
+  app?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  hash?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  icon?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  iframe?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1493,6 +1514,7 @@ export type IResolvers<ContextType = any> = {
   AccessDocument?: IAccessDocumentResolvers<ContextType>;
   AccessInput?: IAccessInputResolvers<ContextType>;
   AccessOptions?: IAccessOptionsResolvers<ContextType>;
+  AdminOptions?: IAdminOptionsResolvers<ContextType>;
   AuthOptions?: IAuthOptionsResolvers<ContextType>;
   CaptchaOptions?: ICaptchaOptionsResolvers<ContextType>;
   ConfigBase?: IConfigBaseResolvers<ContextType>;
@@ -1559,7 +1581,7 @@ export type IResolvers<ContextType = any> = {
 
 
 
-export const GetRoleManagerDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getRoleManagerData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAllAccessConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"resourceAction"}},{"kind":"Field","name":{"kind":"Name","value":"limit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"log"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auth"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"captcha"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"model"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mongoose"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"getAllRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<IGetRoleManagerDataQuery, IGetRoleManagerDataQueryVariables>;
+export const GetRoleManagerDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getRoleManagerData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAllAccessConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"resourceAction"}},{"kind":"Field","name":{"kind":"Name","value":"limit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"log"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auth"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"captcha"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"model"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mongoose"}}]}},{"kind":"Field","name":{"kind":"Name","value":"admin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"app"}},{"kind":"Field","name":{"kind":"Name","value":"iframe"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"getAllRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<IGetRoleManagerDataQuery, IGetRoleManagerDataQueryVariables>;
 export const GetAdminDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAdminData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCurrentUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"usn"}},{"kind":"Field","name":{"kind":"Name","value":"roles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<IGetAdminDataQuery, IGetAdminDataQueryVariables>;
     
                 // additional types generated by build-graphql.js script!

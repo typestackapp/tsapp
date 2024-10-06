@@ -245,12 +245,21 @@ export default `#graphql
         ${DefaultAccessOptions}
     }
 
+    type AdminOptions {
+        hash: String!
+        title: String!
+        app: String
+        iframe: String
+        icon: String
+    }
+
     type AccessOptions implements Enabled { 
         log: LogOptions!
         auth: AuthOptions
         captcha: CaptchaOptions
         limit: LimitOptions
         model: ModelOptions
+        admin: AdminOptions
         ${Enabled}
         ${DefaultAccessOptions}
     }

@@ -522,17 +522,18 @@ export const config = async (options: ConfigOptions) => {
         for(const [resource_key, _resource] of Object.entries<any>(_config.access.ACTIVE)){
             // loop trough each action
             for(const [action_key, _action] of Object.entries<any>(_resource)){
-                if(_action.next)
+                if(_action.admin)
                     apps_config.push({
                         alias: _config.alias,
                         pack: pack_key,
                         resource: resource_key,
                         action: action_key,
-                        next: {
+                        admin: {
                             hash: generateHash(pack_key+"_"+resource_key+"_"+action_key),
-                            import: _action.next.import,
-                            title: _action.next.title || action_key,
-                            icon: _action.next.icon
+                            app: _action.admin.app,
+                            iframe: _action.admin.iframe,
+                            title: _action.admin.title || action_key,
+                            icon: _action.admin.icon
                         }
                     })
             }
@@ -559,20 +560,24 @@ export const config = async (options: ConfigOptions) => {
             alias = "null"
         }
 
+        const _app = (!app.admin.app)? 'undefined' : `
+            dynamic(() => import("${app.admin.app}"), {
+                ssr: false,
+                loading: () => <p>loading...</p>
+            })`
+
         return `
             {
                 alias: ${alias},
                 pack: "${app.pack}",
                 resource: "${app.resource}",
                 action: "${app.action}",
-                next: {
-                    hash: "${app.next.hash}",
-                    import: dynamic(() => import("${app.next.import}"), {
-                        ssr: false,
-                        loading: () => <p>loading...</p>
-                    }),
-                    title: "${app.next.title}",
-                    icon: ${app.next.icon? `"${app.next.icon}"`: "undefined"}
+                admin: {
+                    hash: "${app.admin.hash}",
+                    app: ${_app},
+                    iframe: ${app.admin.iframe? `"${app.admin.iframe}"`: "undefined"},
+                    title: "${app.admin.title}",
+                    icon: ${app.admin.icon? `"${app.admin.icon}"`: "undefined"}
                 }
             }
         `

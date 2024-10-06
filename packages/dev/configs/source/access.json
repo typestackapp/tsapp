@@ -1,11 +1,35 @@
 {
     "ACTIVE": {
         "Test": {
-            "getPing": {},
+            "getPing": {
+                "info": [ "everyone is able to ping server" ]
+            },
             "DevApp": {
-                "next": {
-                    "import": "@typestackapp/dev/next/app/test/page",
+                "info": [ "show component based app in admin panel" ],
+                "admin": {
+                    "app": "@typestackapp/dev/next/app/test/page",
                     "title": "Dev App"
+                }
+            },
+            "DevIframe1": {
+                "info": [ "show iframe based app in admin panel" ],
+                "admin": {
+                    "iframe": ":7443/admin",
+                    "title": "Dev Iframe 1"
+                }
+            },
+            "DevIframe2": {
+                "info": [ "show iframe based app in admin panel" ],
+                "admin": {
+                    "iframe": "https://localhost:7443/admin",
+                    "title": "Dev Iframe 2"
+                }
+            },
+            "DevIframe3": {
+                "info": [ "show iframe based app in admin panel" ],
+                "admin": {
+                    "iframe": "/admin",
+                    "title": "Dev Iframe 3"
                 }
             }
         }

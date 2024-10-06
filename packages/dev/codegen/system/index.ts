@@ -50,6 +50,7 @@ export interface IAccessInput {
 
 export interface IAccessOptions extends IEnabled {
   action: Scalars['String']['output'];
+  admin?: Maybe<IAdminOptions>;
   auth?: Maybe<IAuthOptions>;
   captcha?: Maybe<ICaptchaOptions>;
   enabled: Scalars['Boolean']['output'];
@@ -64,6 +65,14 @@ export interface IAccessOptions extends IEnabled {
 export type IAccessStatus =
   | 'Disabled'
   | 'Enabled';
+
+export interface IAdminOptions {
+  app?: Maybe<Scalars['String']['output']>;
+  hash: Scalars['String']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  iframe?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+}
 
 export interface IAuthOptions extends IEnabled {
   authParamKeyName?: Maybe<Scalars['String']['output']>;
@@ -379,6 +388,7 @@ export type IResolversTypes = {
   AccessInput: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['AccessInput']>;
   AccessOptions: ResolverTypeWrapper<IAccessOptions>;
   AccessStatus: IAccessStatus;
+  AdminOptions: ResolverTypeWrapper<IAdminOptions>;
   AuthOptions: ResolverTypeWrapper<IAuthOptions>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CaptchaOptions: ResolverTypeWrapper<ICaptchaOptions>;
@@ -428,6 +438,7 @@ export type IResolversParentTypes = {
   AccessDocument: IAccessDocument;
   AccessInput: IResolversInterfaceTypes<IResolversParentTypes>['AccessInput'];
   AccessOptions: IAccessOptions;
+  AdminOptions: IAdminOptions;
   AuthOptions: IAuthOptions;
   Boolean: Scalars['Boolean']['output'];
   CaptchaOptions: ICaptchaOptions;
@@ -491,6 +502,7 @@ export type IAccessInputResolvers<ContextType = any, ParentType extends IResolve
 
 export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['AccessOptions'] = IResolversParentTypes['AccessOptions']> = {
   action?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  admin?: Resolver<Maybe<IResolversTypes['AdminOptions']>, ParentType, ContextType>;
   auth?: Resolver<Maybe<IResolversTypes['AuthOptions']>, ParentType, ContextType>;
   captcha?: Resolver<Maybe<IResolversTypes['CaptchaOptions']>, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
@@ -500,6 +512,15 @@ export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResol
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   resourceAction?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IAdminOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['AdminOptions'] = IResolversParentTypes['AdminOptions']> = {
+  app?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  hash?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  icon?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  iframe?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -684,6 +705,7 @@ export type IResolvers<ContextType = any> = {
   AccessDocument?: IAccessDocumentResolvers<ContextType>;
   AccessInput?: IAccessInputResolvers<ContextType>;
   AccessOptions?: IAccessOptionsResolvers<ContextType>;
+  AdminOptions?: IAdminOptionsResolvers<ContextType>;
   AuthOptions?: IAuthOptionsResolvers<ContextType>;
   CaptchaOptions?: ICaptchaOptionsResolvers<ContextType>;
   DateTime?: GraphQLScalarType;

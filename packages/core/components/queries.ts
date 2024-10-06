@@ -25,6 +25,11 @@ export const getRoleManagerData = gql(`#graphql
       model {
         mongoose
       }
+      admin {
+        app
+        iframe
+        title
+      }
     }
     getAllRoles {
       _id

@@ -58,8 +58,8 @@
         },
         "User": {
             "AccountApp": {
-                "next": {
-                    "import": "@typestackapp/core/components/user/account",
+                "admin": {
+                    "app": "@typestackapp/core/components/user/account",
                     "title": "My Account"
                 }
             },
@@ -96,8 +96,8 @@
         },
         "RoleConfig": {
             "RoleManagerApp": {
-                "next": {
-                    "import": "@typestackapp/core/components/user/role",
+                "admin": {
+                    "app": "@typestackapp/core/components/user/role",
                     "title": "Role Manager"
                 }
             },

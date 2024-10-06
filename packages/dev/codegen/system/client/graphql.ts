@@ -46,6 +46,7 @@ export type AccessInput = {
 export type AccessOptions = Enabled & {
   __typename?: 'AccessOptions';
   action: Scalars['String']['output'];
+  admin?: Maybe<AdminOptions>;
   auth?: Maybe<AuthOptions>;
   captcha?: Maybe<CaptchaOptions>;
   enabled: Scalars['Boolean']['output'];
@@ -61,6 +62,15 @@ export enum AccessStatus {
   Disabled = 'Disabled',
   Enabled = 'Enabled'
 }
+
+export type AdminOptions = {
+  __typename?: 'AdminOptions';
+  app?: Maybe<Scalars['String']['output']>;
+  hash: Scalars['String']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  iframe?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+};
 
 export type AuthOptions = Enabled & {
   __typename?: 'AuthOptions';
