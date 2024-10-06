@@ -26,7 +26,7 @@ function AdminLayout({ children }: {
   const adminUser = useQuery(getAdminData, { fetchPolicy: "cache-first" })
   const access = adminUser?.data?.getCurrentUser?.roles?.map( role => role.data.resource_access )
 
-  ctx.session = {state: session, setState: setSession}
+  ctx.session = { state: session, setState: setSession }
   ctx.apps = { state: adminApps, setState: setAdminApps }
 
   React.useEffect(() => {
@@ -36,7 +36,9 @@ function AdminLayout({ children }: {
       .then((data) => setSession(data))
       .catch((error) => setSession({ error: { code: "session-fetch-error", msg: error }, data: undefined}))
     }
-  }, [])
+    
+    if(adminUser.error) adminUser.refetch()
+  }, [session])
   
   // loading
   if(adminUser.loading)
