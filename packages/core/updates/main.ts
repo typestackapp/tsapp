@@ -111,7 +111,7 @@ export const transaction: Transaction = async (session, update) => {
             resource_access: all_access_inputs,
             graphql_access: [{
                 pack: "@typestackapp/core",
-                services: ["system"]
+                services: ["admin"]
             }]
         }
     }

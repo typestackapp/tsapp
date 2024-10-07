@@ -25,24 +25,16 @@ export function randomSecret(str_length: number): string {
 
 export async function checkRolesAccessToGraphqlService(roles: RoleConfigDocument[], options: Pick<GraphqlServerConfig, "pack" | "name">): Promise<boolean> {
     for(const role of roles) {
-        if(await checkRoleAccessToGraphqlService(role, options) === true) {
-            return true
+        if(role.data.graphql_access) {
+            for(const access of role.data.graphql_access) {
+                if(access.pack == options.pack && access.services.includes(options.name)) {
+                    return true
+                }
+            }
         }
     }
-    const role_names = roles.map( role => role.data.name ).toString()
-    throw `Roles ${role_names} does not have access to ${options.pack}`
-}
 
-export async function checkRoleAccessToGraphqlService(role: RoleConfigDocument, options: Pick<GraphqlServerConfig, "pack" | "name">): Promise<boolean> {
-    const graphql_access = role.data.graphql_access.find( access => access.pack === options.pack )
-    if (!graphql_access) {
-        return false
-    }
-
-    const services = graphql_access.services
-    if (!services.includes(options.name)) `Role ${role.data.name} not have access to ${options.pack}:${options.name}`
-
-    return true
+    throw `User does not have access to pack:${options.pack} name:${options.name}`
 }
 
 export function arrayToObject(array: [], keyField: string) {

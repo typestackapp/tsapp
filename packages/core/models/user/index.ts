@@ -1,6 +1,5 @@
 import { Types, Schema, Document, Model } from "mongoose"
 import { IUserInput, IUserDocument as IUserDocument, TSA } from "@typestackapp/core"
-import { accessSchema, AccessDocument } from '@typestackapp/core/models/user/access'
 import { RoleConfigDocument, RoleConfigModel } from "@typestackapp/core/models/config/role"
 import { checkRolesAccessToGraphqlService } from "@typestackapp/core/models/user/access/util"
 import { GraphqlServerConfig } from "@typestackapp/cli/common/util"
