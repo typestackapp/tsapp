@@ -75,7 +75,7 @@ export function Main({ children }: {
   )
 }
 
-export function DisplayIframe(props: { src: string }) {
+export function DisplayIframe(props: { src: string, onClick: () => void }) {
   let src = props.src
 
   // if starts with :${port} // add current host
@@ -84,12 +84,24 @@ export function DisplayIframe(props: { src: string }) {
     src = origin_wo_port + src
   }
 
-  return <iframe src={src} className='w-full h-full border-none'/>
+  // add event listener to iframe
+  // find document.activeElement
+  // if iframe is focused, set focus to iframe
+  return <iframe src={src} className='w-full h-full border-none'
+    onLoad={(e) => {
+      const iframe = e.target as HTMLIFrameElement
+      iframe.contentWindow?.addEventListener('focus', () => {
+        props.onClick()
+      })
+    }}
+  />
 }
 
-export function DisplayApp(props: { app: React.ComponentType }) {
+export function DisplayApp(props: { app: React.ComponentType, onClick: () => void }) {
   const Component = props.app
-  return <Component/>
+  return <div className='h-full w-full overflow-auto' onClick={props.onClick}>
+    <Component/>
+  </div>
 }
 
 // get current base path, and remove params
@@ -200,8 +212,8 @@ export function Admin({ apps, children, access }: {
   const app = getActiveApp(params)
 
   let appContent = children
-  if(app && app.admin.app) appContent = <DisplayApp app={app.admin.app}/>
-  if(app && app.admin.iframe) appContent = <DisplayIframe src={app.admin.iframe}/>
+  if(app && app.admin.app) appContent = <DisplayApp app={app.admin.app} onClick={() => setIsOpened(false)}/>
+  if(app && app.admin.iframe) appContent = <DisplayIframe src={app.admin.iframe} onClick={() => setIsOpened(false)}/>
 
   // watch app change
   React.useEffect(() => {
@@ -226,7 +238,7 @@ export function Admin({ apps, children, access }: {
     <div className='flex h-full w-full max-md:flex-col md:flex-row'>
       <AdminNavBar path={path} setIsOpened={setIsOpened} isOpened={isOpened}/>
       {isOpened && ctx.apps?.state && <AdminAppList path={path} apps={ctx.apps.state}/>}
-      <div className="h-full w-full overflow-auto max-md:flex-1" onClick={() => setIsOpened(false)}>
+      <div className="h-full w-full overflow-auto max-md:flex-1">
         {isOpened && <div className='fixed h-full w-full bg-gray-200 opacity-0 pointer-events-none'></div>}
         {appContent}
       </div>
