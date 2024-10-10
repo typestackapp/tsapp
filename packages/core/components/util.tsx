@@ -280,12 +280,10 @@ export function AdminAppList({ path, apps }: {
 
   // grey line in at both sides of text
   function PackageTitle({ pack }: { pack: string }) {
-    return <div>
-      <div className='flex items-center'>
-        <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
-        <div className='text-center text-gray-600 font-bold text-xs p-2'>{pack.replace(/@/g, "").replace(/\//g, " ")}</div>
-        <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
-      </div>
+    return <div className='flex items-center pb-1'>
+      <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
+      <div className='text-center text-gray-500 font-bold text-xs'>{pack.replace(/@/g, "").replace(/\//g, " ")}</div>
+      <div className='mx-3 flex-grow h-[1px] bg-gray-200'></div>
     </div>
   }
 
@@ -302,14 +300,15 @@ export function AdminAppList({ path, apps }: {
     md:shadow-xl min-w-[350px] w-[500px]
     flex flex-col overflow-hidden text-gray-700
   '>
-    <div className='flex items-center h-12 px-3 gap-x-3 bg-gray-200'>
-      <div className='flex gap-x-3 w-full items-center'>
+    {/* search */}
+    <div className='flex items-center px-3 gap-x-2 bg-gray-200'>
+      <div className='flex w-full items-center'>
         {/* search */}
-        <div className='flex flex-grow h-full items-center max-md:mx-1'>
+        <div className='flex flex-grow items-center max-md:mx-1'>
           <input
             value={filterValue}
             onChange={(e) => updateApps(e.target.value)}
-            className='text-base bg-transparent focus:outline-none w-full'
+            className='bg-transparent focus:outline-none w-full h-10 max-md:h-12'
             id='search'
             type='text'
             placeholder='Type to search...'
@@ -327,7 +326,8 @@ export function AdminAppList({ path, apps }: {
       </div>
     </div>
 
-    <div className='flex-grow overflow-y-auto bg-gray-50'>
+    {/* apps */}
+    <div className='flex-grow overflow-y-auto bg-gray-50 p-2'>
       {filterValue && <AppSection>{filteredApps.map(app =><AppTile key={app.admin.hash} app={app} path={path}/>)}</AppSection>}
       {!filterValue && getAppPackMap(filteredApps).map(([pack, apps]) => 
         <div className='pb-4' key={pack}>
@@ -346,25 +346,18 @@ export function AppTile({ app, path }: {
   path: string
 }) {
   return <div className={app.is_active ? 'max-md:w-20 flex flex-col p-2 hover:bg-gray-200 cursor-pointer bg-gray-200': 'max-md:w-20 flex flex-col p-2 hover:bg-gray-200 cursor-pointer'}>
-    <AppIcon app={app} path={path}/>
+    <Link href={getNavPath(app, path)} className='flex flex-col'>
+      {app.admin?.icon && <img src={app.admin.icon} className='max-h-14 object-contain'/>}
+      {!app.admin?.icon && <svg viewBox="-20 0 190 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" clipRule="evenodd" d="M38.155 140.475L48.988 62.1108L92.869 67.0568L111.437 91.0118L103.396 148.121L38.155 140.475ZM84.013 94.0018L88.827 71.8068L54.046 68.3068L44.192 135.457L98.335 142.084L104.877 96.8088L84.013 94.0018ZM59.771 123.595C59.394 123.099 56.05 120.299 55.421 119.433C64.32 109.522 86.05 109.645 92.085 122.757C91.08 123.128 86.59 125.072 85.71 125.567C83.192 118.25 68.445 115.942 59.771 123.595ZM76.503 96.4988L72.837 99.2588L67.322 92.6168L59.815 96.6468L56.786 91.5778L63.615 88.1508L59.089 82.6988L64.589 79.0188L68.979 85.4578L76.798 81.5328L79.154 86.2638L72.107 90.0468L76.503 96.4988Z" fill="#000000"></path>
+      </svg>
+      }
+      <div className='text-center break-keep line-clamp-2'>
+        {app.admin.title}
+      </div>
+      <div className='grow'></div>
+    </Link>
   </div>
-}
-
-export function AppIcon({ app, path }: {
-  app: AdminApp, 
-  path: string 
-}) {
-  return <Link href={getNavPath(app, path)} className='flex flex-col'>
-    {app.admin?.icon && <img src={app.admin.icon} className='max-h-14 object-contain'/>}
-    {!app.admin?.icon && <svg viewBox="-20 0 190 190" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path fillRule="evenodd" clipRule="evenodd" d="M38.155 140.475L48.988 62.1108L92.869 67.0568L111.437 91.0118L103.396 148.121L38.155 140.475ZM84.013 94.0018L88.827 71.8068L54.046 68.3068L44.192 135.457L98.335 142.084L104.877 96.8088L84.013 94.0018ZM59.771 123.595C59.394 123.099 56.05 120.299 55.421 119.433C64.32 109.522 86.05 109.645 92.085 122.757C91.08 123.128 86.59 125.072 85.71 125.567C83.192 118.25 68.445 115.942 59.771 123.595ZM76.503 96.4988L72.837 99.2588L67.322 92.6168L59.815 96.6468L56.786 91.5778L63.615 88.1508L59.089 82.6988L64.589 79.0188L68.979 85.4578L76.798 81.5328L79.154 86.2638L72.107 90.0468L76.503 96.4988Z" fill="#000000"></path>
-    </svg>
-    }
-    <div className='text-center mt-1'>
-      {app.admin.title}
-    </div>
-    <div className='grow'></div>
-  </Link>
 }
 
 export function AdminNavBar({ path, setIsOpened, isOpened }: {
@@ -373,8 +366,8 @@ export function AdminNavBar({ path, setIsOpened, isOpened }: {
   isOpened: boolean
 }) {
   return <div className='
-    max-md:w-full max-md:h-12 max-md:flex-row max-md:h-12 max-md:min-h-12 max-md:max-h-12 max-md:px-3 max-md:py-2
-    md:h-full md:flex-col md:w-12 md:min-w-12 md:max-w-12 md:py-3 md:px-1
+    max-md:w-full max-md:flex-row max-md:h-14 max-md:px-3 max-md:py-2
+    md:h-full md:flex-col md:w-12 md:min-w-12 md:max-w-12 md:py-1 md:px-1
     flex items-center bg-gray-900 text-gray-200 
   '>
     {/* home */}
@@ -385,11 +378,11 @@ export function AdminNavBar({ path, setIsOpened, isOpened }: {
     </Link>
 
     {/* user */}
-    <div className='md:my-2 max-md:mx-1 hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
+    <Link href={`${path}/core/User/AccountApp`} className='md:my-2 max-md:mx-1 hover:text-gray-300 focus:text-gray-300 focus:outline-none cursor-pointer'>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.4} stroke="currentColor" className="w-9 h-9 max-md:w-10 max-md:h-10">
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
       </svg>
-    </div>
+    </Link>
 
     <div className='max-md:flex-grow'></div>
 
@@ -404,4 +397,62 @@ export function AdminNavBar({ path, setIsOpened, isOpened }: {
 
     <div className='md:flex-grow'></div>
   </div>
+}
+
+export function LogoutBtn() {
+  const { tsappClient } = React.useContext(context)
+
+  const handleLogout = async () => {
+      const data = await tsappClient.auth.revoke.mutate({})
+      if(data.error) {
+          alert(data.error.msg)
+          return
+      }
+      window.location.reload()
+  }
+
+  return <button className='text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-1 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900'
+      onClick={handleLogout}
+  >Logout</button>
+}
+
+export function Login() {
+  const {tsappClient, session} = React.useContext(context)
+  if(!session) throw new Error("Session not found")
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault()
+    const email = event.target.email.value
+    const password = event.target.password.value
+    tsappClient.login(email, password)
+    .then((response) => session?.setState(response))
+    .catch((error) => alert(error))
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col bg-grey rounded-md shadow-md px-4 py-8 gap-2 w-full border">
+      <h1 className="text-2xl font-bold flex justify-center">
+        Sign In
+      </h1>
+      
+      <label htmlFor="email" className="block text-gray-700 text-sm font-bold">
+        Email
+      </label>
+      <input type="email" id="email" name="email" placeholder="email@example.com" required className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      
+      <label htmlFor="password" className="block text-gray-700 text-sm font-bold">
+        Password
+      </label>
+      <input id="password" type="password" placeholder="******************" required className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" />
+      
+      <div className="flex items-center justify-between">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+          Sign In
+        </button>
+        <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">
+          Forgot Password?
+        </a>
+      </div>
+    </form>
+  )
 }

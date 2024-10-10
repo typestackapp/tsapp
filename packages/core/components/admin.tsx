@@ -1,7 +1,6 @@
 import React from 'react'
-import LoginComponent from '@typestackapp/core/components/user/access/login'
 import { context } from '@typestackapp/core/components/global'
-import { Admin, AdminApp, apps, ErrourBoundary } from '@typestackapp/core/components/util'
+import { Admin, AdminApp, apps, ErrourBoundary, Login } from '@typestackapp/core/components/util'
 import { ApolloProvider } from "@apollo/client"
 import { getAdminData, useQuery } from '@typestackapp/core/components/queries'
 
@@ -39,6 +38,15 @@ function AdminLayout({ children }: {
     
     if(adminUser.error) adminUser.refetch()
   }, [session])
+
+  const getError = (code: string, msg: string) => {
+    if(code == "invalid-auth-no-token-found") return <></>
+    if(code == "graphq-error" && msg == "No valid token isTokenValid") return <></>
+    return <div className="w-[300px] flex flex-col rounded-md shadow-md px-4 py-4 border">
+      <div className="text-red-500 text-sm">Error: {code}</div>
+      <div className="text-red-500 text-sm">Message: {msg}</div>
+    </div>
+  }
   
   // loading
   if(adminUser.loading)
@@ -48,12 +56,15 @@ function AdminLayout({ children }: {
 
   // login
   if(adminUser.error || (session && session.error))
-    return <div className="flex flex-col items-center justify-center w-full h-full">
+    return <div className="flex flex-col gap-4 items-center justify-center w-full h-full">
       <div className="w-[300px]">
         <ErrourBoundary>
-          <LoginComponent/>
+          <Login/>
         </ErrourBoundary>
       </div>
+
+      {adminUser.error && getError("graphq-error", adminUser.error.message)}
+      {session && session.error && getError(session.error.code, session.error.msg)}
     </div>
 
   // admin

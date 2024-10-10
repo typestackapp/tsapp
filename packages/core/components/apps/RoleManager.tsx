@@ -1,11 +1,11 @@
 'use client'
-import React, { useContext } from 'react'
+import React from 'react'
 import { context } from '@typestackapp/core/components/global'
 import '@typestackapp/core/next/public/tsapp.css'
 import { getRoleManagerData, useQuery } from '@typestackapp/core/components/queries'
 
-export default function RoleManagerComponent() {
-    const { tsappClient, session } = useContext(context)
+export default function RoleManager() {
+    const { tsappClient, session } = React.useContext(context)
     const { data } = useQuery(getRoleManagerData)
 
     const handleSubmit = async (event: any) => {
