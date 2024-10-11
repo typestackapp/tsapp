@@ -54,6 +54,7 @@ export interface IAccessOptions extends IEnabled {
   auth?: Maybe<IAuthOptions>;
   captcha?: Maybe<ICaptchaOptions>;
   enabled: Scalars['Boolean']['output'];
+  info?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   limit?: Maybe<ILimitOptions>;
   log: ILogOptions;
   model?: Maybe<IModelOptions>;
@@ -225,6 +226,18 @@ export interface IMySqlRes {
   protocol41?: Maybe<Scalars['Boolean']['output']>;
   serverStatus?: Maybe<Scalars['Int']['output']>;
   warningCount?: Maybe<Scalars['Int']['output']>;
+}
+
+export interface IPackageHaproxyOptions {
+  rewrite?: Maybe<Scalars['Boolean']['output']>;
+}
+
+export interface IPackageOptions {
+  alias: Scalars['String']['output'];
+  disable_next_alias?: Maybe<Scalars['Boolean']['output']>;
+  haproxy?: Maybe<IPackageHaproxyOptions>;
+  pack: Scalars['Packages']['output'];
+  version: Scalars['String']['output'];
 }
 
 export interface IPagination {
@@ -419,6 +432,8 @@ export type IResolversTypes = {
   MySqlRes: ResolverTypeWrapper<IMySqlRes>;
   Object: ResolverTypeWrapper<Scalars['Object']['output']>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
+  PackageHaproxyOptions: ResolverTypeWrapper<IPackageHaproxyOptions>;
+  PackageOptions: ResolverTypeWrapper<IPackageOptions>;
   Packages: ResolverTypeWrapper<Scalars['Packages']['output']>;
   Pagination: ResolverTypeWrapper<IResolversInterfaceTypes<IResolversTypes>['Pagination']>;
   PermissionType: IPermissionType;
@@ -466,6 +481,8 @@ export type IResolversParentTypes = {
   MySqlRes: IMySqlRes;
   Object: Scalars['Object']['output'];
   ObjectId: Scalars['ObjectId']['output'];
+  PackageHaproxyOptions: IPackageHaproxyOptions;
+  PackageOptions: IPackageOptions;
   Packages: Scalars['Packages']['output'];
   Pagination: IResolversInterfaceTypes<IResolversParentTypes>['Pagination'];
   Query: {};
@@ -506,6 +523,7 @@ export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResol
   auth?: Resolver<Maybe<IResolversTypes['AuthOptions']>, ParentType, ContextType>;
   captcha?: Resolver<Maybe<IResolversTypes['CaptchaOptions']>, ParentType, ContextType>;
   enabled?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
+  info?: Resolver<Maybe<Array<Maybe<IResolversTypes['String']>>>, ParentType, ContextType>;
   limit?: Resolver<Maybe<IResolversTypes['LimitOptions']>, ParentType, ContextType>;
   log?: Resolver<IResolversTypes['LogOptions'], ParentType, ContextType>;
   model?: Resolver<Maybe<IResolversTypes['ModelOptions']>, ParentType, ContextType>;
@@ -670,6 +688,20 @@ export interface IObjectIdScalarConfig extends GraphQLScalarTypeConfig<IResolver
   name: 'ObjectId';
 }
 
+export type IPackageHaproxyOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['PackageHaproxyOptions'] = IResolversParentTypes['PackageHaproxyOptions']> = {
+  rewrite?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IPackageOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['PackageOptions'] = IResolversParentTypes['PackageOptions']> = {
+  alias?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  disable_next_alias?: Resolver<Maybe<IResolversTypes['Boolean']>, ParentType, ContextType>;
+  haproxy?: Resolver<Maybe<IResolversTypes['PackageHaproxyOptions']>, ParentType, ContextType>;
+  pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
+  version?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface IPackagesScalarConfig extends GraphQLScalarTypeConfig<IResolversTypes['Packages'], any> {
   name: 'Packages';
 }
@@ -729,6 +761,8 @@ export type IResolvers<ContextType = any> = {
   MySqlRes?: IMySqlResResolvers<ContextType>;
   Object?: GraphQLScalarType;
   ObjectId?: GraphQLScalarType;
+  PackageHaproxyOptions?: IPackageHaproxyOptionsResolvers<ContextType>;
+  PackageOptions?: IPackageOptionsResolvers<ContextType>;
   Packages?: GraphQLScalarType;
   Pagination?: IPaginationResolvers<ContextType>;
   Query?: IQueryResolvers<ContextType>;

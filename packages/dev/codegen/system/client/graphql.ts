@@ -50,6 +50,7 @@ export type AccessOptions = Enabled & {
   auth?: Maybe<AuthOptions>;
   captcha?: Maybe<CaptchaOptions>;
   enabled: Scalars['Boolean']['output'];
+  info?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   limit?: Maybe<LimitOptions>;
   log: LogOptions;
   model?: Maybe<ModelOptions>;
@@ -239,6 +240,20 @@ export type MySqlRes = {
   protocol41?: Maybe<Scalars['Boolean']['output']>;
   serverStatus?: Maybe<Scalars['Int']['output']>;
   warningCount?: Maybe<Scalars['Int']['output']>;
+};
+
+export type PackageHaproxyOptions = {
+  __typename?: 'PackageHaproxyOptions';
+  rewrite?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type PackageOptions = {
+  __typename?: 'PackageOptions';
+  alias: Scalars['String']['output'];
+  disable_next_alias?: Maybe<Scalars['Boolean']['output']>;
+  haproxy?: Maybe<PackageHaproxyOptions>;
+  pack: Scalars['Packages']['output'];
+  version: Scalars['String']['output'];
 };
 
 export type Pagination = {

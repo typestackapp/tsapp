@@ -260,8 +260,21 @@ export default `#graphql
         limit: LimitOptions
         model: ModelOptions
         admin: AdminOptions
+        info: [String]
         ${Enabled}
         ${DefaultAccessOptions}
+    }
+    
+    type PackageHaproxyOptions {
+        rewrite: Boolean
+    }
+
+    type PackageOptions {
+        pack: Packages!
+        alias: String!
+        version: String!
+        haproxy: PackageHaproxyOptions
+        disable_next_alias: Boolean
     }
 
     interface AccessInput {

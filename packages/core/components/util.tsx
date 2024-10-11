@@ -7,8 +7,14 @@ import { Packages } from '@typestackapp/core'
 import { ValuesType } from 'utility-types'
 import { useParams, usePathname } from 'next/navigation'
 import { AccessDocument } from '@typestackapp/core/codegen/admin/client/graphql'
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export { apps }
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 export type AdminParams = {
   app?: string[]

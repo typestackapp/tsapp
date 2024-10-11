@@ -76,6 +76,12 @@
                 "auth": { "tokens": ["Bearer", "Cookie"], "permission": "Read" }
             }
         },
+        "Pack": {
+            "getAllPackageConfigs": {
+                "info": [ "Allows user to get all package configs" ],
+                "auth": { "tokens": ["Bearer", "Cookie"], "permission": "Read" }
+            }
+        },
         "Access": {
             "getAllAccessConfigs": {
                 "info": [ "Allows user to get all access configs" ],
@@ -95,10 +101,10 @@
             }
         },
         "RoleConfig": {
-            "RoleManagerApp": {
+            "RoleEditor": {
                 "admin": {
-                    "app": "@typestackapp/core/components/apps/RoleManager",
-                    "title": "Role Manager"
+                    "app": "@typestackapp/core/components/apps/RoleEditor",
+                    "title": "Role Editor"
                 }
             },
             "getAllRoles": {
