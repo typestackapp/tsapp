@@ -68,5 +68,5 @@ function AdminLayout({ children }: {
     </div>
 
   // admin
-  return <Admin apps={apps} children={children} access={access}/>
+  return <Admin apps={apps} children={children} access={access} open={false}/>
 }

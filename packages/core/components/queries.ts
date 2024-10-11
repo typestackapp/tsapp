@@ -1,8 +1,6 @@
 import { gql } from "@typestackapp/core/codegen/admin/client"
 import * as client from "@typestackapp/core/codegen/admin/client/graphql"
-
 import { useQuery } from "@apollo/client"
-
 export { client }
 export { useQuery }
 
@@ -28,6 +26,7 @@ export const getRoleManagerData = gql(`#graphql
       }
       auth {
         enabled
+        tokens
         permission
       }
       captcha {

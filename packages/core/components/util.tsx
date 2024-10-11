@@ -206,15 +206,16 @@ export function getAccesableAdminApps(access: AccessDocument [][] | undefined, _
   })
 }
 
-export function Admin({ apps, children, access }: {
+export function Admin({ apps, children, access, open }: {
   apps: AdminApp[]
   children: React.ReactNode
   access: AccessDocument [][] | undefined
+  open: boolean
 }) {
   const ctx = React.useContext(context)
   const params = useParams() as AdminParams
   const path: string = getBasePath(usePathname() || '')
-  const [isOpened, setIsOpened] = useState(true)
+  const [isOpened, setIsOpened] = useState(open)
   const app = getActiveApp(params)
 
   let appContent = children
