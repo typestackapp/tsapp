@@ -15,6 +15,7 @@ describe('Test ExpressRouter', () => {
             "/api/util/dropbox/:ApiKey/:key_id",
             "/api/test/cache_[ApiKey]_[file]",
             "/api/test/cache_[ApiKey]_[file]/cache_[ApiKey]/:file",
+            "/api/test/cache_[ApiKey]_cache_test.pdf",
         ])
         expect(paths).to.be.deep.equal([
             "/api/core/test/ping/pong",
@@ -25,6 +26,7 @@ describe('Test ExpressRouter', () => {
             "/api/util/dropbox/:ApiKey/:key_id",
             "/api/test/cache/:ApiKey/:file",
             "/api/test/cache/:ApiKey/:file/cache/:ApiKey/:file",
+            "/api/test/cache/:ApiKey/cache/test.pdf",
         ])
     })
 })

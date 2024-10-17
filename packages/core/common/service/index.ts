@@ -148,14 +148,14 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
         return paths.map(path => {
             let _path = path
             // replace [] with :
-            _path = _path.replace(/\[(.*?)\]/g, ":$1")
+            // _path = 
     
             // replace _ with /
-            return _path.replace(/_/g, (match, offset, string) => {
+            _path = _path.replace(/_/g, (match, offset, string) => {
                 // console.log(_path, match, offset, string)
     
                 // if next char is : then replace with /
-                if (string[offset + 1] == ':') return '/'
+                if (string[offset + 1] == '[' ||string[offset + 1] == ':') return '/'
     
                 // check if _ is part of param
                 // crawl backwards till find : or / or offset is 0
@@ -163,7 +163,8 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
                     // if / or offset 0 then replace with /
                 let i = offset - 1
                 while(i >= 0) {
-                    if (string[i] == ':') return match
+                    if (string[i] == ']') return "/"
+                    if (string[i] == '[' || string[i] == ':') return match
                     if (string[i] == '/') return '/'
                     if (i == 0) return '/'
                     i--
@@ -171,6 +172,7 @@ export class ExpressRouter<T extends ExpressHandlers = ExpressHandlers> {
                 
                 return match
             })
+            return _path.replace(/\[(.*?)\]/g, ":$1")
         });
     }
 
