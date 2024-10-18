@@ -10,6 +10,7 @@ git clone https://github.com/typestackapp/tsapp.git
 cd tsapp
 npm install
 npm run build --workspaces --if-present
+npm link ./packages/cli
 tsa init
 tsa config --link=0
 ```
