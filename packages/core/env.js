@@ -40,11 +40,13 @@ exports.haproxy = new env_1.ENV({
     HAPROXY_PORT: env_1.zod.string(),
     HAPROXY_STATS_AUTH: env_1.zod.string(),
     HAPROXY_TSAPP_PORT: env_1.zod.string(),
+    HAPROXY_MAXCONN: env_1.zod.string()
 }, {
     HAPROXY_IP: "10.44.44.41",
     HAPROXY_PORT: '["7443:443", "7444:9003", "7445:8404"]',
     HAPROXY_STATS_AUTH: "haproxy:root-psw",
     HAPROXY_TSAPP_PORT: "7443",
+    HAPROXY_MAXCONN: "2048"
 }, {
     default: true,
 });

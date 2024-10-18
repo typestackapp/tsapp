@@ -9,9 +9,9 @@
 git clone https://github.com/typestackapp/tsapp.git
 cd tsapp
 npm install
+npm run build --workspaces --if-present
 tsa init
 tsa config --link=0
-npm run build --workspaces --if-present
 ```
 
 ###  Start docker containers
