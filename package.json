@@ -6,6 +6,10 @@
         "haproxy": { "rewrite": true },
         "disable_next_alias": true
       },
+      "@typestackapp/wireguard": {
+        "haproxy": { "rewrite": false },
+        "disable_next_alias": false
+      },
       "@typestackapp/dev": {
         "haproxy": { "rewrite": false },
         "disable_next_alias": true

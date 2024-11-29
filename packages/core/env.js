@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.codeserver = exports.wireguard = exports.sftp = exports.rabbitmq = exports.mongo = exports.certbot = exports.haproxy = exports.tsapp = void 0;
+exports.codeserver = exports.sftp = exports.rabbitmq = exports.mongo = exports.certbot = exports.haproxy = exports.tsapp = void 0;
 const env_1 = require("@typestackapp/cli/common/env");
 exports.tsapp = new env_1.ENV({
     TSAPP_ENV_TYPE: env_1.zod.string(),
@@ -9,7 +9,6 @@ exports.tsapp = new env_1.ENV({
     TSAPP_VOLUME: env_1.zod.string().default('["../:/tsapp/"]'),
     TSAPP_SUBNET: env_1.zod.string(),
     TSAPP_TIME_ZONE: env_1.zod.string(),
-    TSAPP_ENV_FILE: env_1.zod.string(),
     TSAPP_DOMAIN_NAME: env_1.zod.string(),
     TSAPP_INIT_PSW: env_1.zod.string(),
     TSAPP_INIT_EMAIL: env_1.zod.string().email(),
@@ -24,7 +23,6 @@ exports.tsapp = new env_1.ENV({
     TSAPP_VOLUME: '["../:/tsapp/"]',
     TSAPP_SUBNET: "10.44.44.0/24",
     TSAPP_TIME_ZONE: "UTC",
-    TSAPP_ENV_FILE: "../example.env",
     TSAPP_DOMAIN_NAME: "localhost",
     TSAPP_INIT_PSW: "root-psw",
     TSAPP_INIT_EMAIL: "test@test.com",
@@ -105,23 +103,6 @@ exports.sftp = new env_1.ENV({
 }, {
     SFTP_PORT: "22",
     SFTP_IP: "10.44.44.46"
-});
-exports.wireguard = new env_1.ENV({
-    WIREGUARD_PORT: env_1.zod.string().default("51820"),
-    WIREGUARD_IP: env_1.zod.string().ip().default("10.44.44.45"),
-    WIREGUARD_SERVERURL: env_1.zod.string().default("auto"),
-    WIREGUARD_PEERS: env_1.zod.coerce.number().int().default(50),
-    WIREGUARD_PEERDNS: env_1.zod.string().ip().default("1.1.1.1"),
-    WIREGUARD_ALLOWEDIPS: env_1.zod.string().default("10.44.44.0/24"),
-    WIREGUARD_INTERNAL_SUBNET: env_1.zod.string().ip().default("10.10.1.0")
-}, {
-    WIREGUARD_PORT: "51820",
-    WIREGUARD_IP: "10.44.44.45",
-    WIREGUARD_SERVERURL: "auto",
-    WIREGUARD_PEERS: 50,
-    WIREGUARD_PEERDNS: "1.1.1.1",
-    WIREGUARD_ALLOWEDIPS: "10.44.44.0/24",
-    WIREGUARD_INTERNAL_SUBNET: "10.10.1.0"
 });
 exports.codeserver = new env_1.ENV({
     CODESERVER_PORT: env_1.zod.string().default("8015"),
