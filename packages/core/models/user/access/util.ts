@@ -44,8 +44,7 @@ export function arrayToObject(array: [], keyField: string) {
     }, {});
 }
 
-export interface AccessCheckOptions extends Pick<IAccessOptions, "pack" | "resource"> {
-    action?: Maybe<IAccessOptions["action"]> | undefined, 
+export interface AccessCheckOptions extends Pick<IAccessOptions, "pack" | "resource" | "action"> {
     auth?: Maybe<{
         permission?: Maybe<IPermissionType>
     }>
@@ -70,9 +69,9 @@ export class AccessValidator {
 
     getOptions(access: AccessOutput | IAccessInput, permission?: IPermissionType): AccessCheckOptions {
         return {
+            pack: access.pack,
             resource: access.resource,
             action: access.action,
-            pack: access.pack,
             auth: { permission }
         }
     }
@@ -107,27 +106,40 @@ export class AccessValidator {
         const required_pack = options.pack
     
         if(required_permission == undefined) return true
-        // TODO integrate pack
+        
         for(const user_access of this.access_provided) {
             // pack keys should match
             if(user_access.pack != required_pack) continue
     
-            // resource keys should match
-            if(user_access.resource != required_resource) continue
-    
             // user access should be enabled
             if(!enabled_access_status.includes(user_access.status)) continue
-    
-            // access via top level resource
-            if( true
-                && user_access.action == undefined 
-                && user_access.resource == required_resource
+
+            // check this.access_provided has explicitly disabled access via action
+            const explicitly_disabled = (): boolean => {
+                return this.access_provided.find((access) => {
+                    return access.pack == required_pack
+                        && access.resource == required_resource
+                        && access.action == required_action
+                        && access.status == "Disabled"
+                }) != undefined
+            }
+
+            // access via pack level
+            if( user_access.action == undefined 
+                && user_access.resource == undefined
                 && user_access.permissions.includes(required_permission)
+                && !explicitly_disabled()
             ) return true
     
-            // access via lower level action
-            if( true
-                && user_access.action == required_action 
+            // access via resource level 
+            if( user_access.action == undefined 
+                && user_access.resource == required_resource
+                && user_access.permissions.includes(required_permission)
+                && !explicitly_disabled()
+            ) return true
+    
+            // access via action level 
+            if( user_access.action == required_action 
                 && user_access.resource == required_resource
                 && user_access.permissions.includes(required_permission)
             ) return true

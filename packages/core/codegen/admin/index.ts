@@ -33,7 +33,7 @@ export interface IAccessDocument extends IAccessInput, IMongoTimeStampsMeybe {
   created_by?: Maybe<Scalars['ObjectId']['output']>;
   pack: Scalars['Packages']['output'];
   permissions: Array<IPermissionType>;
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   status: IAccessStatus;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updated_by?: Maybe<Scalars['ObjectId']['output']>;
@@ -44,13 +44,13 @@ export interface IAccessInput {
   created_by?: Maybe<Scalars['ObjectId']['output']>;
   pack: Scalars['Packages']['output'];
   permissions: Array<IPermissionType>;
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   status: IAccessStatus;
   updated_by?: Maybe<Scalars['ObjectId']['output']>;
 }
 
 export interface IAccessOptions extends IEnabled {
-  action: Scalars['String']['output'];
+  action?: Maybe<Scalars['String']['output']>;
   admin?: Maybe<IAdminOptions>;
   auth?: Maybe<IAuthOptions>;
   captcha?: Maybe<ICaptchaOptions>;
@@ -60,7 +60,7 @@ export interface IAccessOptions extends IEnabled {
   log: ILogOptions;
   model?: Maybe<IModelOptions>;
   pack: Scalars['Packages']['output'];
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   resourceAction: Scalars['String']['output'];
 }
 
@@ -208,9 +208,9 @@ export interface ICountryUpdate {
 }
 
 export interface IDefaultAccessOptions {
-  action: Scalars['String']['output'];
+  action?: Maybe<Scalars['String']['output']>;
   pack: Scalars['Packages']['output'];
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   resourceAction: Scalars['String']['output'];
 }
 
@@ -695,12 +695,12 @@ export interface IUserOutput extends IMongoId, IMongoTimeStamps {
 export type IGetRoleManagerDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IGetRoleManagerDataQuery = { getAllPackageConfigs: Array<{ pack: Packages, alias: string, version: string }>, getAllAccessConfigs: Array<{ enabled: boolean, resource: string, pack: Packages, action: string, resourceAction: string, info?: Array<string | null> | null, limit?: { enabled: boolean } | null, log: { enabled: boolean }, auth?: { enabled: boolean, tokens: Array<ITokenType>, permission?: IPermissionType | null } | null, captcha?: { enabled: boolean } | null, model?: { mongoose?: string | null } | null, admin?: { app?: string | null, iframe?: string | null, title: string } | null }>, getAllRoles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, created_by: MongooseTypes.ObjectId, updated_by: MongooseTypes.ObjectId, pack: Packages, type: string, createdAt: Date, updatedAt: Date, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType>, created_by?: MongooseTypes.ObjectId | null, updated_by?: MongooseTypes.ObjectId | null, createdAt?: Date | null, updatedAt?: Date | null }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null };
+export type IGetRoleManagerDataQuery = { getAllPackageConfigs: Array<{ pack: Packages, alias: string, version: string }>, getAllAccessConfigs: Array<{ enabled: boolean, resource?: string | null, pack: Packages, action?: string | null, resourceAction: string, info?: Array<string | null> | null, limit?: { enabled: boolean } | null, log: { enabled: boolean }, auth?: { enabled: boolean, tokens: Array<ITokenType>, permission?: IPermissionType | null } | null, captcha?: { enabled: boolean } | null, model?: { mongoose?: string | null } | null, admin?: { app?: string | null, iframe?: string | null, title: string } | null }>, getAllRoles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, created_by: MongooseTypes.ObjectId, updated_by: MongooseTypes.ObjectId, pack: Packages, type: string, createdAt: Date, updatedAt: Date, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource?: string | null, action?: string | null, permissions: Array<IPermissionType>, created_by?: MongooseTypes.ObjectId | null, updated_by?: MongooseTypes.ObjectId | null, createdAt?: Date | null, updatedAt?: Date | null }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null };
 
 export type IGetAdminDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IGetAdminDataQuery = { getCurrentUser?: { _id: MongooseTypes.ObjectId, usn: string, roles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, pack: Packages, type: string, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource: string, action?: string | null, permissions: Array<IPermissionType> }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null } | null };
+export type IGetAdminDataQuery = { getCurrentUser?: { _id: MongooseTypes.ObjectId, usn: string, roles?: Array<{ _id?: MongooseTypes.ObjectId | null, title: string, pack: Packages, type: string, data: { name: string, resource_access: Array<{ status: IAccessStatus, pack: Packages, resource?: string | null, action?: string | null, permissions: Array<IPermissionType> }>, graphql_access: Array<{ pack: Packages, services: Array<string> }> } }> | null } | null };
 
 
 
@@ -966,7 +966,7 @@ export type IAccessDocumentResolvers<ContextType = any, ParentType extends IReso
   created_by?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   permissions?: Resolver<Array<IResolversTypes['PermissionType']>, ParentType, ContextType>;
-  resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  resource?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<IResolversTypes['AccessStatus'], ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<IResolversTypes['DateTime']>, ParentType, ContextType>;
   updated_by?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
@@ -979,13 +979,13 @@ export type IAccessInputResolvers<ContextType = any, ParentType extends IResolve
   created_by?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
   permissions?: Resolver<Array<IResolversTypes['PermissionType']>, ParentType, ContextType>;
-  resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  resource?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<IResolversTypes['AccessStatus'], ParentType, ContextType>;
   updated_by?: Resolver<Maybe<IResolversTypes['ObjectId']>, ParentType, ContextType>;
 };
 
 export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['AccessOptions'] = IResolversParentTypes['AccessOptions']> = {
-  action?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  action?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   admin?: Resolver<Maybe<IResolversTypes['AdminOptions']>, ParentType, ContextType>;
   auth?: Resolver<Maybe<IResolversTypes['AuthOptions']>, ParentType, ContextType>;
   captcha?: Resolver<Maybe<IResolversTypes['CaptchaOptions']>, ParentType, ContextType>;
@@ -995,7 +995,7 @@ export type IAccessOptionsResolvers<ContextType = any, ParentType extends IResol
   log?: Resolver<IResolversTypes['LogOptions'], ParentType, ContextType>;
   model?: Resolver<Maybe<IResolversTypes['ModelOptions']>, ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
-  resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  resource?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   resourceAction?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1147,9 +1147,9 @@ export interface IDateTimeScalarConfig extends GraphQLScalarTypeConfig<IResolver
 }
 
 export type IDefaultAccessOptionsResolvers<ContextType = any, ParentType extends IResolversParentTypes['DefaultAccessOptions'] = IResolversParentTypes['DefaultAccessOptions']> = {
-  action?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  action?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   pack?: Resolver<IResolversTypes['Packages'], ParentType, ContextType>;
-  resource?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  resource?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   resourceAction?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

@@ -46,21 +46,21 @@ describe('Test Bearer token', () => {
 
     it('should retrive new access token', async () => {
         const refresh_token = token.key.refresh.tk
-        const acccess_token = token.key.access.tk
+        const access_token = token.key.access.tk
 
-        token = await newAccessToken(refresh_token, acccess_token, {
+        token = await newAccessToken(refresh_token, access_token, {
             time: moment().subtract(0, 'seconds'), // token is used now, should allow to retrive new access token
             accessTokenExtendTime: "10s"
         })
 
-        expect(token.key.access.tk).to.be.not.equal(acccess_token)
+        expect(token.key.access.tk).to.be.not.equal(access_token)
     })
 
     it('should retrive new refresh token', async () => {
         const refresh_token = token.key.refresh.tk
-        const acccess_token = token.key.access.tk
+        const access_token = token.key.access.tk
 
-        token = await newAccessToken(refresh_token, acccess_token, {
+        token = await newAccessToken(refresh_token, access_token, {
             time: moment().subtract(15, 'seconds'),
             refreshTokenRenewBefore: "5s",
             refreshTokenExtendTime: "30s",
@@ -72,9 +72,9 @@ describe('Test Bearer token', () => {
 
     it('should not retrive new refresh token', async () => {
         const refresh_token = token.key.refresh.tk
-        const acccess_token = token.key.access.tk
+        const access_token = token.key.access.tk
 
-        token = await newAccessToken(refresh_token, acccess_token, {
+        token = await newAccessToken(refresh_token, access_token, {
             time: moment().subtract(15, 'seconds'),
             refreshTokenRenewBefore: "5s",
             refreshTokenExtendTime: "30s",
@@ -110,7 +110,13 @@ describe('Test ApiKey token', () => {
 
 
 describe('Test access', () => {
-    const user_access: AccessInput = {
+    const user_pack_access: AccessInput = {
+        pack: "@typestackapp/core",
+        status: "Enabled",
+        permissions: ["Write", "Delete"]
+    }
+
+    const user_resource_access: AccessInput = {
         pack: "@typestackapp/core",
         status: "Enabled",
         resource: "User",
@@ -125,8 +131,13 @@ describe('Test access', () => {
         permissions: ["Read"]
     }
 
-    const vuser_access = new AccessValidator([user_access])
-    const vuser_read_access = new AccessValidator([user_read_access])
+    const user_write_access: AccessInput = {
+        pack: "@typestackapp/core",
+        status: "Enabled",
+        resource: "User",
+        action: "getCurrentUser",
+        permissions: ["Write"]
+    }
 
     it('should allow pass type AccessOptions to function checkAccess', async () => {
         const access: AccessInput[] = [] as AccessInput[]
@@ -142,7 +153,8 @@ describe('Test access', () => {
             action: "getCurrentUser",
             auth: { permission: undefined }
         }
-        expect(vuser_read_access.checkAccess(options)).to.be.equal(true)
+        const validator = new AccessValidator([user_read_access])
+        expect(validator.checkAccess(options)).to.be.equal(true)
     })
 
     it('should have access if auth.permission is Read', async () => {
@@ -152,7 +164,8 @@ describe('Test access', () => {
             action: "getCurrentUser",
             auth: { permission: "Read" }
         }
-        expect(vuser_read_access.checkAccess(options)).to.be.equal(true)
+        const validator = new AccessValidator([user_read_access])
+        expect(validator.checkAccess(options)).to.be.equal(true)
     })
 
     it('should not have access if auth.permission is Write', async () => {
@@ -162,71 +175,129 @@ describe('Test access', () => {
             action: "getCurrentUser",
             auth: { permission: "Write" }
         }
-        expect(vuser_read_access.checkAccess(options)).to.be.equal(false)
+        const validator = new AccessValidator([user_read_access])
+        expect(validator.checkAccess(options)).to.be.equal(false)
     })
 
-    it('should have access via top level user_access', async () => {
+    it('should have access via top level user_resource_access', async () => {
         const options: AccessCheckOptions = {
             pack: "@typestackapp/core",
             resource: "User",
             action: "getCurrentUser",
             auth: { permission: "Write" }
         }
-        expect(vuser_access.checkAccess(options)).to.be.equal(true)
+        const validator = new AccessValidator([user_resource_access])
+        expect(validator.checkAccess(options)).to.be.equal(true)
     })
 
-    it('should not have access via top level user_access', async () => {
+    it('should not have read access via top level user_resource_access', async () => {
         const options: AccessCheckOptions = {
             pack: "@typestackapp/core",
             resource: "Test",
             action: "getPing",
             auth: { permission: "Read" }
         }
-        expect(vuser_access.checkAccess(options)).to.be.equal(false)
+        const validator = new AccessValidator([user_resource_access])
+        expect(validator.checkAccess(options)).to.be.equal(false)
     })
 
-    it('should not have access if user_access.status is Disabled' , async () => {
+    it('should not have access if user_resource_access.status is Disabled' , async () => {
         const options: AccessCheckOptions = {
             pack: "@typestackapp/core",
             resource: "User",
             action: "getCurrentUser",
             auth: { permission: "Write" }
         }
-        const validator = new AccessValidator([{ ...user_access, status: "Disabled" }])
+        const validator = new AccessValidator([{ ...user_resource_access, status: "Disabled" }])
         expect(validator.checkAccess(options)).to.be.equal(false)
     })
 
-    it('should not have access to resource Test_getPing. Test_getPing is not defined on user_access' , async () => {
+    it('should not have access to action getPing' , async () => {
         const options: AccessCheckOptions = {
             pack: "@typestackapp/core",
             resource: "Test",
             action: "getPing",
             auth: { permission: "Write" }
         }
-        const validator = new AccessValidator([{ ...user_access, action: undefined }])
+        const validator = new AccessValidator([{ ...user_resource_access }])
         expect(validator.checkAccess(options)).to.be.equal(false)
     })
 
-    it('should not have access for same resource on different pack' , async () => {
+    it('should not have access to test package' , async () => {
         const options: AccessCheckOptions = {
             pack: "@typestackapp/test" as any,
             resource: "User",
             action: "getCurrentUser",
             auth: { permission: "Write" }
         }
-        const validator = new AccessValidator([{ ...user_access }])
+        const validator = new AccessValidator([{ ...user_resource_access }])
         expect(validator.checkAccess(options)).to.be.equal(false)
     })
 
-    it('should have access for same resource on same pack' , async () => {
+    it('should have access for action in resource' , async () => {
         const options: AccessCheckOptions = {
             pack: "@typestackapp/core",
             resource: "User",
             action: "getCurrentUser",
             auth: { permission: "Write" }
         }
-        const validator = new AccessValidator([{ ...user_access }])
+        const validator = new AccessValidator([{ ...user_resource_access }])
         expect(validator.checkAccess(options)).to.be.equal(true)
+    })
+
+    it('should have access if resource is disabled, but action is explicitly enabled' , async () => {
+        const options: AccessCheckOptions = {
+            pack: "@typestackapp/core",
+            resource: "User",
+            action: "getCurrentUser",
+            auth: { permission: "Write" }
+        }
+        const validator = new AccessValidator([{ ...user_resource_access, status: "Disabled" }, user_write_access])
+        expect(validator.checkAccess(options)).to.be.equal(true)
+    })
+
+    it('should not have access if resource is enabled, but action is explicitly disabled' , async () => {
+        const options: AccessCheckOptions = {
+            pack: "@typestackapp/core",
+            resource: "User",
+            action: "getCurrentUser",
+            auth: { permission: "Write" }
+        }
+        const validator = new AccessValidator([{ ...user_resource_access }, { ...user_write_access, status: "Disabled" }])
+        expect(validator.checkAccess(options)).to.be.equal(false)
+    })
+
+    it('should have pack level access' , async () => {
+        const options: AccessCheckOptions = {
+            pack: "@typestackapp/core",
+            resource: "User",
+            action: "getCurrentUser",
+            auth: { permission: "Write" }
+        }
+        const validator = new AccessValidator([user_pack_access])
+        expect(validator.checkAccess(options)).to.be.equal(true)
+    })
+
+    it('should have access if pack is disabled, but action is explicitly enabled' , async () => {
+        const options: AccessCheckOptions = {
+            pack: "@typestackapp/core",
+            resource: "User",
+            action: "getCurrentUser",
+            auth: { permission: "Write" }
+        }
+        const validator = new AccessValidator([{ ...user_pack_access, status: "Disabled" }, user_write_access])
+        expect(validator.checkAccess(options)).to.be.equal(true)
+    })
+
+    it('should not have access if pack is enabled, but action is explicitly disabled' , async () => {
+        const options: AccessCheckOptions = {
+            pack: "@typestackapp/core",
+            resource: "User",
+            action: "getCurrentUser",
+            auth: { permission: "Write" }
+        }
+        const validator = new AccessValidator([{ ...user_pack_access }, { ...user_write_access, status: "Disabled" }])
+        expect(validator.checkAccess(options)).to.be.equal(false)
     })
 
     it('should log user on auth' , async () => {

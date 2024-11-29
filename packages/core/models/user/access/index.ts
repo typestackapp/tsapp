@@ -87,7 +87,7 @@ export const userAccessLogSchema = new Schema<UserAccessLogDocument, Model<UserA
 export const accessSchema = new Schema<AccessDocument, Model<AccessDocument>, AccessDocument>({
     status: { type: String, index: true, required: true },
     pack: { type: String, index: true, required: true },
-    resource: { type: String, index: true, required: true },
+    resource: { type: String, index: true, required: false },
     action: { type: String, index: true, required: false },
     permissions: { type: [String], index: true, required: true },
     created_by: { type: Schema.Types.ObjectId, ref: 'users', index: true, required: false },
