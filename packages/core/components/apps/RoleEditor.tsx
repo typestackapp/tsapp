@@ -6,20 +6,7 @@ import { getRoleManagerData, useQuery, client } from '@typestackapp/core/compone
 import { AccessValidator } from '@typestackapp/core/models/user/access/util'
 
 type AccessStructure = {
-  [role: string]: {
-    [pack: string]: client.GetRoleManagerDataQuery["getAllAccessConfigs"]
-  }
-}
-
-function AccordionMenu({ title, children, className }: { title: string, children: React.ReactNode, className?: string }) {
-    const [open, setOpen] = React.useState<boolean>(true)
-    return <div>
-        <div className={className} onClick={() => setOpen(!open)}>
-            <span className="ml-auto">{open ? "▼" : "►"}</span>
-            <span>{title}</span>
-        </div>
-        {open && children}
-    </div>
+  [role: string]: client.GetRoleManagerDataQuery["getAllAccessConfigs"]
 }
 
 export default function RoleEditor() {
@@ -27,7 +14,8 @@ export default function RoleEditor() {
     const query = useQuery(getRoleManagerData)
     const [data, setData] = React.useState<client.GetRoleManagerDataQuery | undefined>(query.data)
     const [selectedRole, setSelectedRole] = React.useState<string>()
-    const access: AccessStructure = {}
+    const [selectedScope, setSelectedScope] = React.useState<string>("core.Auth.use")
+    const all_role_access: AccessStructure = {}
 
     React.useEffect(() => {
         setData(query.data)
@@ -42,50 +30,25 @@ export default function RoleEditor() {
 
     data?.getAllRoles?.map(role => {
         data?.getAllAccessConfigs.map(config => {
-            if (!access[role._id]) access[role._id] = {}
-            if (!access[role._id][config.pack]) access[role._id][config.pack] = access[role._id][config.pack] = []
-            access[role._id][config.pack].push(config)
+            if (!all_role_access[role._id]) all_role_access[role._id] = []
+            all_role_access[role._id].push(config)
         })
     })
 
-    function AccessEditor() {
-        if (!selectedRole) return <div></div>
-        // const selected_access = access[selectedRole][selectedPack][selectedResource]
-        // const role = getRole(selectedRole)
-        // if(!selected_access || !role) return <div></div>
-        // const role_access = role.data.resource_access
-        // const valid = new AccessValidator(role_access)
-
-        return <div>
-            {/* {selected_access.map((config, index) => (
-                <div key={index} className="mb-2 p-2 bg-secondary rounded-md">
-                    <strong>Action:</strong> {config.resource}.{config.action}<br />
-                    <strong>Accessable:</strong> {valid.checkResourceAccess([{
-                        pack: config.pack,
-                        resource: config.resource,
-                        action: config.action,
-                        permissions: ['Read'],
-                        status: 'Enabled'
-                    }]).has_full_access ? 'Yes' : 'No'}<br />
-                    <strong>Tokens:</strong> {config.auth?.tokens?.join(", ") || "-"}<br />
-                    <strong>Permission:</strong> {config.auth?.permission || "-"}<br />
-                    <strong>Info:</strong>
-                    <ul className="list-disc list-inside pl-2">
-                        {config.info?.map((info, i) => <li key={i}>{info}</li>)}
-                    </ul>
-                </div>
-            ))} */}
+    function ScopeEditor() {
+        if (!selectedScope || !selectedRole) return <div></div>
+        
+        return <div className='min-h-[50px] pt-2'>
+            Scope: {selectedScope}
         </div>
     }
     
     function RoleEditor() {
         const role = getRole(selectedRole)
         if(!role || !selectedRole) return <div></div>
-        const role_access = role.data.resource_access
-        const all_role_access = access[selectedRole]
+        const granted_role_access = role.data.resource_access
 
-
-        const permisions: client.PermissionType[] = [
+        const permissions: client.PermissionType[] = [
             client.PermissionType.Read, 
             client.PermissionType.Write,
             client.PermissionType.Delete,
@@ -93,68 +56,51 @@ export default function RoleEditor() {
         ]
 
         // create multi level list
-        return <div className='h-full mt-4 flex flex-row gap-4'>
-            {Object.entries(all_role_access).map(([pack, resources], index) => {
-                const alias = getAlias(pack) || ""
-                const resources_dropdown: { [key: string]: client.GetRoleManagerDataQuery["getAllAccessConfigs"] } = {}
-                for (const resource of resources) {
-                    if(resource.resource == undefined) continue
-                    if (!resources_dropdown[resource.resource]) resources_dropdown[resource.resource] = []
-                    resources_dropdown[resource.resource].push(resource)
-                }
-
-                return <div key={index} className="w-full ">
-                    <AccordionMenu title={alias} className="border-b border-gray-300 cursor-pointer hover:bg-gray-100 text-lg">
-                        <table className=" table-auto w-full border border-gray-300">
-                            {Object.entries(resources_dropdown).map(([resource, actions], index) => {
-                                return <>
-                                    <thead>
-                                        <tr className="bg-gray-200 border-b border-gray-300">
-                                            <th className="px-4 py-1 border-r border-gray-300">Scope</th>
-                                            <th className="px-4 py-1 border-r border-gray-300">Permission</th>
-                                            <th className="px-4 py-1">Tokens</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {actions.map((action, index) => (
-                                            <tr key={index} className="border-b border-gray-300">
-                                                <td className="px-4 border-r border-gray-300">
-                                                    {alias}.{action.resource}.{action.action}
-                                                </td>
-                                                <td className="px-4 border-r border-gray-300">
-                                                    {action.auth?.permission || "-"}
-                                                </td>
-                                                <td className="px-4">
-                                                    {action.auth?.tokens?.join(", ") || "-"}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </>
-                            })}
-                        </table>
-                    </AccordionMenu>
-                </div>
-            })}
-        </div>
+        return <table className="w-full h-full table-auto border-r border-l">
+            <thead className="mt-4 bg-gray-200 sticky top-0">
+                <tr>
+                    <th className="px-4 py-1 border-r border-gray-300">Scope</th>
+                    <th className="px-4 py-1 border-r border-gray-300">Required</th>
+                    <th className="px-4 py-1">Tokens</th>
+                </tr>
+            </thead>
+            <tbody>
+                {all_role_access[selectedRole].map((action, index) => {
+                    return <tr key={index} className="border-b border-gray-300">
+                        <td className="px-4 border-r border-gray-300 text-nowrap table-auto">
+                            <input type="checkbox" checked={granted_role_access.includes(action._id)} className="mr-2" />
+                            {getAlias(action.pack)}.{action.resource}.{action.action}
+                        </td>
+                        <td className="px-4 border-r border-gray-300">
+                            {action.auth?.permission || "-"}
+                        </td>
+                        <td className="px-4 text-nowrap overflow-hidden overflow-ellipsis">
+                            {action.auth?.tokens?.join(", ") || "-"}
+                        </td>
+                    </tr>
+                })}
+            </tbody>
+        </table>
     }
 
-    if (!data) {
-        return <div className="flex items-center justify-center h-screen">Loading...</div>
-    }
+    if (!data) return <div className="flex items-center justify-center h-screen">Loading...</div>
 
-    return <div className="p-4 w-full h-full">
-        <div className="h-[100px] overflow-y-auto">
-            <h1 className="text-2xl font-bold mb-4">User Role Editor</h1>
-
+    return <div className="w-full h-full flex flex-col p-4">
+        <div className="min-h-[50px]">
             {/* pick role dropdown */}
             <select className="p-2 border border-gray-300 rounded" defaultValue={selectedRole} onChange={e => setSelectedRole(e.target.value)}>
                 {data?.getAllRoles?.map(role => <option key={role._id} value={role._id}>{role.data.name}</option>)}
             </select>
 
+            {/* search */}
+            <input type="text" className="p-2 border border-gray-300 rounded ml-2" placeholder="Search" />
+
             <button className="p-2.5 bg-primary text-white rounded ml-2">Update</button>
+
+            {/* scope editor */}
+            <ScopeEditor />
         </div>
-        <div className="h-[calc(100%-100px)]">
+        <div className="h-[calc(100%-50px)] overflow-auto max-w-screen-lg">
             {/* role details */}
             <RoleEditor />
         </div>
