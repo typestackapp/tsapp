@@ -269,10 +269,11 @@ export const config = async (options: ConfigOptions) => {
 
             env_vars["@ALIAS"] = _config.alias
             env_vars["@PACKAGE"] = pack_key
-            env_vars["@ENV_DEFAULTS"] = `[${default_files.join(', ')}]`
-            env_vars["@ENV_FILE"] = env_file
-            env_vars["@ENV_NAME"] = env_file_name
-            env_vars["@ENV_TAG"] = env_file_tag
+            env_vars["@DEFAULTS"] = `[${default_files.join(', ')}]`
+            env_vars["@FILE"] = env_file
+            env_vars["@NAME"] = env_file_name
+            env_vars["@TAG"] = env_file_tag
+            env_vars["@NAMETAG"] = `${env_file_name}${env_file_tag? `.${env_file_tag}`: ''}`
 
             const env_file_tag_with_dot = env_file_tag ? `.${env_file_tag}` : ''
 

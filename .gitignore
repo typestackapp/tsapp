@@ -8,6 +8,7 @@ package-lock.json
 !packages/cli
 !packages/core
 !packages/dev
+!packages/wireguard
 
 # JAVA projects
 HELP.md

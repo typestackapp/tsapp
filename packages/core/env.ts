@@ -10,7 +10,6 @@ export const tsapp = new ENV(
         TSAPP_VOLUME: zod.string().default('["../:/tsapp/"]'),
         TSAPP_SUBNET: zod.string(),
         TSAPP_TIME_ZONE: zod.string(),
-        TSAPP_ENV_FILE: zod.string(),
         TSAPP_DOMAIN_NAME: zod.string(),
         TSAPP_INIT_PSW: zod.string(),
         TSAPP_INIT_EMAIL: zod.string().email(),
@@ -26,7 +25,6 @@ export const tsapp = new ENV(
         TSAPP_VOLUME: '["../:/tsapp/"]',
         TSAPP_SUBNET: "10.44.44.0/24",
         TSAPP_TIME_ZONE: "UTC",
-        TSAPP_ENV_FILE: "../example.env",
         TSAPP_DOMAIN_NAME: "localhost",
         TSAPP_INIT_PSW: "root-psw",
         TSAPP_INIT_EMAIL: "test@test.com",
@@ -130,27 +128,6 @@ export const sftp = new ENV(
     {
         SFTP_PORT: "22",
         SFTP_IP: "10.44.44.46"
-    }
-)
-
-export const wireguard = new ENV(
-    {
-        WIREGUARD_PORT: zod.string().default("51820"),
-        WIREGUARD_IP: zod.string().ip().default("10.44.44.45"),
-        WIREGUARD_SERVERURL: zod.string().default("auto"),
-        WIREGUARD_PEERS: zod.coerce.number().int().default(50),
-        WIREGUARD_PEERDNS: zod.string().ip().default("1.1.1.1"),
-        WIREGUARD_ALLOWEDIPS: zod.string().default("10.44.44.0/24"),
-        WIREGUARD_INTERNAL_SUBNET: zod.string().ip().default("10.10.1.0")
-    },
-    {
-        WIREGUARD_PORT: "51820",
-        WIREGUARD_IP: "10.44.44.45",
-        WIREGUARD_SERVERURL: "auto",
-        WIREGUARD_PEERS: 50,
-        WIREGUARD_PEERDNS: "1.1.1.1",
-        WIREGUARD_ALLOWEDIPS: "10.44.44.0/24",
-        WIREGUARD_INTERNAL_SUBNET: "10.10.1.0"
     }
 )
 

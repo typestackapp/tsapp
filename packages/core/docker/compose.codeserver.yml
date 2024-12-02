@@ -4,7 +4,7 @@ services:
     image: lscr.io/linuxserver/code-server:latest
     restart: unless-stopped
     networks:
-      default_network:
+      tsapp_net:
         ipv4_address: ${CODESERVER_IP}
     environment:
       - PUID=1000

@@ -1,6 +1,6 @@
 version: '3.3'
 networks:
-  default_network:
+  tsapp_net:
     driver: bridge
     ipam:
       driver: default
