@@ -24,15 +24,14 @@ export function getAllAccessInputs(): AccessDocument[] {
     for(const [pack_key, pack] of Object.entries(config as Config)) {
         const active_access = pack?.access?.ACTIVE
         if(!active_access) continue
-        for (const [resource_key, resource] of Object.entries(active_access)) {
-            let doc_input: IAccessInput = {
-                status: "Enabled",
-                pack: pack_key as Packages,
-                resource: resource_key,
-                permissions: ["Read", "Write", "Update", "Delete"]
-            }
-            _access.push(new AccessModel(doc_input))
+        let doc_input: IAccessInput = {
+            status: "Enabled",
+            pack: pack_key as Packages,
+            resource: undefined, // allow access to all resources
+            action: undefined, // allow access to all actions
+            permissions: ["Read", "Write", "Update", "Delete"]
         }
+        _access.push(new AccessModel(doc_input))
     }
     return _access
 }

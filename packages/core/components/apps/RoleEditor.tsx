@@ -7,10 +7,19 @@ import { AccessValidator } from '@typestackapp/core/models/user/access/util'
 
 type AccessStructure = {
   [role: string]: {
-    [pack: string]: {
-      [resource: string]: client.GetRoleManagerDataQuery["getAllAccessConfigs"]
-    }
+    [pack: string]: client.GetRoleManagerDataQuery["getAllAccessConfigs"]
   }
+}
+
+function AccordionMenu({ title, children, className }: { title: string, children: React.ReactNode, className?: string }) {
+    const [open, setOpen] = React.useState<boolean>(true)
+    return <div>
+        <div className={className} onClick={() => setOpen(!open)}>
+            <span className="ml-auto">{open ? "▼" : "►"}</span>
+            <span>{title}</span>
+        </div>
+        {open && children}
+    </div>
 }
 
 export default function RoleEditor() {
@@ -18,8 +27,6 @@ export default function RoleEditor() {
     const query = useQuery(getRoleManagerData)
     const [data, setData] = React.useState<client.GetRoleManagerDataQuery | undefined>(query.data)
     const [selectedRole, setSelectedRole] = React.useState<string>()
-    const [selectedPack, setSelectedPack] = React.useState<string>()
-    const [selectedResource, setSelectedResource] = React.useState<string>()
     const access: AccessStructure = {}
 
     React.useEffect(() => {
@@ -36,22 +43,21 @@ export default function RoleEditor() {
     data?.getAllRoles?.map(role => {
         data?.getAllAccessConfigs.map(config => {
             if (!access[role._id]) access[role._id] = {}
-            if (!access[role._id][config.pack]) access[role._id][config.pack] = {}
-            if (!access[role._id][config.pack][config.resource]) access[role._id][config.pack][config.resource] = []
-            access[role._id][config.pack][config.resource].push(config)
+            if (!access[role._id][config.pack]) access[role._id][config.pack] = access[role._id][config.pack] = []
+            access[role._id][config.pack].push(config)
         })
     })
 
     function AccessEditor() {
-        if (!selectedPack || !selectedRole || !selectedResource) return <div></div>
-        const selected_access = access[selectedRole][selectedPack][selectedResource]
-        const role = getRole(selectedRole)
-        if(!selected_access || !role) return <div></div>
-        const role_access = role.data.resource_access
-        const valid = new AccessValidator(role_access)
+        if (!selectedRole) return <div></div>
+        // const selected_access = access[selectedRole][selectedPack][selectedResource]
+        // const role = getRole(selectedRole)
+        // if(!selected_access || !role) return <div></div>
+        // const role_access = role.data.resource_access
+        // const valid = new AccessValidator(role_access)
 
         return <div>
-            {selected_access.map((config, index) => (
+            {/* {selected_access.map((config, index) => (
                 <div key={index} className="mb-2 p-2 bg-secondary rounded-md">
                     <strong>Action:</strong> {config.resource}.{config.action}<br />
                     <strong>Accessable:</strong> {valid.checkResourceAccess([{
@@ -68,19 +74,16 @@ export default function RoleEditor() {
                         {config.info?.map((info, i) => <li key={i}>{info}</li>)}
                     </ul>
                 </div>
-            ))}
+            ))} */}
         </div>
     }
-
+    
     function RoleEditor() {
         const role = getRole(selectedRole)
         if(!role || !selectedRole) return <div></div>
         const role_access = role.data.resource_access
-        const resource_access = role_access.find(
-            access => access.pack === selectedPack
-            && access.resource === selectedResource
-            && access.action === null
-        )
+        const all_role_access = access[selectedRole]
+
 
         const permisions: client.PermissionType[] = [
             client.PermissionType.Read, 
@@ -89,51 +92,50 @@ export default function RoleEditor() {
             client.PermissionType.Update
         ]
 
+        // create multi level list
         return <div className='h-full mt-4 flex flex-row gap-4'>
-            {/* packages */}
-            <div className='p-2 border-l border-gray-300'>
-                <div className='h-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden'>
-                    <div className='font-bold text-lg min-w-24'>Packages</div>
-                    {Object.entries(access[selectedRole]).map(([pack, resources]) => <div key={pack}>
-                        <button title={pack} onClick={() => setSelectedPack(pack)} className={`${selectedPack === pack ? 'bg-primary text-white' : 'bg-gray-200'} p-2 rounded`}>
-                            {getAlias(pack)}
-                        </button>
-                    </div>)}
-                </div>
-            </div>
+            {Object.entries(all_role_access).map(([pack, resources], index) => {
+                const alias = getAlias(pack) || ""
+                const resources_dropdown: { [key: string]: client.GetRoleManagerDataQuery["getAllAccessConfigs"] } = {}
+                for (const resource of resources) {
+                    if(resource.resource == undefined) continue
+                    if (!resources_dropdown[resource.resource]) resources_dropdown[resource.resource] = []
+                    resources_dropdown[resource.resource].push(resource)
+                }
 
-            {/* resources */}
-            <div className='p-2 border-l border-gray-300'>
-                <div className='h-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden'>
-                    <div className='font-bold text-lg min-w-24'>Resources</div>
-                    {Object.entries(access[selectedRole][selectedPack || ""] || {}).map(([resource, configs]) => <div key={resource}>
-                        <button title={resource} onClick={() => setSelectedResource(resource)} className={`${selectedResource === resource ? 'bg-primary text-white' : 'bg-gray-200'} p-2 rounded`}>
-                            {resource}
-                        </button>
-                    </div>)}
+                return <div key={index} className="w-full ">
+                    <AccordionMenu title={alias} className="border-b border-gray-300 cursor-pointer hover:bg-gray-100 text-lg">
+                        <table className=" table-auto w-full border border-gray-300">
+                            {Object.entries(resources_dropdown).map(([resource, actions], index) => {
+                                return <>
+                                    <thead>
+                                        <tr className="bg-gray-200 border-b border-gray-300">
+                                            <th className="px-4 py-1 border-r border-gray-300">Scope</th>
+                                            <th className="px-4 py-1 border-r border-gray-300">Permission</th>
+                                            <th className="px-4 py-1">Tokens</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {actions.map((action, index) => (
+                                            <tr key={index} className="border-b border-gray-300">
+                                                <td className="px-4 border-r border-gray-300">
+                                                    {alias}.{action.resource}.{action.action}
+                                                </td>
+                                                <td className="px-4 border-r border-gray-300">
+                                                    {action.auth?.permission || "-"}
+                                                </td>
+                                                <td className="px-4">
+                                                    {action.auth?.tokens?.join(", ") || "-"}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </>
+                            })}
+                        </table>
+                    </AccordionMenu>
                 </div>
-            </div>
-
-            {/* access */}
-            <div className='p-2 w-full border-l border-gray-300'>
-                <div className='h-full flex flex-col gap-2 overflow-y-auto overflow-x-hidden'>
-                    <div className='font-bold text-lg min-w-24'>Access</div>
-                    
-                    {resource_access && <div className='flex flex-row gap-2'>
-                        <div>Apply to all:</div>
-                        {permisions.map(permission => <div key={permission}>
-                            <label className='flex items-center gap-1'>
-                                <input
-                                    type='checkbox' 
-                                    defaultChecked={resource_access.permissions.includes(permission)}
-                                />
-                                {permission}
-                            </label>
-                        </div>)}
-                    </div>}   
-                    <AccessEditor />
-                </div>
-            </div>
+            })}
         </div>
     }
 

@@ -27,7 +27,7 @@ export type AccessDocument = AccessInput & MongoTimeStampsMeybe & {
   created_by?: Maybe<Scalars['ObjectId']['output']>;
   pack: Scalars['Packages']['output'];
   permissions: Array<PermissionType>;
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   status: AccessStatus;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   updated_by?: Maybe<Scalars['ObjectId']['output']>;
@@ -38,14 +38,14 @@ export type AccessInput = {
   created_by?: Maybe<Scalars['ObjectId']['output']>;
   pack: Scalars['Packages']['output'];
   permissions: Array<PermissionType>;
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   status: AccessStatus;
   updated_by?: Maybe<Scalars['ObjectId']['output']>;
 };
 
 export type AccessOptions = Enabled & {
   __typename?: 'AccessOptions';
-  action: Scalars['String']['output'];
+  action?: Maybe<Scalars['String']['output']>;
   admin?: Maybe<AdminOptions>;
   auth?: Maybe<AuthOptions>;
   captcha?: Maybe<CaptchaOptions>;
@@ -55,7 +55,7 @@ export type AccessOptions = Enabled & {
   log: LogOptions;
   model?: Maybe<ModelOptions>;
   pack: Scalars['Packages']['output'];
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   resourceAction: Scalars['String']['output'];
 };
 
@@ -218,9 +218,9 @@ export type CountryUpdate = {
 
 export type DefaultAccessOptions = {
   __typename?: 'DefaultAccessOptions';
-  action: Scalars['String']['output'];
+  action?: Maybe<Scalars['String']['output']>;
   pack: Scalars['Packages']['output'];
-  resource: Scalars['String']['output'];
+  resource?: Maybe<Scalars['String']['output']>;
   resourceAction: Scalars['String']['output'];
 };
 
@@ -744,12 +744,12 @@ export type UserOutput = MongoId & MongoTimeStamps & {
 export type GetRoleManagerDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetRoleManagerDataQuery = { __typename?: 'Query', getAllPackageConfigs: Array<{ __typename?: 'PackageOptions', pack: any, alias: string, version: string }>, getAllAccessConfigs: Array<{ __typename?: 'AccessOptions', enabled: boolean, resource: string, pack: any, action: string, resourceAction: string, info?: Array<string | null> | null, limit?: { __typename?: 'LimitOptions', enabled: boolean } | null, log: { __typename?: 'LogOptions', enabled: boolean }, auth?: { __typename?: 'AuthOptions', enabled: boolean, tokens: Array<TokenType>, permission?: PermissionType | null } | null, captcha?: { __typename?: 'CaptchaOptions', enabled: boolean } | null, model?: { __typename?: 'ModelOptions', mongoose?: string | null } | null, admin?: { __typename?: 'AdminOptions', app?: string | null, iframe?: string | null, title: string } | null }>, getAllRoles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, created_by: any, updated_by: any, pack: any, type: string, createdAt: any, updatedAt: any, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource: string, action?: string | null, permissions: Array<PermissionType>, created_by?: any | null, updated_by?: any | null, createdAt?: any | null, updatedAt?: any | null }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null };
+export type GetRoleManagerDataQuery = { __typename?: 'Query', getAllPackageConfigs: Array<{ __typename?: 'PackageOptions', pack: any, alias: string, version: string }>, getAllAccessConfigs: Array<{ __typename?: 'AccessOptions', enabled: boolean, resource?: string | null, pack: any, action?: string | null, resourceAction: string, info?: Array<string | null> | null, limit?: { __typename?: 'LimitOptions', enabled: boolean } | null, log: { __typename?: 'LogOptions', enabled: boolean }, auth?: { __typename?: 'AuthOptions', enabled: boolean, tokens: Array<TokenType>, permission?: PermissionType | null } | null, captcha?: { __typename?: 'CaptchaOptions', enabled: boolean } | null, model?: { __typename?: 'ModelOptions', mongoose?: string | null } | null, admin?: { __typename?: 'AdminOptions', app?: string | null, iframe?: string | null, title: string } | null }>, getAllRoles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, created_by: any, updated_by: any, pack: any, type: string, createdAt: any, updatedAt: any, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource?: string | null, action?: string | null, permissions: Array<PermissionType>, created_by?: any | null, updated_by?: any | null, createdAt?: any | null, updatedAt?: any | null }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null };
 
 export type GetAdminDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAdminDataQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserOutput', _id: any, usn: string, roles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, pack: any, type: string, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource: string, action?: string | null, permissions: Array<PermissionType> }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null } | null };
+export type GetAdminDataQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'UserOutput', _id: any, usn: string, roles?: Array<{ __typename?: 'RoleConfigDocument', _id?: any | null, title: string, pack: any, type: string, data: { __typename?: 'RoleConfigDataDocument', name: string, resource_access: Array<{ __typename?: 'AccessDocument', status: AccessStatus, pack: any, resource?: string | null, action?: string | null, permissions: Array<PermissionType> }>, graphql_access: Array<{ __typename?: 'GraphqlAccess', pack: any, services: Array<string> }> } }> | null } | null };
 
 
 export const GetRoleManagerDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getRoleManagerData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAllPackageConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"alias"}},{"kind":"Field","name":{"kind":"Name","value":"version"}}]}},{"kind":"Field","name":{"kind":"Name","value":"getAllAccessConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"resourceAction"}},{"kind":"Field","name":{"kind":"Name","value":"info"}},{"kind":"Field","name":{"kind":"Name","value":"limit"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"log"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"auth"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}},{"kind":"Field","name":{"kind":"Name","value":"tokens"}},{"kind":"Field","name":{"kind":"Name","value":"permission"}}]}},{"kind":"Field","name":{"kind":"Name","value":"captcha"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}},{"kind":"Field","name":{"kind":"Name","value":"model"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mongoose"}}]}},{"kind":"Field","name":{"kind":"Name","value":"admin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"app"}},{"kind":"Field","name":{"kind":"Name","value":"iframe"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"getAllRoles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"resource_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"resource"}},{"kind":"Field","name":{"kind":"Name","value":"action"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}},{"kind":"Field","name":{"kind":"Name","value":"created_by"}},{"kind":"Field","name":{"kind":"Name","value":"updated_by"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"graphql_access"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pack"}},{"kind":"Field","name":{"kind":"Name","value":"services"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetRoleManagerDataQuery, GetRoleManagerDataQueryVariables>;
