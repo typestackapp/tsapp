@@ -59,26 +59,33 @@ export default function RoleEditor() {
         return <table className="w-full h-full table-auto border-r border-l">
             <thead className="mt-4 bg-gray-200 sticky top-0">
                 <tr>
-                    <th className="px-4 py-1 border-r border-gray-300">Scope</th>
-                    <th className="px-4 py-1 border-r border-gray-300">Required</th>
-                    <th className="px-4 py-1">Tokens</th>
+                    <th className="py-2 border-r border-gray-300">Granted</th>
+                    <th className="py-2 border-r border-gray-300">Package</th>
+                    <th className="py-2 border-r border-gray-300">Resource</th>
+                    <th className="py-2 border-r border-gray-300">Action</th>
+                    <th className="py-2 border-r border-gray-300">Permission</th>
                 </tr>
             </thead>
             <tbody>
-                {all_role_access[selectedRole].map((action, index) => {
-                    return <tr key={index} className="border-b border-gray-300">
-                        <td className="px-4 border-r border-gray-300 text-nowrap table-auto">
-                            <input type="checkbox" checked={granted_role_access.includes(action._id)} className="mr-2" />
-                            {getAlias(action.pack)}.{action.resource}.{action.action}
+                {all_role_access[selectedRole].map((action, index) => 
+                    <tr key={index} className="border-b border-gray-300">
+                        <td className="p-1 border-r border-gray-300 text-nowrap text-center">
+                            {new AccessValidator(granted_role_access).checkAccess(action) ? "✅" : "❌"}
                         </td>
-                        <td className="px-4 border-r border-gray-300">
+                        <td className="p-1 border-r border-gray-300 text-nowrap">
+                            {getAlias(action.pack)}
+                        </td>
+                        <td className="p-1 border-r border-gray-300 text-nowrap">
+                            {action.resource}
+                        </td>
+                        <td className="p-1 border-r border-gray-300 text-nowrap">
+                            {action.action}
+                        </td>
+                        <td className="p-1 border-r border-gray-300">
                             {action.auth?.permission || "-"}
                         </td>
-                        <td className="px-4 text-nowrap overflow-hidden overflow-ellipsis">
-                            {action.auth?.tokens?.join(", ") || "-"}
-                        </td>
                     </tr>
-                })}
+                )}
             </tbody>
         </table>
     }
