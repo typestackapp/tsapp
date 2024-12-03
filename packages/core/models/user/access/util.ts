@@ -51,14 +51,14 @@ export interface AccessCheckOptions extends Pick<IAccessOptions, "pack" | "resou
 }
 
 export class AccessValidator {
-    private access_provided: AccessOutput[] | IAccessInput[] = []
+    private access_provided: (AccessOutput | IAccessInput)[] = []
 
-    constructor(access_provided: AccessOutput[][] | IAccessInput[][] | AccessOutput[] | IAccessInput[]) {
+    constructor(access_provided: (AccessOutput | IAccessInput)[][] | (AccessOutput | IAccessInput)[]) {
         for(const access of access_provided) {
             if(Array.isArray(access)) {
-                this.access_provided.push(...access as any)
+                this.access_provided.push(...access)
             }else {
-                this.access_provided.push(access as any)
+                this.access_provided.push(access)
             }
         }
     }
@@ -76,7 +76,7 @@ export class AccessValidator {
         }
     }
     
-    checkResourceAccess(access_required: AccessOutput[] | IAccessInput[]) {
+    checkResourceAccess(access_required: (AccessOutput | IAccessInput)[]) {
         const has_access: AccessCheckOptions[] = []
         const no_access: AccessCheckOptions[] = []
         for(const required of access_required) {
@@ -146,5 +146,16 @@ export class AccessValidator {
         }
     
         return false
+    }
+
+    findAccessProvided(options: AccessCheckOptions) {
+        const arr: (AccessOutput | IAccessInput)[] = []
+        for(const user_access of this.access_provided) {
+            const valid = new AccessValidator([user_access])
+            if(valid.checkAccess(options) && options.auth?.permission) {
+                arr.push(user_access)
+            }
+        }
+        return arr
     }
 }
