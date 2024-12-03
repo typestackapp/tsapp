@@ -191,7 +191,7 @@ export function JsonViewer(props: { data: any, space: number}) {
   )
 }
 
-export function getAccesableAdminApps(access: AccessDocument [][] | undefined, _apps?: AdminApp[]): AdminApp[] {
+export function getAccessibleAdminApps(access: AccessDocument [][] | undefined, _apps?: AdminApp[]): AdminApp[] {
   if(!access) return []
   if(!apps) _apps = apps
   return apps.filter((app) => {
@@ -224,7 +224,7 @@ export function Admin({ apps, children, access, open }: {
 
   // watch app change
   React.useEffect(() => {
-    const adminApps = getAdminAppState(getAccesableAdminApps(access, apps), app)
+    const adminApps = getAdminAppState(getAccessibleAdminApps(access, apps), app)
     const side_nav_active_app = adminApps.find(side_nav_app => 
       side_nav_app.pack === app?.pack && side_nav_app.resource === app.resource && side_nav_app.action === app.action
     )
