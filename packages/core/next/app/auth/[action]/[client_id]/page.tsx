@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import LoginComponent from '@typestackapp/core/components/user/access/login'
+import { Login } from '@typestackapp/core/components/util'
 import { context } from '@typestackapp/core/components/global'
 import { Main } from '@typestackapp/core/components/util'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -210,7 +210,7 @@ export default function Page() {
 
   if(session?.error || !session?.data) return (
     <context.Provider value={globalContext}>
-      <LoginComponent/>
+      <Login/>
     </context.Provider>
   )
 
